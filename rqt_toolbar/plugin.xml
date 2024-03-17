@@ -1,0 +1,18 @@
+<library path="src">
+  <class name="Toolbar" type="rqt_toolbar.ToolBar.ToolBar" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Provide interface to enable/disable axis
+    </description>
+    <qtgui>
+      
+      <group>
+        <label>&amp;SONIA</label>
+        <icon type="theme">folder</icon>
+      </group>
+      
+      <label>Z - &amp;Toolbar</label>
+      <icon type="theme">utilities-system-monitor</icon>
+      <statustip>Provide control toolbar</statustip>
+    </qtgui>
+  </class>
+</library>
