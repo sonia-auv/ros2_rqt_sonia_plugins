@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'rqt_dvl'
+package_name = 'rqt_thruster_control'
 
 setup(
     name=package_name,
