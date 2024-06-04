@@ -1,31 +1,34 @@
-#!/usr/bin/env python
 import os
 import rclpy
-import rospkg
-
+from threading import Thread
 from qt_gui.plugin import Plugin
 
-from .DvlWidget import DvlWidget
+from .DepthIndicatorWidget import DepthIndicatorWidget
 
-class ProviderDvl(Plugin):
+
+class DepthIndicator(Plugin):
 
     def __init__(self, context):
-        super(ProviderDvl, self).__init__(context)
-        self.setObjectName('ProviderDvl')
+        super(DepthIndicator, self).__init__(context)
+
+        # Give QObjects reasonable names
+        self.setObjectName('DepthIndicator')
+
+        # Process standalone plugin command-line arguments
         from argparse import ArgumentParser
         parser = ArgumentParser()
+        # Add argument(s) to the parser.
         parser.add_argument("-q", "--quiet", action="store_true",
                       dest="quiet",
                       help="Put plugin in silent mode")
         args, unknowns = parser.parse_known_args(context.argv())
+
         if not args.quiet:
             print('arguments: ', args)
             print('unknowns: ', unknowns)
 
-        self.__internal_node = rclpy.create_node('rqt_dvl_node')
-        # Create QWidget
-        self._mainWindow = DvlWidget(self.__internal_node)
-        # Get path to UI file which should be in the "resource" folder of this package
+        self.__internal_node= rclpy.create_node('rqt_depth_indicator')
+        self._mainWindow = DepthIndicatorWidget(self.__internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
         if context.serial_number() > 1:
@@ -36,6 +39,7 @@ class ProviderDvl(Plugin):
         context.add_widget(self._mainWindow)
 
     def shutdown_plugin(self):
+        # TODO unregister all publishers here
         self._mainWindow.shutdown_plugin()
         pass
 

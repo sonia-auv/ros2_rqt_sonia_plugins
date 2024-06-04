@@ -1,15 +1,13 @@
 import os
-import rclpy
-import rospkg
 import threading
 from ament_index_python.packages import get_package_share_directory
+from rclpy.publisher import Publisher
 from .ThrusterAction import ThrusterAction
 
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow
 
-
-from sonia_common_ros2.msg import MotorMessages
+from sonia_common_ros2.msg import MotorPwm
 from std_msgs.msg import Bool
 from std_srvs.srv import Empty
 
@@ -31,7 +29,7 @@ class ThrusterWidget(QMainWindow):
         self.resetPwmButton.setEnabled(False)
         self.enableButton.clicked[bool].connect(self._handle_enableButton_clicked)
         self.disableButton.clicked[bool].connect(self._handle_disableButton_clicked)
-        self.actionStart_test.triggered.connect(self._handle_start_test_triggered)
+        #self.actionStart_test.triggered.connect(self._handle_start_test_triggered)
         self.resetPwmButton.clicked[bool].connect(self._handle_resetPwmButton_clicked)
 
         self.thruster_1 = ThrusterAction(self, 0, 'T1')
@@ -43,7 +41,7 @@ class ThrusterWidget(QMainWindow):
         self.thruster_7 = ThrusterAction(self, 6, 'T7')
         self.thruster_8 = ThrusterAction(self, 7, 'T8')
 
-        self.thruster_publisher = internal_node.create_publisher(MotorMessages,"/provider_thruster/thruster_pwm", 10)
+        self.thruster_publisher: Publisher = internal_node.create_publisher(MotorPwm,"/provider_thruster/thruster_pwm", 10)
         #self.dry_test_publisher = rospy.Publisher("/telemetry/dry_run", Bool, queue_size=10, latch=True)
         #self.dry_test_service = rospy.ServiceProxy('/provider_thruster/dry_test', Empty)
 
@@ -57,7 +55,7 @@ class ThrusterWidget(QMainWindow):
         self.T7_T8.setEnabled(False)
         self.actionStart_test.setEnabled(False)
 
-        self.pwms = [1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500]
+        self.pwms=[1500,1500,1500,1500,1500,1500,1500,1500,1500]
 
     def _dry_run_callback(self, msg):
         if msg.data:
@@ -80,7 +78,8 @@ class ThrusterWidget(QMainWindow):
             self.actionStart_test.setEnabled(False)
     
     def _handle_resetPwmButton_clicked(self, checked):
-        self.pwms = [1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500]
+        
+        self.pwms=[1500,1500,1500,1500,1500,1500,1500,1500,1500]
         self.send_pwms()
         self.thruster_1.handle_thruster_effort1500_clicked(None)
         self.thruster_2.handle_thruster_effort1500_clicked(None)
@@ -100,7 +99,7 @@ class ThrusterWidget(QMainWindow):
         self.T7_T8.setEnabled(True)
         self.resetPwmButton.setEnabled(True)
         self.actionStart_test.setEnabled(True)
-        self.dry_test_publisher.publish(data = True)
+        #self.dry_test_publisher.publish(data = True)
 
     def _handle_disableButton_clicked(self, checked):
         self.enableButton.setEnabled(True)
@@ -111,13 +110,23 @@ class ThrusterWidget(QMainWindow):
         self.T7_T8.setEnabled(False)
         self.resetPwmButton.setEnabled(False)
         self.actionStart_test.setEnabled(False)
-        self.dry_test_publisher.publish(data = False)
+        #self.dry_test_publisher.publish(data = False)
 
     def set_pwm(self, index, value):
         self.pwms[index] = value
 
     def send_pwms(self):
-        self.thruster_publisher.publish(data = self.pwms)
+        msg=MotorPwm()
+        msg.motor1=self.pwms[0]
+        msg.motor2=self.pwms[1]
+        msg.motor3=self.pwms[2]
+        msg.motor4=self.pwms[3]
+        msg.motor5=self.pwms[4]
+        msg.motor6=self.pwms[5]
+        msg.motor7=self.pwms[6]
+        msg.motor8=self.pwms[7]     
+
+        self.thruster_publisher.publish(msg)
 
     #def _handle_start_test_triggered(self):
         #newThread = Threads(self.dry_test_service)
@@ -125,6 +134,7 @@ class ThrusterWidget(QMainWindow):
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
+        self.thruster_publisher.destroy()
         pass
 
     def save_settings(self, plugin_settings, instance_settings):

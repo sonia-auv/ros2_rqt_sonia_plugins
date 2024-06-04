@@ -1,17 +1,13 @@
 #!/usr/bin/env python
-import os
 import rclpy
-import rospkg
-
 from qt_gui.plugin import Plugin
+from .PowerWidget import PowerWidget
 
-from .DvlWidget import DvlWidget
-
-class ProviderDvl(Plugin):
+class ProviderPower(Plugin):
 
     def __init__(self, context):
-        super(ProviderDvl, self).__init__(context)
-        self.setObjectName('ProviderDvl')
+        super(ProviderPower, self).__init__(context)
+        self.setObjectName('ProviderPower')
         from argparse import ArgumentParser
         parser = ArgumentParser()
         parser.add_argument("-q", "--quiet", action="store_true",
@@ -21,10 +17,9 @@ class ProviderDvl(Plugin):
         if not args.quiet:
             print('arguments: ', args)
             print('unknowns: ', unknowns)
-
-        self.__internal_node = rclpy.create_node('rqt_dvl_node')
+        self.__internal_node = rclpy.create_node('rqt_power_node')
         # Create QWidget
-        self._mainWindow = DvlWidget(self.__internal_node)
+        self._mainWindow = PowerWidget(self.__internal_node)
         # Get path to UI file which should be in the "resource" folder of this package
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
@@ -34,6 +29,7 @@ class ProviderDvl(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
+
 
     def shutdown_plugin(self):
         self._mainWindow.shutdown_plugin()

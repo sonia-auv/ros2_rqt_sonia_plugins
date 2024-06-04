@@ -1,3 +1,5 @@
+from threading import Thread
+import rclpy
 from qt_gui.plugin import Plugin
 from .ThrusterWidget import ThrusterWidget
 
@@ -20,8 +22,9 @@ class ThrusterControl(Plugin):
         if not args.quiet:
             print('arguments: ', args)
             print('unknowns: ', unknowns)
-
-        self._mainWindow = ThrusterWidget()
+        self.__internal_node= rclpy.create_node('rqt_thruster_control_node')
+        # Create QWidget
+        self._mainWindow = ThrusterWidget(self.__internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
         if context.serial_number() > 1:
@@ -30,9 +33,12 @@ class ThrusterControl(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
+        # Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
+        
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
+        self._mainWindow.shutdown_plugin()
         pass
 
     def save_settings(self, plugin_settings, instance_settings):

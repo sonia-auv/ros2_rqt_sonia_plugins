@@ -1,0 +1,22 @@
+<library path="src">
+  <class name="Waypoint" type="rqt_waypoint.Waypoint.Waypoint" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Provide interface to control waypoint target
+    </description>
+    <qtgui>
+      
+      <group>
+        <label>&amp;SONIA</label>
+        <icon type="theme">folder</icon>
+      </group>
+      <group>
+        <label>&amp;Control</label>
+        <icon type="theme">folder</icon>
+      </group>
+      
+      <label>&amp;Waypoint</label>
+      <icon type="theme">utilities-system-monitor</icon>
+      <statustip>Provide interface to see and select waypoint</statustip>
+    </qtgui>
+  </class>
+</library>

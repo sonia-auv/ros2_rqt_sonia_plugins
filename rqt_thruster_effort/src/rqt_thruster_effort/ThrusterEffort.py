@@ -1,3 +1,5 @@
+from threading import Thread
+import rclpy
 from qt_gui.plugin import Plugin
 
 from .ThrusterEffortWidget import ThrusterEffortWidget
@@ -24,8 +26,10 @@ class ThrusterEffort(Plugin):
         if not args.quiet:
             print('arguments: ', args)
             print('unknowns: ', unknowns)
+            
+        self.__internal_node=rclpy.create_node('rqt_thruster_effort_node')
 
-        self._mainWindow = ThrusterEffortWidget()
+        self._mainWindow = ThrusterEffortWidget(self.__internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
         if context.serial_number() > 1:
@@ -34,6 +38,8 @@ class ThrusterEffort(Plugin):
         self._mainWindow.setPalette(context._handler._main_window.palette())
         self._mainWindow.setAutoFillBackground(True)
         context.add_widget(self._mainWindow)
+        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
+        
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here

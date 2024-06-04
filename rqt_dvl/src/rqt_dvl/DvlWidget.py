@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtGui import QPalette
 
-from sonia_common_ros2.msg import BottomTracking
+#from sonia_common_ros2.msg import BottomTracking
 from geometry_msgs.msg import TwistStamped
 
 
@@ -26,8 +26,8 @@ class DvlWidget(QMainWindow, QWidget):
 
         self.setObjectName('DvlControlWidget')
 
-        self._dvl_subscriber_status = internal_node.create_subscription('/provider_dvl/dvl_data', BottomTracking, self._dvl_subscriber_status_cb)
-        self._dvl_subscriber_twist = internal_node.create_subscription('/provider_dvl/dvl_twist', TwistStamped, self._dvl_subscriber_twist_cb)
+        #self._dvl_subscriber_status = internal_node.create_subscription('/provider_dvl/dvl_data', BottomTracking, self._dvl_subscriber_status_cb)
+        self._dvl_subscriber_twist = internal_node.create_subscription(TwistStamped, '/provider_dvl/dvl_twist', self._dvl_subscriber_twist_cb,10)
         self.dvl_received_status.connect(self._handle_dvl_status)
         self.dvl_received_twist.connect(self._handle_dvl_twist)
 
@@ -201,7 +201,7 @@ class DvlWidget(QMainWindow, QWidget):
         pass
 
     def shutdown_plugin(self):
-        self._dvl_subscriber_status.unregister()
+        #self._dvl_subscriber_status.unregister()
         self._dvl_subscriber_twist.unregister()
 
     def save_settings(self, plugin_settings, instance_settings):
