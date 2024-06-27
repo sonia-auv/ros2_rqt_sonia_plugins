@@ -6,6 +6,8 @@ import rospy
 import rospkg
 import math
 
+from rclpy.subscription import Subscription
+from rclpy.publisher import Publisher
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
@@ -51,21 +53,21 @@ class WaypointWidget(QMainWindow):
         self.prev_run = ""
 
         # Subscribers
-        self.position_target_subscriber = rospy.Subscriber('/proc_control/current_target', Pose, self._position_target_callback)
+        self.position_target_subscriber: Subscription = ros_node.create_subscription('/proc_control/current_target', Pose, self._position_target_callback)
         #self.controller_info_subscriber = rospy.Subscriber("/proc_control/controller_info", MpcInfo, self.set_mpc_info)
         #self.timeout_subscriber = rospy.Subscriber("/sonia_behaviors/timeout", MissionTimer, self.timeout_info)
         # self.auv_position_subscriber = rospy.Subscriber("/proc_nav/auv_states", Odometry, self.auv_pose_callback)
         # self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
         # Publishers
-        self.simulation_start_publisher = rospy.Publisher("/proc_simulation/start_simulation", Pose, queue_size=10, latch=True)
-        self.single_add_pose_publisher = rospy.Publisher("/proc_control/add_pose", AddPose, queue_size=10)
-        self.multi_add_pose_publisher = rospy.Publisher("/proc_planner/send_multi_addpose", MultiAddPose, queue_size=10)
-        self.reset_trajectory_publisher = rospy.Publisher("/proc_control/reset_trajectory", Bool, queue_size=10)
-        self.auv7_tare_publisher = rospy.Publisher("/provider_dvl/setDepthOffset", Bool, queue_size=10)
-        self.set_dvl_started_publisher = rospy.Publisher("/provider_dvl/enable_disable_ping", Bool, queue_size=10, latch=True)
-        self.set_sonar_started_publisher = rospy.Publisher("/provider_sonar/enable_disable_ping", Bool, queue_size=10, latch=True)
-        self.set_initial_position_publisher = rospy.Publisher("/proc_nav/reset_pos", Bool, queue_size=10)
+        self.simulation_start_publisher: Publisher= rospy.Publisher("/proc_simulation/start_simulation", Pose, queue_size=10, latch=True)
+        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(AddPose,"/proc_control/add_pose", queue_size=10)
+        self.multi_add_pose_publisher: Publisher = rospy.Publisher("/proc_planner/send_multi_addpose", MultiAddPose, queue_size=10)
+        self.reset_trajectory_publisher: Publisher = rospy.Publisher("/proc_control/reset_trajectory", Bool, queue_size=10)
+        self.auv7_tare_publisher: Publisher = rospy.Publisher("/provider_dvl/setDepthOffset", Bool, queue_size=10)
+        self.set_dvl_started_publisher: Publisher = rospy.Publisher("/provider_dvl/enable_disable_ping", Bool, queue_size=10, latch=True)
+        self.set_sonar_started_publisher: Publisher = rospy.Publisher("/provider_sonar/enable_disable_ping", Bool, queue_size=10, latch=True)
+        self.set_initial_position_publisher: Publisher = rospy.Publisher("/proc_nav/reset_pos", Bool, queue_size=10)
 
         # Services
         self.initial_position_service = rospy.ServiceProxy("/proc_simulation/auv_pose", ObjectPoseService)

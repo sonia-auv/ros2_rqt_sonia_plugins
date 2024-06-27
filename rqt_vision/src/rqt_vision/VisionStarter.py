@@ -1,18 +1,18 @@
-import os
 import rclpy
-from threading import Thread
 from qt_gui.plugin import Plugin
+from .VisionMainWidget import VisionMainWidget
+from .ConfigWidget import ConfigWidget
 
-from .DepthIndicatorWidget import DepthIndicatorWidget
 
-
-class DepthIndicator(Plugin):
+class VisionStarter(Plugin):
 
     def __init__(self, context):
-        super(DepthIndicator, self).__init__(context)
+        super(VisionStarter, self).__init__(context)
+
 
         # Give QObjects reasonable names
-        self.setObjectName('DepthIndicator')
+        self.setObjectName('VisionStarter')
+        self.configWidget = None
 
         # Process standalone plugin command-line arguments
         from argparse import ArgumentParser
@@ -26,22 +26,22 @@ class DepthIndicator(Plugin):
         if not args.quiet:
             print('arguments: ', args)
             print('unknowns: ', unknowns)
-
-        self.__internal_node= rclpy.create_node('rqt_depth_indicator')
-        self._mainWindow = DepthIndicatorWidget(self.__internal_node)
+        self.__internal_node= rclpy.create_node('rqt_vision_node')
+        self._mainWindow = VisionMainWidget(self.__internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
+        self.context_serial = context.serial_number()
         if context.serial_number() > 1:
             self._mainWindow.setWindowTitle(self._mainWindow.windowTitle() + (' (%d)' % context.serial_number()))
         self._mainWindow.setPalette(context._handler._main_window.palette())
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
-        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
-        
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
+        if self.configWidget is not None:
+            self.configWidget.close()
         self._mainWindow.shutdown_plugin()
         pass
 
@@ -55,7 +55,9 @@ class DepthIndicator(Plugin):
         # v = instance_settings.value(k)
         pass
 
-    #def trigger_configuration(self):
-        # Comment in to signal that the plugin has a way to configure
-        # This will enable a setting button (gear icon) in each dock widget title bar
-        # Usually used to open a modal configuration dialog
+    def trigger_configuration(self):
+        self.configWidget = ConfigWidget(self._mainWindow,self.__internal_node)
+        if self.context_serial > 1:
+            self.configWidget.setWindowTitle(self.configWidget.windowTitle() + (' (%d)' % self.context_serial))
+        self.configWidget.show()
+

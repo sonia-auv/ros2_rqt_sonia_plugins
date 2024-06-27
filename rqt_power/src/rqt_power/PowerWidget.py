@@ -6,11 +6,13 @@ from rclpy.publisher import Publisher
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
+
 from std_msgs.msg import Float64MultiArray, Bool, UInt8MultiArray
+from sonia_common_ros2.msg import BatteryVoltage, MotorVoltages
 
 class PowerWidget(QMainWindow):
-    voltage_result_received = pyqtSignal(Float64MultiArray)
-    voltage12V_result_received = pyqtSignal(Float64MultiArray)
+    voltage_result_received = pyqtSignal(BatteryVoltage)
+    voltage12V_result_received = pyqtSignal(MotorVoltages)
     current_result_received = pyqtSignal(Float64MultiArray)
     temperature_result_received = pyqtSignal(Float64MultiArray)
     motor_feedback_received = pyqtSignal(UInt8MultiArray)
@@ -38,8 +40,8 @@ class PowerWidget(QMainWindow):
 
         self.setObjectName('MyPowerControlWidget')
 
-        self._voltage_subscriber :Subscription= ros_node.create_subscription(Float64MultiArray,"/provider_power/voltage", self._voltage_callback, 10)
-        self._voltage12V_subscriber:Subscription = ros_node.create_subscription(Float64MultiArray,"/provider_power/voltage12V", self._voltage12V_callback, 10)
+        self._voltage_subscriber :Subscription= ros_node.create_subscription(BatteryVoltage,"/provider_power/voltage", self._voltage_callback, 10)
+        self._voltage12V_subscriber:Subscription = ros_node.create_subscription(MotorVoltages,"/provider_power/voltage12V", self._voltage12V_callback, 10)
         self._current_subscriber: Subscription = ros_node.create_subscription(Float64MultiArray,"/provider_power/current", self._current_callback, 10)
         self._temperature_subscriber: Subscription =ros_node.create_subscription(Float64MultiArray,"/provider_power/temperature",  self._temperature_callback, 10)
         self.motor_feedback_subscriber: Subscription = ros_node.create_subscription( UInt8MultiArray,"/proc_fault/motor_feedback", self.motor_feedback_callback, 10)
@@ -74,7 +76,7 @@ class PowerWidget(QMainWindow):
     def motor_feedback_callback(self, data):
         self.motor_feedback_received.emit(data)
 
-    def show_12V(self, data):
+    def show_12V(self, msg):
         pass
 
     def show_Temperature(self, data):
@@ -104,17 +106,17 @@ class PowerWidget(QMainWindow):
         self.CurrentB2.display(format_data)
         self.CurrentB2_2.display(format_data)
 
-    def show_Voltage(self, data):
-
-        for i in range(len(data.data)-2):
-            format_data = '{:.2f}'.format(data.data[i])
+    def show_Voltage(self, msg):
+        data =[msg.battery1, msg.battery2]
+        for i in range(len(data)-2):
+            format_data = '{:.2f}'.format(data[i])
             eval('self.VoltageM' + str(i+1)).display(format_data)
             eval('self.VoltageM' + str(i+1) + '_2').display(format_data)
 
-        format_data = '{:.2f}'.format(data.data[len(data.data)-2])
+        format_data = '{:.2f}'.format(data[0])
         self.VoltageB1.display(format_data)
         self.VoltageB1_2.display(format_data)
-        format_data = '{:.2f}'.format(data.data[len(data.data)-1])
+        format_data = '{:.2f}'.format(data[1])
         self.VoltageB2.display(format_data)
         self.VoltageB2_2.display(format_data)
 

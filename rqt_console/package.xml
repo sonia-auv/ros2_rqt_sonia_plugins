@@ -1,16 +1,23 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>rqt_depth_indicator</name>
+  <name>rqt_console</name>
   <version>0.0.0</version>
-  <description>Depth indicator</description>
+  <description>My console plugin</description>
   <maintainer email="my.address@gmail.com">Sam</maintainer>
   <license>Apache License 2.0</license>
+
+  <url type="website">http://ros.org/wiki/rqt_console</url>
+  <url type="repository">https://github.com/ros-visualization/rqt_common_plugins</url>
+  <url type="bugtracker">https://github.com/ros-visualization/rqt_common_plugins/issues</url>
 
   <depend>rclpy</depend>
   <depend>rqt_gui</depend>
   <depend>rqt_gui_py</depend>
   <depend>std_msgs</depend>
+  <depend>rqt_logger_level</depend>
+  <depend>rqt_py_common</depend>
+  <depend>roslib</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
