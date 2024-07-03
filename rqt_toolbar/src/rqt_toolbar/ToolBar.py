@@ -7,6 +7,9 @@ import rospkg
 from qt_gui.plugin import Plugin
 from PyQt5.QtWidgets import QMainWindow, QToolBar
 
+import rclpy.exceptions
+import rclpy.executors
+
 from .ToolbarSetControlMode import SetModeControlWidget
 from .ToolbarBatteryWidget import BatteryWidget
 from .ToolbarCpuTempWidget import CpuTempWidget
@@ -46,8 +49,8 @@ class ToolBar(Plugin):
         # self._warnings = WarningsWidget()
         self._camera = CameraWidget()
         # context._handler._main_window.setPalette(self._palette.palette())
-        self._batteryWidget1 = BatteryWidget(8, self.__internal_node)
-        self._batteryWidget2 = BatteryWidget(9, self.__internal_node)
+        self._batteryWidget1 = BatteryWidget(1, self.__internal_node)
+        self._batteryWidget2 = BatteryWidget(2, self.__internal_node)
         self._killMissionWidget = KillMissionWidget(self.__internal_node)
         self._tempWidget1 = CpuTempWidget(os.getenv("AUV", "AUV"), self.__internal_node)
 
@@ -63,7 +66,7 @@ class ToolBar(Plugin):
         context.add_toolbar(self._toolbar)
 
         # Spin this thread
-        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
+        #Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
 
     def shutdown_plugin(self):
         pass

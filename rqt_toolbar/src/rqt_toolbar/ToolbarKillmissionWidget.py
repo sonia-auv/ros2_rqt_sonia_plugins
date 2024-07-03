@@ -7,8 +7,6 @@ from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QAction, QMenu, QWidget, QActionGroup
 from PyQt5.QtCore import pyqtSignal, Qt
 
-from std_msgs.msg import Bool
-
 class KillMissionWidget(QWidget):
     mission_received = pyqtSignal(MissionStatus)
     kill_received = pyqtSignal(KillStatus)
