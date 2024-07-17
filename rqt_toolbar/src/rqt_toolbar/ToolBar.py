@@ -66,7 +66,7 @@ class ToolBar(Plugin):
         context.add_toolbar(self._toolbar)
 
         # Spin this thread
-        #Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
+        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
 
     def shutdown_plugin(self):
         pass

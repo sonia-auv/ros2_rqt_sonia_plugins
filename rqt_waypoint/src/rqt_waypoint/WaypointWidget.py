@@ -14,19 +14,22 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from std_msgs.msg import Bool
-from geometry_msgs.msg import Pose
+#from geometry_msgs.msg import Pose
 #from sonia_common.msg import AddPose, MultiAddPose, MpcInfo, MissionTimer
+from sonia_common_ros2.msg import Pose, PoseArray, ObstacleInfo
+
 #from sonia_common.srv import ObjectPoseService, SetSimulationAUVService
 from std_srvs.srv import Empty
-#from tf.transformations import euler_from_quaternion
+import tf2_ros
+ #.transformations import euler_from_quaternion
 
 class WaypointWidget(QMainWindow):
 
     current_target_received = pyqtSignal('PyQt_PyObject')
-    createLabel = pyqtSignal(MissionTimer)
-    greenLabel = pyqtSignal(MissionTimer)
-    redLabel = pyqtSignal(MissionTimer)
-    failedLabel = pyqtSignal(MissionTimer)
+    #createLabel = pyqtSignal(MissionTimer)
+    #greenLabel = pyqtSignal(MissionTimer)
+    #redLabel = pyqtSignal(MissionTimer)
+    #failedLabel = pyqtSignal(MissionTimer)
     listMissionLabels = {}
 
     def __init__(self, ros_node):
@@ -53,27 +56,27 @@ class WaypointWidget(QMainWindow):
         self.prev_run = ""
 
         # Subscribers
-        self.position_target_subscriber: Subscription = ros_node.create_subscription('/proc_control/current_target', Pose, self._position_target_callback)
-        #self.controller_info_subscriber = rospy.Subscriber("/proc_control/controller_info", MpcInfo, self.set_mpc_info)
-        #self.timeout_subscriber = rospy.Subscriber("/sonia_behaviors/timeout", MissionTimer, self.timeout_info)
-        # self.auv_position_subscriber = rospy.Subscriber("/proc_nav/auv_states", Odometry, self.auv_pose_callback)
+        self.position_target_subscriber: Subscription = ros_node.create_subscription(Pose,'/proc_control/current_target', self._position_target_callback)
+        self.controller_info_subscriber: Subscription = ros_node.create_subscription(ObstacleInfo, "/proc_control/controller_info", self.set_mpc_info)
+        #self.timeout_subscriber: Subscription = ros_node.create_subscription(MissonTimer,"/sonia_behaviors/timeout", self.timeout_info)
+        #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
         # self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
         # Publishers
-        self.simulation_start_publisher: Publisher= rospy.Publisher("/proc_simulation/start_simulation", Pose, queue_size=10, latch=True)
-        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(AddPose,"/proc_control/add_pose", queue_size=10)
-        self.multi_add_pose_publisher: Publisher = rospy.Publisher("/proc_planner/send_multi_addpose", MultiAddPose, queue_size=10)
-        self.reset_trajectory_publisher: Publisher = rospy.Publisher("/proc_control/reset_trajectory", Bool, queue_size=10)
-        self.auv7_tare_publisher: Publisher = rospy.Publisher("/provider_dvl/setDepthOffset", Bool, queue_size=10)
-        self.set_dvl_started_publisher: Publisher = rospy.Publisher("/provider_dvl/enable_disable_ping", Bool, queue_size=10, latch=True)
-        self.set_sonar_started_publisher: Publisher = rospy.Publisher("/provider_sonar/enable_disable_ping", Bool, queue_size=10, latch=True)
-        self.set_initial_position_publisher: Publisher = rospy.Publisher("/proc_nav/reset_pos", Bool, queue_size=10)
+        self.simulation_start_publisher: Publisher= ros_node.create_publisher(Pose, "/proc_simulation/start_simulation", queue_size=10, latch=True)
+        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(Pose,"/proc_control/add_pose", queue_size=10)
+        self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_multi_addpose", queue_size=10)
+        self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", queue_size=10)
+        self.auv7_tare_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/setDepthOffset", queue_size=10)
+        self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_ping", queue_size=10, latch=True)
+        self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", queue_size=10, latch=True)
+        self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", queue_size=10)
 
         # Services
-        self.initial_position_service = rospy.ServiceProxy("/proc_simulation/auv_pose", ObjectPoseService)
-        self.set_auv_service = rospy.ServiceProxy("/proc_simulation/select_auv", SetSimulationAUVService)
-        self.depth_tare_service = rospy.ServiceProxy("/provider_depth/tare", Empty)
-        self.imu_tare_service = rospy.ServiceProxy("/provider_imu/tare", Empty)
+        #self.initial_position_service = rospy.ServiceProxy("/proc_simulation/auv_pose", ObjectPoseService)
+        #self.set_auv_service = rospy.ServiceProxy("/proc_simulation/select_auv", SetSimulationAUVService)
+        #self.depth_tare_service = rospy.ServiceProxy("/provider_depth/tare", Empty)
+        #self.imu_tare_service = rospy.ServiceProxy("/provider_imu/tare", Empty)
 
         self.current_target_received.connect(self._current_target_received)
         self.createLabel.connect(self.addButton)
@@ -112,7 +115,7 @@ class WaypointWidget(QMainWindow):
                 elif msg.status == 4:
                     self.missionFailed(msg)
     
-    @pyqtSlot(MissionTimer)
+    #@pyqtSlot(MissionTimer)
     def addButton(self, msg):
         label1 = QLabel()
         label1.setText(msg.mission)
@@ -148,7 +151,7 @@ class WaypointWidget(QMainWindow):
         except (RuntimeError, KeyError):
             pass
 
-    @pyqtSlot(MissionTimer)
+    #@pyqtSlot(MissionTimer)
     def missionComplete(self, msg):
         label = self.listMissionLabels[msg.uniqueID][1]
         label.setStyleSheet("background-color: green")
@@ -156,7 +159,7 @@ class WaypointWidget(QMainWindow):
         t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.uniqueID,))
         t.start()
     
-    @pyqtSlot(MissionTimer)
+    #@pyqtSlot(MissionTimer)
     def missionTimeout(self, msg):
         label = self.listMissionLabels[msg.uniqueID][1]
         label.setStyleSheet("background-color: red")
@@ -164,7 +167,7 @@ class WaypointWidget(QMainWindow):
         t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.uniqueID,))
         t.start()
     
-    @pyqtSlot(MissionTimer)
+    #@pyqtSlot(MissionTimer)
     def missionFailed(self, msg):
         label = self.listMissionLabels[msg.uniqueID][1]
         label.setStyleSheet("background-color: red")
@@ -271,9 +274,9 @@ class WaypointWidget(QMainWindow):
             self.xPositionCurrent.setText('%.2f' % data.position.x)
             self.yPositionCurrent.setText('%.2f' % data.position.y)
             self.zPositionCurrent.setText('%.2f' % data.position.z)
-            self.rollPositionCurrent.setText('%.2f' % math.degrees(euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[2]))
-            self.pitchPositionCurrent.setText('%.2f' % math.degrees(euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[1]))
-            self.yawPositionCurrent.setText('%.2f' % math.degrees(euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[0]))
+            self.rollPositionCurrent.setText('%.2f' % math.degrees(tf2_ros.transformations.euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[2]))
+            self.pitchPositionCurrent.setText('%.2f' % math.degrees(tf2_ros.transformations.euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[1]))
+            self.yawPositionCurrent.setText('%.2f' % math.degrees(tf2_ros.transformations.euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[0]))
         except ValueError:
             pass
 
@@ -332,7 +335,7 @@ class WaypointWidget(QMainWindow):
                         self.show_error("Speed incorrect.")
                     else:
                         # Send a single waypoint.
-                        pose = AddPose()
+                        pose = PoseArray()
                         pose.position.x = x_val
                         pose.position.y = y_val
                         pose.position.z = z_val
@@ -352,7 +355,7 @@ class WaypointWidget(QMainWindow):
                         self.show_error("Speed profile incorrect.")
                     else:
                         # Send a multi-waypoint.
-                        pose = AddPose()
+                        pose = Pose()
                         pose.position.x = x_val
                         pose.position.y = y_val
                         pose.position.z = z_val
@@ -364,7 +367,7 @@ class WaypointWidget(QMainWindow):
                         pose.fine = fine_val
                         pose.rotation = path_val
 
-                        multi_pose = MultiAddPose()
+                        multi_pose = PoseArray()
                         multi_pose.pose.append(pose)
                         multi_pose.interpolation_method = method_val
 

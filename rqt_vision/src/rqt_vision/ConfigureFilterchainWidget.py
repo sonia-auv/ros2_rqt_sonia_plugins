@@ -7,8 +7,7 @@ from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QCheckBox, QSlider,QSpinBox, QDoubleSpinBox, QLineEdit
-from sonia_common.srv import GetInformationList, GetFilterchainFilter, GetFilterchainFilterAllParam, SetFilterchainFilterParam, ManageFilterchainFilter, SetFilterchainFilterObserver, SaveFilterchain, SetFilterchainFilterOrder
-
+#from sonia_common.srv import GetInformationList, GetFilterchainFilter, GetFilterchainFilterAllParam, SetFilterchainFilterParam, ManageFilterchainFilter, SetFilterchainFilterObserver, SaveFilterchain, SetFilterchainFilterOrder
 
 class ConfigureFilterchainWidget(QWidget):
     def __init__(self, execution_name,filterchain):

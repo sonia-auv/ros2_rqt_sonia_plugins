@@ -19,10 +19,10 @@ class KillMissionWidget(QWidget):
         ui_file = os.path.join(get_package_share_directory('rqt_toolbar'), 'resource', 'KillMission.ui')
         loadUi(ui_file, self)
 
-        self._mission_switch = ros_node.create_subscription(MissionStatus, '/provider_mission/status', self._mission_switch_callback, 10)
+        self._mission_switch = ros_node.create_subscription(MissionStatus, '/provider_rs485/mission_status', self._mission_switch_callback, 10)
         self.mission_received.connect(self._handle_mission_result)
 
-        self.kill_switch = ros_node.create_subscription(KillStatus, '/provider_kill/status', self._kill_switch_callback, 10)
+        self.kill_switch = ros_node.create_subscription(KillStatus, '/provider_rs485/kill_status', self._kill_switch_callback, 10)
         self.kill_received.connect(self._handle_kill_result)
 
 
