@@ -2,7 +2,7 @@
 import os
 import rclpy
 import rospkg
-
+from threading import Thread
 from qt_gui.plugin import Plugin
 
 from .DvlWidget import DvlWidget
@@ -34,6 +34,7 @@ class ProviderDvl(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
+        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
 
     def shutdown_plugin(self):
         self._mainWindow.shutdown_plugin()

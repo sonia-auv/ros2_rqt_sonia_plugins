@@ -13,7 +13,7 @@ from std_msgs.msg import Int8MultiArray
 class ThrusterEffortWidget(QWidget):
 
     monitor_thruster_newton_msg = pyqtSignal('PyQt_PyObject')
-    monitor_thruster_pwm_msg = pyqtSignal('PyQt_PyObject')
+    monitor_thruster_pwm_msg = pyqtSignal(MotorPwm)
 
     def __init__(self, internal_node):
         super(ThrusterEffortWidget, self).__init__()
@@ -28,7 +28,7 @@ class ThrusterEffortWidget(QWidget):
         self.monitor_thruster_newton_msg.connect(self._received_thruster_newton_msg)
         self.monitor_thruster_pwm_msg.connect(self._received_thruster_pwm_msg)
 
-    def _handle_thruster_newton_msg(self, msg):
+    def _handle_thruster_newton_msg(self, msg:MotorPwm):
         # print(msg)
         # pwm_thrust=Int8MultiArray()
         # pwm_thrust.data=msg
@@ -42,7 +42,7 @@ class ThrusterEffortWidget(QWidget):
         for i in range(0, len(msg.data)):
             self._set_thruster_value(i + 1, msg.data[i])
     
-    def _received_thruster_pwm_msg(self, msg):   
+    def _received_thruster_pwm_msg(self, msg:MotorPwm):   
         self._set_pwm_value(1, msg.motor1)
         self._set_pwm_value(2, msg.motor2)
         self._set_pwm_value(3, msg.motor3)
