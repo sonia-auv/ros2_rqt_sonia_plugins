@@ -51,7 +51,7 @@ class PowerWidget(QMainWindow):
         self._motor_current_subscriber: Subscription = ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_currents", self._motor_current_callback, 10)
         self._battery_temperature_subscriber: Subscription =ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_temperatures",  self._battery_temperature_callback, 10)
         self._motor_temperature_subscriber: Subscription =ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_temperatures",  self._motor_temperature_callback, 10)
-        self._motor_feedback_subscriber: Subscription = ros_node.create_subscription(MotorFeedback,"/proc_fault/motor_feedback", self.motor_feedback_callback, 10)
+        self._motor_feedback_subscriber: Subscription = ros_node.create_subscription(MotorFeedback,"/provider_power/motor_feedback", self.motor_feedback_callback, 10)
 
         self.activate_all_motor: Publisher = ros_node.create_publisher(Bool, '/provider_power/activate_motors',100)
 
@@ -143,7 +143,6 @@ class PowerWidget(QMainWindow):
             eval('self.VoltageM' + str(i+1)).display(format_data)
             eval('self.VoltageM' + str(i+1) + '_2').display(format_data)
 
-    @pyqtSlot(MotorFeedback)
     def show_motor_feedback(self, msg):
         data =[msg.motor1, msg.motor2, msg.motor3, msg.motor4, msg.motor5, msg.motor6, msg.motor7, msg.motor8]
         dict_colors = {0:"grey", 1:"green", 2:"yellow", 3:"red", 4:"blue"}
