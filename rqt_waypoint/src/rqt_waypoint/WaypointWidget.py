@@ -2,12 +2,16 @@ import os
 import threading
 from time import sleep, time
 
-import rospy
-import rospkg
+#import rospy
+#import rospkg
 import math
-
+import rclpy
+import rclpy.exceptions
+import rclpy.logging
+import rclpy.service
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
+from rclpy.client import Client
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
@@ -19,17 +23,17 @@ from std_msgs.msg import Bool
 from sonia_common_ros2.msg import Pose, PoseArray, ObstacleInfo
 
 #from sonia_common.srv import ObjectPoseService, SetSimulationAUVService
-from std_srvs.srv import Empty
+from std_srvs.srv import Trigger, Empty
 import tf2_ros
  #.transformations import euler_from_quaternion
 
 class WaypointWidget(QMainWindow):
 
     current_target_received = pyqtSignal('PyQt_PyObject')
-    #createLabel = pyqtSignal(MissionTimer)
-    #greenLabel = pyqtSignal(MissionTimer)
-    #redLabel = pyqtSignal(MissionTimer)
-    #failedLabel = pyqtSignal(MissionTimer)
+    createLabel = pyqtSignal('PyQt_PyObject')
+    greenLabel = pyqtSignal('PyQt_PyObject')
+    redLabel = pyqtSignal('PyQt_PyObject')
+    failedLabel = pyqtSignal('PyQt_PyObject')
     listMissionLabels = {}
 
     def __init__(self, ros_node):
@@ -56,27 +60,27 @@ class WaypointWidget(QMainWindow):
         self.prev_run = ""
 
         # Subscribers
-        self.position_target_subscriber: Subscription = ros_node.create_subscription(Pose,'/proc_control/current_target', self._position_target_callback)
-        self.controller_info_subscriber: Subscription = ros_node.create_subscription(ObstacleInfo, "/proc_control/controller_info", self.set_mpc_info)
+        self.position_target_subscriber: Subscription = ros_node.create_subscription(Pose,'/proc_control/current_target', self._position_target_callback,10)
+        self.controller_info_subscriber: Subscription = ros_node.create_subscription(ObstacleInfo, "/proc_control/controller_info", self.set_mpc_info,10)
         #self.timeout_subscriber: Subscription = ros_node.create_subscription(MissonTimer,"/sonia_behaviors/timeout", self.timeout_info)
         #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
         # self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
         # Publishers
-        self.simulation_start_publisher: Publisher= ros_node.create_publisher(Pose, "/proc_simulation/start_simulation", queue_size=10, latch=True)
-        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(Pose,"/proc_control/add_pose", queue_size=10)
-        self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_multi_addpose", queue_size=10)
-        self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", queue_size=10)
-        self.auv7_tare_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/setDepthOffset", queue_size=10)
-        self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_ping", queue_size=10, latch=True)
-        self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", queue_size=10, latch=True)
-        self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", queue_size=10)
+        self.simulation_start_publisher: Publisher= ros_node.create_publisher(Pose, "/proc_simulation/start_simulation",10)
+        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(Pose,"/proc_control/add_pose", 10)
+        self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_multi_addpose",10)
+        self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
+        self.auv7_tare_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/setDepthOffset", 10)
+        self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
+        self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", 10)
+        self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
 
         # Services
         #self.initial_position_service = rospy.ServiceProxy("/proc_simulation/auv_pose", ObjectPoseService)
         #self.set_auv_service = rospy.ServiceProxy("/proc_simulation/select_auv", SetSimulationAUVService)
-        #self.depth_tare_service = rospy.ServiceProxy("/provider_depth/tare", Empty)
-        #self.imu_tare_service = rospy.ServiceProxy("/provider_imu/tare", Empty)
+        self.depth_tare_service: Client= ros_node.create_client(Empty, "/provider_depth/tare")
+        self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
 
         self.current_target_received.connect(self._current_target_received)
         self.createLabel.connect(self.addButton)
@@ -182,31 +186,36 @@ class WaypointWidget(QMainWindow):
             self.auv7_tare_publisher.publish(data=True)
         elif auv_name == "AUV8":
             try:
-                self.depth_tare_service.call()
-            except rospy.ServiceException as e:
+                req = Empty.Request()
+                self.depth_tare_service.call(req)
+            except Exception as e:
                 print(e)
-                rospy.logerr('Provider depth is not started.')
+                rclpy.logging.get_logger().info('Provider depth is not started.')
+                #rospy.logerr('Provider depth is not started.')
         else:
-            rospy.logerr('AUV environment variable not properly set.')
+            rclpy.logging.get_logger().info('AUV environment variable not properly set.')
+            #rospy.logerr('AUV environment variable not properly set.')
 
     def _tare_imu(self):
         try:
-            self.imu_tare_service.call()
-        except rospy.ServiceException as e:
+            req= Trigger.Request()
+            self.imu_tare_service.call(req)
+        except Exception as e:
             print(e)
-            rospy.logerr('Provider IMU is not started.')
+            rclpy.logging.get_logger().info('Provider IMU is not started.')
+            #rospy.logerr('Provider IMU is not started.')
 
     def startDVL(self):
-        self.set_dvl_started_publisher.publish(data=True)
+        self.set_dvl_started_publisher.publish(True)
 
     def stopDVL(self):
-        self.set_dvl_started_publisher.publish(data=False)
+        self.set_dvl_started_publisher.publish(False)
 
     def startSonar(self):
-        self.set_sonar_started_publisher.publish(data=True)
+        self.set_sonar_started_publisher.publish(True)
 
     def stopSonar(self):
-        self.set_sonar_started_publisher.publish(data=False)
+        self.set_sonar_started_publisher.publish(False)
 
     def _reset_position(self):
 
@@ -240,7 +249,7 @@ class WaypointWidget(QMainWindow):
     #     self.z_pose
 
     def _clear_waypoint(self):
-        self.reset_trajectory_publisher.publish(data=True)
+        self.reset_trajectory_publisher.publish(True)
 
     def send_initial_position(self):
         try:
@@ -259,11 +268,13 @@ class WaypointWidget(QMainWindow):
 
                 self.simulation_start_publisher.publish(pose)
             else:
-                rospy.logerr('AUV environment variable not properly set.')
+                rclpy.logging.get_logger().info('AUV environment variable not properly set.')
+                #rospy.logerr('AUV environment variable not properly set.')
 
-        except rospy.ServiceException as e:
+        except Exception as e:
             print(e)
-            rospy.logerr('Simulation is not started')
+            rclpy.logging.get_logger().info('Simulation is not started')
+            #rospy.logerr('Simulation is not started')
             self.show_error('Simulation is not started')
 
     def _position_target_callback(self,data):
@@ -335,7 +346,7 @@ class WaypointWidget(QMainWindow):
                         self.show_error("Speed incorrect.")
                     else:
                         # Send a single waypoint.
-                        pose = PoseArray()
+                        pose = Pose()
                         pose.position.x = x_val
                         pose.position.y = y_val
                         pose.position.z = z_val
@@ -368,7 +379,7 @@ class WaypointWidget(QMainWindow):
                         pose.rotation = path_val
 
                         multi_pose = PoseArray()
-                        multi_pose.pose.append(pose)
+                        multi_pose.poses.append(pose)
                         multi_pose.interpolation_method = method_val
 
                         self.multi_add_pose_publisher.publish(multi_pose)
@@ -378,14 +389,14 @@ class WaypointWidget(QMainWindow):
 
     def show_error(self, message):
         msgBox = QMessageBox()
-        msgBox.setIcon(QMessageBox.Warning)
+        msgBox.setIcon(QMessageBox.warning)
         msgBox.setText(message)
         msgBox.setWindowTitle("Error")
         msgBox.setStandardButtons(QMessageBox.Ok)
         msgBox.exec()
 
     def shutdown_plugin(self):
-        self.controller_info_subscriber.unregister()
-        self.position_target_subscriber.unregister()
-        self.timeout_subscriber.unregister()
+        self.controller_info_subscriber.destroy()
+        self.position_target_subscriber.destroy()
+        #self.timeout_subscriber.destroy()
         

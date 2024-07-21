@@ -42,7 +42,7 @@ class ThrusterWidget(QMainWindow):
         self.thruster_8 = ThrusterAction(self, 7, 'T8')
 
         self.thruster_publisher: Publisher = internal_node.create_publisher(MotorPwm,"/provider_thruster/thruster_pwm", 10)
-        #self.dry_test_publisher = rospy.Publisher("/telemetry/dry_run", Bool, queue_size=10, latch=True)
+        self.dry_test_publisher: Publisher = internal_node.create_publisher(Bool,"/telemetry/dry_run",10)
         #self.dry_test_service = rospy.ServiceProxy('/provider_thruster/dry_test', Empty)
 
         #self.dry_test_subscriber = rospy.Subscriber("/telemetry/dry_run", Bool, self._dry_run_callback)
@@ -99,7 +99,7 @@ class ThrusterWidget(QMainWindow):
         self.T7_T8.setEnabled(True)
         self.resetPwmButton.setEnabled(True)
         self.actionStart_test.setEnabled(True)
-        #self.dry_test_publisher.publish(data = True)
+        self.dry_test_publisher.publish(True)
 
     def _handle_disableButton_clicked(self, checked):
         self.enableButton.setEnabled(True)
@@ -110,7 +110,7 @@ class ThrusterWidget(QMainWindow):
         self.T7_T8.setEnabled(False)
         self.resetPwmButton.setEnabled(False)
         self.actionStart_test.setEnabled(False)
-        #self.dry_test_publisher.publish(data = False)
+        self.dry_test_publisher.publish(False)
 
     def set_pwm(self, index, value):
         self.pwms[index] = value

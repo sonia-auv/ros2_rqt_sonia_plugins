@@ -1,6 +1,6 @@
 import os
-import rospy
-import rospkg
+#import rospy
+#import rospkg
 import rclpy
 
 from threading import Thread
@@ -41,7 +41,7 @@ class Waypoint(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
-        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
+        #Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
