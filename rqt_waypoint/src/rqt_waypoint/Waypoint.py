@@ -1,6 +1,4 @@
 import os
-#import rospy
-#import rospkg
 import rclpy
 
 from threading import Thread
@@ -9,12 +7,10 @@ import rclpy.executors
 
 from .WaypointWidget import WaypointWidget
 
-
 class Waypoint(Plugin):
 
     def __init__(self, context):
         super(Waypoint, self).__init__(context)
-
 
         # Give QObjects reasonable names
         self.setObjectName('WaypointWidget')

@@ -18,9 +18,11 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from std_msgs.msg import Bool
-#from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose as geoPose
+from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint
 #from sonia_common.msg import AddPose, MultiAddPose, MpcInfo, MissionTimer
-from sonia_common_ros2.msg import Pose, PoseArray, ObstacleInfo
+from sonia_common_ros2.msg import MpcInfo, ObstacleInfo, PoseArray, Pose as soniaPose
+from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
 
 #from sonia_common.srv import ObjectPoseService, SetSimulationAUVService
 from std_srvs.srv import Trigger, Empty
@@ -60,25 +62,25 @@ class WaypointWidget(QMainWindow):
         self.prev_run = ""
 
         # Subscribers
-        self.position_target_subscriber: Subscription = ros_node.create_subscription(Pose,'/proc_control/current_target', self._position_target_callback,10)
+        self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(ObstacleInfo, "/proc_control/controller_info", self.set_mpc_info,10)
         #self.timeout_subscriber: Subscription = ros_node.create_subscription(MissonTimer,"/sonia_behaviors/timeout", self.timeout_info)
         #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
         # self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
         # Publishers
-        self.simulation_start_publisher: Publisher= ros_node.create_publisher(Pose, "/proc_simulation/start_simulation",10)
-        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(Pose,"/proc_control/add_pose", 10)
-        self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_multi_addpose",10)
+        self.simulation_start_publisher: Publisher= ros_node.create_publisher(geoPose, "/proc_simulation/start_simulation",10)
+        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(geoPose,"/proc_control/add_pose", 10)
+        self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
         self.auv7_tare_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/setDepthOffset", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
-        self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", 10)
-        self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
+        #self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", 10)
+        #self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
 
         # Services
-        #self.initial_position_service = rospy.ServiceProxy("/proc_simulation/auv_pose", ObjectPoseService)
-        #self.set_auv_service = rospy.ServiceProxy("/proc_simulation/select_auv", SetSimulationAUVService)
+        self.initial_position_service: Client = ros_node.create_client(ObjectPoseService,"/proc_simulation/auv_pose")
+        self.set_auv_service: Client = ros_node.create_client(SetSimulationAUVService, "/proc_simulation/select_auv")
         self.depth_tare_service: Client= ros_node.create_client(Empty, "/provider_depth/tare")
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
 
@@ -119,7 +121,7 @@ class WaypointWidget(QMainWindow):
                 elif msg.status == 4:
                     self.missionFailed(msg)
     
-    #@pyqtSlot(MissionTimer)
+    @pyqtSlot(MissionTimer)
     def addButton(self, msg):
         label1 = QLabel()
         label1.setText(msg.mission)
@@ -346,7 +348,7 @@ class WaypointWidget(QMainWindow):
                         self.show_error("Speed incorrect.")
                     else:
                         # Send a single waypoint.
-                        pose = Pose()
+                        pose = geoPose()
                         pose.position.x = x_val
                         pose.position.y = y_val
                         pose.position.z = z_val

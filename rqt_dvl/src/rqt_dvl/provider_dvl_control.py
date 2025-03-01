@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import rclpy
-import rospkg
 from threading import Thread
 from qt_gui.plugin import Plugin
 
