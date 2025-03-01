@@ -21,10 +21,9 @@ from std_msgs.msg import Bool
 from geometry_msgs.msg import Pose as geoPose
 from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint
 #from sonia_common.msg import AddPose, MultiAddPose, MpcInfo, MissionTimer
-from sonia_common_ros2.msg import MpcInfo, ObstacleInfo, PoseArray, Pose as soniaPose
+from sonia_common_ros2.msg import MissionTimer, ObstacleInfo, PoseArray, Pose as soniaPose
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
 
-#from sonia_common.srv import ObjectPoseService, SetSimulationAUVService
 from std_srvs.srv import Trigger, Empty
 import tf2_ros
  #.transformations import euler_from_quaternion
@@ -32,10 +31,10 @@ import tf2_ros
 class WaypointWidget(QMainWindow):
 
     current_target_received = pyqtSignal('PyQt_PyObject')
-    createLabel = pyqtSignal('PyQt_PyObject')
-    greenLabel = pyqtSignal('PyQt_PyObject')
-    redLabel = pyqtSignal('PyQt_PyObject')
-    failedLabel = pyqtSignal('PyQt_PyObject')
+    createLabel = pyqtSignal(MissionTimer)
+    greenLabel = pyqtSignal(MissionTimer)
+    redLabel = pyqtSignal(MissionTimer)
+    failedLabel = pyqtSignal(MissionTimer)
     listMissionLabels = {}
 
     def __init__(self, ros_node):
@@ -66,7 +65,7 @@ class WaypointWidget(QMainWindow):
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(ObstacleInfo, "/proc_control/controller_info", self.set_mpc_info,10)
         #self.timeout_subscriber: Subscription = ros_node.create_subscription(MissonTimer,"/sonia_behaviors/timeout", self.timeout_info)
         #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
-        # self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
+        #self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
         # Publishers
         self.simulation_start_publisher: Publisher= ros_node.create_publisher(geoPose, "/proc_simulation/start_simulation",10)
@@ -157,7 +156,7 @@ class WaypointWidget(QMainWindow):
         except (RuntimeError, KeyError):
             pass
 
-    #@pyqtSlot(MissionTimer)
+    @pyqtSlot(MissionTimer)
     def missionComplete(self, msg):
         label = self.listMissionLabels[msg.uniqueID][1]
         label.setStyleSheet("background-color: green")
@@ -165,7 +164,7 @@ class WaypointWidget(QMainWindow):
         t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.uniqueID,))
         t.start()
     
-    #@pyqtSlot(MissionTimer)
+    @pyqtSlot(MissionTimer)
     def missionTimeout(self, msg):
         label = self.listMissionLabels[msg.uniqueID][1]
         label.setStyleSheet("background-color: red")
@@ -173,7 +172,7 @@ class WaypointWidget(QMainWindow):
         t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.uniqueID,))
         t.start()
     
-    #@pyqtSlot(MissionTimer)
+    @pyqtSlot(MissionTimer)
     def missionFailed(self, msg):
         label = self.listMissionLabels[msg.uniqueID][1]
         label.setStyleSheet("background-color: red")
@@ -221,7 +220,7 @@ class WaypointWidget(QMainWindow):
 
     def _reset_position(self):
 
-        pose = Pose()
+        pose = geoPose()
         pose.position.x = 0
         pose.position.y = 0
         pose.position.z = 0
@@ -258,7 +257,7 @@ class WaypointWidget(QMainWindow):
             auv_name = os.getenv('AUV')
             if auv_name:
                 resp = self.initial_position_service.call(object_name=auv_name)
-                pose = Pose()
+                pose = geoPose()
                 pose.position.x = resp.object_pose.position.x
                 pose.position.y = resp.object_pose.position.y
                 pose.position.z = resp.object_pose.position.z
@@ -348,7 +347,7 @@ class WaypointWidget(QMainWindow):
                         self.show_error("Speed incorrect.")
                     else:
                         # Send a single waypoint.
-                        pose = geoPose()
+                        pose = soniaPose()
                         pose.position.x = x_val
                         pose.position.y = y_val
                         pose.position.z = z_val
@@ -368,7 +367,7 @@ class WaypointWidget(QMainWindow):
                         self.show_error("Speed profile incorrect.")
                     else:
                         # Send a multi-waypoint.
-                        pose = Pose()
+                        pose = soniaPose()
                         pose.position.x = x_val
                         pose.position.y = y_val
                         pose.position.z = z_val
