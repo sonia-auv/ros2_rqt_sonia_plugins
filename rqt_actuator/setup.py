@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'rqt_vision'
+package_name = 'rqt_actuator'
 
 setup(
     name=package_name,
@@ -10,7 +10,7 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
-        ('share/' + package_name + '/resource', ['resource/mainwidget.ui', 'resource/config.ui', 'resource/filters_parameter.ui', 'resource/filters_parameter.ui.autosave']),
+        ('share/' + package_name + '/resource', ['resource/mainWidget.ui']),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name, ['plugin.xml']),
     ],
@@ -34,4 +34,3 @@ setup(
         ],
     },
 )
-

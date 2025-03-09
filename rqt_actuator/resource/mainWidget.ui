@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mainWidget</class>
+ <widget class="QWidget" name="mainWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>398</width>
+    <height>247</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>398</width>
+    <height>208</height>
+   </size>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>Actuator</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QPushButton" name="drop_port">
+        <property name="text">
+         <string>Drop Port</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="drop_starboard">
+        <property name="text">
+         <string>Drop Starboard</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="torpedo_port">
+        <property name="text">
+         <string>Torpedo Port</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="torpedo_starboard">
+        <property name="text">
+         <string>Torpedo Starboard</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="open_arm">
+        <property name="text">
+         <string>Open Robotic Arm</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="close_arm">
+        <property name="text">
+         <string>Close Robotic Arm</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
