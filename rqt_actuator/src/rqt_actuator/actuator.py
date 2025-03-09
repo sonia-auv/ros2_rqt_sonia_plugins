@@ -1,7 +1,6 @@
+import rclpy
 from rqt_gui_py.plugin import Plugin
-
 from .actuator_widget import ActuatorWidget
-
 
 class Actuator(Plugin):
 
@@ -9,7 +8,9 @@ class Actuator(Plugin):
         super(Actuator, self).__init__(context)
         self.setObjectName('Actuator')
 
-        self._widget = ActuatorWidget()
+        self.__internal_node= rclpy.create_node('rqt_actuator')
+        self._widget = ActuatorWidget(self.__internal_node)
+
         if context.serial_number() > 1:
             self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
         self._widget.setPalette(context._handler._main_window.palette())

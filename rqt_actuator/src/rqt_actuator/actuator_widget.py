@@ -1,8 +1,9 @@
 import os
 from time import sleep
-import rospkg
+#import rospkg
 import rclpy
 import threading
+from ament_index_python import get_package_share_directory
 from sonia_common_ros2.msg import ActuatorDoAction, ActuatorSendReply
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
@@ -10,15 +11,15 @@ from PyQt5.QtWidgets import QWidget
 
 # main class inherits from the ui window class
 class ActuatorWidget(QWidget):
-    def __init__(self, ros_node):
+    def __init__(self, internal_node):
         super(ActuatorWidget, self).__init__()
-        rp = rospkg.RosPack()
+        #rp = rospkg.RosPack()
 
-        ui_file = os.path.join(rp.get_path('rqt_actuator'), 'resource', 'mainWidget.ui')
+        ui_file = os.path.join(get_package_share_directory('rqt_actuator'), 'resource', 'mainWidget.ui')
         loadUi(ui_file, self)
 
-        self.actuatorSubscriber = ros_node.create_subscription("/provider_actuators/do_action_from_actuators", ActuatorSendReply, self.actuatorCallback)
-        self.actuatorPublisher = ros_node.create_publisher(ActuatorDoAction,"/provider_actuators/do_action_to_actuators", queue_size=100)
+        self.actuatorSubscriber = internal_node.create_subscription("/provider_actuators/do_action_from_actuators", ActuatorSendReply, self.actuatorCallback)
+        self.actuatorPublisher = internal_node.create_publisher(ActuatorDoAction,"/provider_actuators/do_action_to_actuators", queue_size=100)
         self.drop_port.clicked.connect(self._handle_drop_port)
         self.drop_starboard.clicked.connect(self._handle_drop_starboard)
         self.torpedo_port.clicked.connect(self._handle_torpedo_port)
