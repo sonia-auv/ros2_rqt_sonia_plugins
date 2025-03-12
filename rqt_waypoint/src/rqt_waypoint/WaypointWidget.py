@@ -63,7 +63,7 @@ class WaypointWidget(QMainWindow):
         # Subscribers
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(ObstacleInfo, "/proc_control/controller_info", self.set_mpc_info,10)
-        #self.timeout_subscriber: Subscription = ros_node.create_subscription(MissonTimer,"/sonia_behaviors/timeout", self.timeout_info)
+        self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info)
         #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
         #self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 

@@ -1,10 +1,11 @@
 import os
 from time import sleep
-#import rospkg
 import rclpy
+from rclpy.client import Client
 import threading
 from ament_index_python import get_package_share_directory
-from sonia_common_ros2.msg import ActuatorDoAction, ActuatorSendReply
+#from sonia_common_ros2.msg import ActuatorDoAction, ActuatorSendReply
+from sonia_common_ros2.srv import ActuatorService
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
 
@@ -13,13 +14,14 @@ from PyQt5.QtWidgets import QWidget
 class ActuatorWidget(QWidget):
     def __init__(self, internal_node):
         super(ActuatorWidget, self).__init__()
-        #rp = rospkg.RosPack()
-
+        
         ui_file = os.path.join(get_package_share_directory('rqt_actuator'), 'resource', 'mainWidget.ui')
         loadUi(ui_file, self)
 
-        self.actuatorSubscriber = internal_node.create_subscription("/provider_actuators/do_action_from_actuators", ActuatorSendReply, self.actuatorCallback)
-        self.actuatorPublisher = internal_node.create_publisher(ActuatorDoAction,"/provider_actuators/do_action_to_actuators", queue_size=100)
+        self.actuatorClient: Client = internal_node.create_client(ActuatorService, "/provider_actuator/do_action")
+        self.req= ActuatorService.Request()
+        #self.actuatorSubscriber = internal_node.create_subscription("/provider_actuators/do_action_from_actuators", ActuatorSendReply, self.actuatorCallback)
+        #self.actuatorPublisher = internal_node.create_publisher(ActuatorDoAction,"/provider_actuators/do_action_to_actuators", queue_size=100)
         self.drop_port.clicked.connect(self._handle_drop_port)
         self.drop_starboard.clicked.connect(self._handle_drop_starboard)
         self.torpedo_port.clicked.connect(self._handle_torpedo_port)
@@ -31,74 +33,76 @@ class ActuatorWidget(QWidget):
         if self.drop_port.styleSheet() == "background-color: yellow":
             return
         self.drop_port.setStyleSheet("background-color: yellow")
-        self.sendMessage(ActuatorDoAction.ELEMENT_DROPPER,ActuatorDoAction.SIDE_PORT,ActuatorDoAction.ACTION_DROPPER_LAUNCH)
+        self.sendMessage(ActuatorService.Request.ELEMENT_DROPPER, ActuatorService.Request.SIDE_PORT, ActuatorService.Request.ACTION_LAUNCH)
 
     def _handle_drop_starboard(self):
         if self.drop_starboard.styleSheet() == "background-color: yellow":
             return
         self.drop_starboard.setStyleSheet("background-color: yellow")
-        self.sendMessage(ActuatorDoAction.ELEMENT_DROPPER,ActuatorDoAction.SIDE_STARBOARD,ActuatorDoAction.ACTION_DROPPER_LAUNCH)
+        self.sendMessage(ActuatorService.Request.ELEMENT_DROPPER, ActuatorService.Request.SIDE_STARBOARD, ActuatorService.Request.ACTION_LAUNCH)
 
     def _handle_torpedo_port(self):
         if self.torpedo_port.styleSheet() == "background-color: yellow":
             return
         self.torpedo_port.setStyleSheet("background-color: yellow")
-        self.sendMessage(ActuatorDoAction.ELEMENT_TORPEDO,ActuatorDoAction.SIDE_PORT,ActuatorDoAction.ACTION_TORPEDO_LAUNCH)
+        self.sendMessage(ActuatorService.Request.ELEMENT_TORPEDO, ActuatorService.Request.SIDE_PORT, ActuatorService.Request.ACTION_LAUNCH)
 
     def _handle_torpedo_starboard(self):
         if self.torpedo_starboard.styleSheet() == "background-color: yellow":
             return
         self.torpedo_starboard.setStyleSheet("background-color: yellow")
-        self.sendMessage(ActuatorDoAction.ELEMENT_TORPEDO,ActuatorDoAction.SIDE_STARBOARD,ActuatorDoAction.ACTION_TORPEDO_LAUNCH)
+        self.sendMessage(ActuatorService.Request.ELEMENT_TORPEDO, ActuatorService.Request.SIDE_STARBOARD, ActuatorService.Request.ACTION_LAUNCH)
 
     def _handle_open_robotic_arm(self):
         if self.open_arm.styleSheet() == "background-color: yellow":
             return
         self.open_arm.setStyleSheet("background-color: yellow")
-        self.sendMessage(ActuatorDoAction.ELEMENT_ARM,ActuatorDoAction.ARM_OPEN,ActuatorDoAction.ACTION_ARM_EXEC)
+        #self.sendMessage(ActuatorDoAction.ELEMENT_ARM,ActuatorDoAction.ARM_OPEN,ActuatorDoAction.ACTION_ARM_EXEC)
 
     def _handle_close_robotic_arm(self):
         if self.close_arm.styleSheet() == "background-color: yellow":
             return
         self.close_arm.setStyleSheet("background-color: yellow")
-        self.sendMessage(ActuatorDoAction.ELEMENT_ARM,ActuatorDoAction.ARM_CLOSE,ActuatorDoAction.ACTION_ARM_EXEC)
+        #self.sendMessage(ActuatorDoAction.ELEMENT_ARM,ActuatorDoAction.ARM_CLOSE,ActuatorDoAction.ACTION_ARM_EXEC)
 
     def sendMessage(self, element, side, action):
-        message = ActuatorDoAction()
-        message.element = element
-        message.side = side
-        message.action = action
-        self.actuatorPublisher.publish(message)
+        self.req.action=action
+        self.req.side=side
+        self.req.element=element
+        self.future = self.actuatorClient.call_async(self.req)
+        
+        self.actuatorCallback(self,element,side,self.future.result)
+        #self.actuatorPublisher.publish(message)
 
-    def actuatorCallback(self, data):
+    def actuatorCallback(self, element, side, response):
         button = ""
-        if data.element == ActuatorSendReply.ELEMENT_ARM:
-            if data.side == ActuatorSendReply.ARM_CLOSE:
-                button = self.close_arm
-            elif data.side == ActuatorSendReply.ARM_OPEN:
-                button = self.open_arm
-        elif data.element == ActuatorSendReply.ELEMENT_DROPPER:
-            if data.side == ActuatorSendReply.SIDE_PORT:
+        #if data.element == ActuatorSendReply.ELEMENT_ARM:
+            #if data.side == ActuatorSendReply.ARM_CLOSE:
+                #button = self.close_arm
+            #elif data.side == ActuatorSendReply.ARM_OPEN:
+                #button = self.open_arm
+        if element == ActuatorService.Request.ELEMENT_DROPPER:
+            if side == ActuatorService.Request.SIDE_PORT:
                 button = self.drop_port
-            elif data.side == ActuatorSendReply.SIDE_STARBOARD:
+            elif side == ActuatorService.Request.SIDE_STARBOARD:
                 button = self.drop_starboard
-        elif data.element == ActuatorSendReply.ELEMENT_TORPEDO:
-            if data.side == ActuatorSendReply.SIDE_PORT:
+        elif element == ActuatorService.Request.ELEMENT_TORPEDO:
+            if side == ActuatorService.Request.SIDE_PORT:
                 button = self.torpedo_port
-            elif data.side == ActuatorSendReply.SIDE_STARBOARD:
+            elif side == ActuatorService.Request.SIDE_STARBOARD:
                 button = self.torpedo_starboard
         if button == "":
-            rclpy.logerr(f"{data} has an invalid side or element")
+            rclpy.logerr(f"{element} has an invalid side or element")
         else:
-            if data.response == ActuatorSendReply.RESPONSE_SUCCESS:
+            if response == ActuatorService.Response.success:
                 button.setStyleSheet("background-color: green")
                 newThread = Threads(button)
                 newThread.start()
-            elif data.response == ActuatorSendReply.RESPONSE_TIMED_OUT:
+            elif response != ActuatorService.Response.success:
                 button.setStyleSheet("background-color: red")
                 newThread = Threads(button)
                 newThread.start()
-            elif data.response == ActuatorSendReply.RESPONSE_FAILURE:
+            else:#if response == ActuatorService.Response.success:
                 button.setStyleSheet("background: rgb(88, 8, 24)")
                 newThread = Threads(button)
                 newThread.start()
