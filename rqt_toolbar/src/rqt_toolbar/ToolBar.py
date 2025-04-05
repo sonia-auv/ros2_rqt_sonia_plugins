@@ -2,13 +2,9 @@ import imp
 import os
 from threading import Thread
 import rclpy
-import rospkg
 
 from qt_gui.plugin import Plugin
 from PyQt5.QtWidgets import QMainWindow, QToolBar
-
-import rclpy.exceptions
-import rclpy.executors
 
 from .ToolbarSetControlMode import SetModeControlWidget
 from .ToolbarBatteryWidget import BatteryWidget
@@ -45,7 +41,7 @@ class ToolBar(Plugin):
 
         self._toolbar = QToolBar()
         # self._palette = Palette()
-        self._setControlModeWidget = SetModeControlWidget()
+        self._setControlModeWidget = SetModeControlWidget(self.__internal_node)
         # self._warnings = WarningsWidget()
         self._camera = CameraWidget()
         # context._handler._main_window.setPalette(self._palette.palette())
@@ -69,7 +65,7 @@ class ToolBar(Plugin):
         Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
 
     def shutdown_plugin(self):
-        pass
+        self._toolbar.destroy()
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

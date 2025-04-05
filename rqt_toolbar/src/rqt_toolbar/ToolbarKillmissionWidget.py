@@ -1,5 +1,7 @@
 import os
 import rclpy
+
+from rclpy.subscription import Subscription
 from sonia_common_ros2.msg import MissionStatus, KillStatus
 from ament_index_python.packages import get_package_share_directory
 from threading import Thread
@@ -19,10 +21,10 @@ class KillMissionWidget(QWidget):
         ui_file = os.path.join(get_package_share_directory('rqt_toolbar'), 'resource', 'KillMission.ui')
         loadUi(ui_file, self)
 
-        self._mission_switch = ros_node.create_subscription(MissionStatus, '/provider_rs485/mission_status', self._mission_switch_callback, 10)
+        self._mission_switch: Subscription = ros_node.create_subscription(MissionStatus, '/provider_rs485/mission_status', self._mission_switch_callback, 10)
         self.mission_received.connect(self._handle_mission_result)
 
-        self.kill_switch = ros_node.create_subscription(KillStatus, '/provider_rs485/kill_status', self._kill_switch_callback, 10)
+        self.kill_switch: Subscription = ros_node.create_subscription(KillStatus, '/provider_rs485/kill_status', self._kill_switch_callback, 10)
         self.kill_received.connect(self._handle_kill_result)
 
 
@@ -46,5 +48,5 @@ class KillMissionWidget(QWidget):
             self.KillSwitch_label.setPalette(self.paletteUnchecked.palette())
 
     def shutdown_plugin(self):
-        self._mission_switch.unregister()
-        self.kill_switch.unregister()
+        self._mission_switch.destroy()
+        self.kill_switch.destroy()

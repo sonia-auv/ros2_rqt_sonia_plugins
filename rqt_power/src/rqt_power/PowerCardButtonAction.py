@@ -1,4 +1,3 @@
-import rospy
 from tkinter import Tk
 import tkinter.messagebox
 
@@ -75,8 +74,8 @@ class PowerCardButtonAction():
     #     self._set_bus_state(2, 1)
     #     pass
 
-    def _set_bus_state(self, bus, state):
-        try:
-            self.manage_power_supply_srv(int(self.slave_number), bus, state)
-        except rospy.ServiceException as e:
-            rospy.logerr('Service call failed to manage bus')
+    #def _set_bus_state(self, bus, state):
+     #   try:
+     #       self.manage_power_supply_srv(int(self.slave_number), bus, state)
+     #   except rospy.ServiceException as e:
+     #       rospy.logerr('Service call failed to manage bus')

@@ -71,7 +71,7 @@ class ActuatorWidget(QWidget):
         self.req.element=element
         self.future = self.actuatorClient.call_async(self.req)
         
-        self.actuatorCallback(self,element,side,self.future.result())
+        self.actuatorCallback(element,side,self.future.result())
         #self.actuatorPublisher.publish(message)
 
     def actuatorCallback(self, element, side, response):

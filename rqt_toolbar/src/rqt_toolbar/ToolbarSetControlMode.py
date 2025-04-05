@@ -6,21 +6,20 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QColor
 from ament_index_python.packages import get_package_share_directory
 from std_msgs.msg import UInt8
-# from sonia_common.msg import MpcInfo
+from sonia_common_ros2.msg import MpcInfo
 
 class SetModeControlWidget(QWidget):
 
-    def __init__(self):
+    def __init__(self, ros_node):
         super(SetModeControlWidget, self).__init__()
 
         self.setObjectName('SetModeControlWidget')
         ui_file = os.path.join(get_package_share_directory('rqt_toolbar'), 'resource', 'set_control_mode.ui')
         loadUi(ui_file, self)
-        self.__internal_node = rclpy.create_node("set_mode_ctrl_node")
         # TODO: ROS CHANGE
-        self.setModePublisher = self.__internal_node.create_publisher(UInt8, '/proc_control/set_mode', 10)
+        self.setModePublisher = ros_node.create_publisher(UInt8, '/proc_control/set_mode', 10)
         # TODO: ROS CHANGE
-        # self.controllerInfoSubscriber = rclpy.Subscriber('/proc_control/controller_info', MpcInfo, self.controller_info_callback)
+        self.controllerInfoSubscriber = ros_node.create_subscription(MpcInfo, '/proc_control/controller_info', self.controller_info_callback, 10)
 
         # Subscribe to slot
         self.mpcPlanner.clicked[bool].connect(self.handle_mpc_planner_clicked)
@@ -61,10 +60,12 @@ class SetModeControlWidget(QWidget):
         else:
             self.targetReached.setStyleSheet("background-color: red")
 
-    def set_mode(self, mode):
-        self.setModePublisher.publish(data=mode)
+    def set_mode(self, mode: UInt8):
+        mpc_mode=UInt8()
+        mpc_mode.data=mode
+        self.setModePublisher.publish(mpc_mode)
 
-    def controller_info_callback(self, msg):
+    def controller_info_callback(self, msg: MpcInfo):
         self.set_buttons_style(msg.mpc_mode)
         self.set_target_reached(msg.target_reached)
 

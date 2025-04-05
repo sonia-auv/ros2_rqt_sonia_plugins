@@ -140,9 +140,11 @@ class PowerWidget(QMainWindow):
         data =[msg.motor1, msg.motor2, msg.motor3, msg.motor4, msg.motor5, msg.motor6, msg.motor7, msg.motor8]
         for i in range(len(data)):
             format_data = '{:.2f}'.format(data[i])
+            print("format_data")
             eval('self.VoltageM' + str(i+1)).display(format_data)
             eval('self.VoltageM' + str(i+1) + '_2').display(format_data)
 
+    pyqtSlot(MotorFeedback)
     def show_motor_feedback(self, msg):
         data =[msg.motor1, msg.motor2, msg.motor3, msg.motor4, msg.motor5, msg.motor6, msg.motor7, msg.motor8]
         dict_colors = {0:"grey", 1:"green", 2:"yellow", 3:"red", 4:"blue"}
@@ -191,7 +193,6 @@ class PowerWidget(QMainWindow):
         self._motor_temperature_subscriber.destroy()
         self._voltage12V_subscriber.destroy()
         self._motor_feedback_subscriber.destroy()
-        pass
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:
