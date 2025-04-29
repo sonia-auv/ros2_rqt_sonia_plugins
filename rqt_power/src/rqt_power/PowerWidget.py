@@ -98,7 +98,7 @@ class PowerWidget(QMainWindow):
     def show_12V(self, msg):
         pass
 
-    def show_battery_Temperature(self, msg):
+    def show_battery_Temperature(self, msg: BatteryPowerMessages):
         format_data = '{:.2f}'.format(msg.battery1)
         self.TempB1.display(format_data)
         self.TempB1_2.display(format_data)
@@ -106,14 +106,14 @@ class PowerWidget(QMainWindow):
         self.TempB2.display(format_data)
         self.TempB2_2.display(format_data)
 
-    def show_motor_Temperature(self, msg):
+    def show_motor_Temperature(self, msg: MotorPowerMessages):
         data =[msg.motor1, msg.motor2, msg.motor3, msg.motor4, msg.motor5, msg.motor6, msg.motor7, msg.motor8]
         for i in range(len(data)):
             format_data = '{:.2f}'.format(data[i])
             eval('self.TempM' + str(i+1)).display(format_data)
             eval('self.TempM' + str(i+1) + '_2').display(format_data)
             
-    def show_battery_Current(self, msg):
+    def show_battery_Current(self, msg: BatteryPowerMessages):
         format_data = '{:.2f}'.format(msg.battery1)
         self.CurrentB1.display(format_data)
         self.CurrentB1_2.display(format_data)
@@ -121,14 +121,14 @@ class PowerWidget(QMainWindow):
         self.CurrentB2.display(format_data)
         self.CurrentB2_2.display(format_data)
         
-    def show_motor_Current(self, msg):
+    def show_motor_Current(self, msg: MotorPowerMessages):
         data =[msg.motor1, msg.motor2, msg.motor3, msg.motor4, msg.motor5, msg.motor6, msg.motor7, msg.motor8]
         for i in range(len(data)):
             format_data = '{:.2f}'.format(data[i])
             eval('self.CurrentM' + str(i+1)).display(format_data)
             eval('self.CurrentM' + str(i+1) + '_2').display(format_data)
             
-    def show_battery_Voltage(self, msg):
+    def show_battery_Voltage(self, msg: BatteryPowerMessages):
         format_data = '{:.2f}'.format(msg.battery1)
         self.VoltageB1.display(format_data)
         self.VoltageB1_2.display(format_data)
@@ -136,16 +136,15 @@ class PowerWidget(QMainWindow):
         self.VoltageB2.display(format_data)
         self.VoltageB2_2.display(format_data)
         
-    def show_motor_Voltage(self, msg):
+    def show_motor_Voltage(self, msg: MotorPowerMessages):
         data =[msg.motor1, msg.motor2, msg.motor3, msg.motor4, msg.motor5, msg.motor6, msg.motor7, msg.motor8]
         for i in range(len(data)):
             format_data = '{:.2f}'.format(data[i])
-            print("format_data")
             eval('self.VoltageM' + str(i+1)).display(format_data)
             eval('self.VoltageM' + str(i+1) + '_2').display(format_data)
 
-    pyqtSlot(MotorFeedback)
-    def show_motor_feedback(self, msg):
+    @pyqtSlot(MotorFeedback)
+    def show_motor_feedback(self, msg: MotorFeedback):
         data =[msg.motor1, msg.motor2, msg.motor3, msg.motor4, msg.motor5, msg.motor6, msg.motor7, msg.motor8]
         dict_colors = {0:"grey", 1:"green", 2:"yellow", 3:"red", 4:"blue"}
         for i in range(len(data)):

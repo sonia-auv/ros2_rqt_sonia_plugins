@@ -62,10 +62,12 @@ class ToolBar(Plugin):
         context.add_toolbar(self._toolbar)
 
         # Spin this thread
-        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
-
-    def shutdown_plugin(self):
-        self._toolbar.destroy()
+        self._thread3 = Thread(target=rclpy.spin, name="rqt_toolbar", args=[self.__internal_node], daemon=True)
+        self._thread3.start()
+    
+    def shutdown_plugin(self):   
+        if(self._thread3.getName=="rqt_toolbar"):
+            self._thread3.join()
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

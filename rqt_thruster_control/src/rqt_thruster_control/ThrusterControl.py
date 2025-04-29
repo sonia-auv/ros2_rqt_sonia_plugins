@@ -33,13 +33,17 @@ class ThrusterControl(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
-        #Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
+
+        self._thread =Thread(target=rclpy.spin,name="rqt_thrustorControl", args=[self.__internal_node], daemon=True)
+        self._thread.start()
         
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
-        self._mainWindow.shutdown_plugin()
-        pass
+        #self._mainWindow.shutdown_plugin()
+        if(self._thread.getName=="rqt_thrustorControl"):
+            self._thread.join
+        
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

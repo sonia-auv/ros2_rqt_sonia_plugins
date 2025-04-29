@@ -67,3 +67,5 @@ class BatteryWidget(QWidget):
             elif self.store_index == 2:
                 msg.setText('Battery 2 has a very low voltage')
             msg.exec_()
+    def shutdown_plugin(self):
+        self._power_supply.destroy()

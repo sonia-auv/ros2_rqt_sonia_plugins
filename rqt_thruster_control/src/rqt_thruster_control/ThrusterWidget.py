@@ -99,7 +99,9 @@ class ThrusterWidget(QMainWindow):
         self.T7_T8.setEnabled(True)
         self.resetPwmButton.setEnabled(True)
         self.actionStart_test.setEnabled(True)
-        self.dry_test_publisher.publish(True)
+        state= Bool()
+        state.data=True
+        self.dry_test_publisher.publish(state)
 
     def _handle_disableButton_clicked(self, checked):
         self.enableButton.setEnabled(True)
@@ -110,7 +112,9 @@ class ThrusterWidget(QMainWindow):
         self.T7_T8.setEnabled(False)
         self.resetPwmButton.setEnabled(False)
         self.actionStart_test.setEnabled(False)
-        self.dry_test_publisher.publish(False)
+        state= Bool()
+        state.data=False
+        self.dry_test_publisher.publish(state)
 
     def set_pwm(self, index, value):
         self.pwms[index] = value
