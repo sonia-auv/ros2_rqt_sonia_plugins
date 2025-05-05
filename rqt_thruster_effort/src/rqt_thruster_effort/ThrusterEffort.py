@@ -1,4 +1,4 @@
-from threading import Thread
+from PyQt5.QtCore import QTimer
 import rclpy
 from qt_gui.plugin import Plugin
 from rclpy.node import Node
@@ -28,7 +28,8 @@ class ThrusterEffort(Plugin):
             print('arguments: ', args)
             print('unknowns: ', unknowns)
             
-        #rclpy.init(context=context)
+        if not rclpy.ok():
+            rclpy.init()
         self.__internal_node=Node('rqt_thruster_effort_node')
 
         self._mainWindow = ThrusterEffortWidget(self.__internal_node)
@@ -41,17 +42,24 @@ class ThrusterEffort(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         context.add_widget(self._mainWindow)        
 
-        self._thread = Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True)
-        self._thread.start()
-        
+        # Spin this thread
+        self._timer = QTimer()
+        self._timer.timeout.connect(self._spin_once)
+        self._timer.start(10)
+    
+    def _spin_once(self):
+        if rclpy.ok() and self.__internal_node:
+            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
+
     def shutdown_plugin(self):
-        self._thread.join()
+        self._timer.stop()
+        self._timer.timeout.disconnect(self._spin_once)
         if self.__internal_node:
             self.__internal_node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
         self._mainWindow.shutdown_plugin()
-
+        
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:
         # instance_settings.set_value(k, v)

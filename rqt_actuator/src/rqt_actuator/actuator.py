@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from rqt_gui_py.plugin import Plugin
-from threading import Thread
+from PyQt5.QtCore import QTimer
 from .actuator_widget import ActuatorWidget
 
 class Actuator(Plugin):
@@ -20,17 +20,26 @@ class Actuator(Plugin):
         self._widget.setAutoFillBackground(True)
         context.add_widget(self._widget)
 
-        self._thread =Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True)
-        self._thread.start()
-
+        # Spin this thread
+        self._timer = QTimer()
+        self._timer.timeout.connect(self._spin_once)
+        self._timer.start(10)
+    
+    def _spin_once(self):
+        if rclpy.ok() and self.__internal_node:
+            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
+            
+    def shutdown_plugin(self):
+        self._timer.stop()
+        self._timer.timeout.disconnect(self._spin_once)
+        if self.__internal_node:
+            self.__internal_node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+        self._widget.shutdown_plugin()
+        
     def save_settings(self, plugin_settings, instance_settings):
         self._widget.save_settings(plugin_settings, instance_settings)
 
     def restore_settings(self, plugin_settings, instance_settings):
         self._widget.restore_settings(plugin_settings, instance_settings)
-
-    def shutdown_plugin(self):
-        rclpy.shutdown()
-        self._thread.join()
-        self.__internal_node.destroy_node()
-        self._widget.shutdown_plugin()
