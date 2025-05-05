@@ -1,5 +1,5 @@
 import os
-import threading
+import asyncio
 from ament_index_python.packages import get_package_share_directory
 from rclpy.publisher import Publisher
 from .ThrusterAction import ThrusterAction
@@ -29,7 +29,7 @@ class ThrusterWidget(QMainWindow):
         self.resetPwmButton.setEnabled(False)
         self.enableButton.clicked[bool].connect(self._handle_enableButton_clicked)
         self.disableButton.clicked[bool].connect(self._handle_disableButton_clicked)
-        #self.actionStart_test.triggered.connect(self._handle_start_test_triggered)
+        self.actionStart_test.triggered.connect(self._handle_start_test_triggered)
         self.resetPwmButton.clicked[bool].connect(self._handle_resetPwmButton_clicked)
 
         self.thruster_1 = ThrusterAction(self, 0, 'T1')
@@ -100,7 +100,7 @@ class ThrusterWidget(QMainWindow):
         self.resetPwmButton.setEnabled(True)
         self.actionStart_test.setEnabled(True)
         state= Bool()
-        state.data=True
+        state.data=checked
         self.dry_test_publisher.publish(state)
 
     def _handle_disableButton_clicked(self, checked):
@@ -113,7 +113,7 @@ class ThrusterWidget(QMainWindow):
         self.resetPwmButton.setEnabled(False)
         self.actionStart_test.setEnabled(False)
         state= Bool()
-        state.data=False
+        state.data=checked
         self.dry_test_publisher.publish(state)
 
     def set_pwm(self, index, value):
@@ -132,9 +132,17 @@ class ThrusterWidget(QMainWindow):
 
         self.thruster_publisher.publish(msg)
 
-    #def _handle_start_test_triggered(self):
-        #newThread = Threads(self.dry_test_service)
-        #newThread.start()
+    async def dry_run(self):
+        for i in range(8):
+            self.set_pwm(i, 1550)
+            self.send_pwms()
+            await asyncio.sleep(4)
+            self.set_pwm(i, 1500)
+            self.send_pwms()
+            await asyncio.sleep(0.5)
+            
+    def _handle_start_test_triggered(self):
+        self.dry_run()
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
