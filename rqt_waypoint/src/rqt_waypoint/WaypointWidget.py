@@ -21,7 +21,7 @@ from std_msgs.msg import Bool
 from geometry_msgs.msg import Pose as geoPose
 from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint
 #from sonia_common.msg import AddPose, MultiAddPose, MpcInfo, MissionTimer
-from sonia_common_ros2.msg import MissionTimer, ObstacleInfo, PoseArray, Pose as soniaPose
+from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
 
 from std_srvs.srv import Trigger, Empty
@@ -62,8 +62,8 @@ class WaypointWidget(QMainWindow):
 
         # Subscribers
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
-        self.controller_info_subscriber: Subscription = ros_node.create_subscription(ObstacleInfo, "/proc_control/controller_info", self.set_mpc_info,10)
-        self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info)
+        self.controller_info_subscriber: Subscription = ros_node.create_subscription(MpcInfo, "/proc_control/controller_info", self.set_mpc_info,10)
+        #self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info)
         #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
         #self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
@@ -121,7 +121,7 @@ class WaypointWidget(QMainWindow):
                     self.missionFailed(msg)
     
     @pyqtSlot(MissionTimer)
-    def addButton(self, msg):
+    def addButton(self, msg: MissionTimer):
         label1 = QLabel()
         label1.setText(msg.mission)
         self.missionGrid.addWidget(label1, self.labelsCreated, 0)
@@ -184,7 +184,9 @@ class WaypointWidget(QMainWindow):
         # Getting AUV name environnment variable.
         auv_name = os.getenv('AUV')
         if auv_name == "AUV7":
-            self.auv7_tare_publisher.publish(data=True)
+            tare = Bool()
+            tare.data=True
+            self.auv7_tare_publisher.publish(tare)
         elif auv_name == "AUV8":
             try:
                 req = Empty.Request()
@@ -207,16 +209,22 @@ class WaypointWidget(QMainWindow):
             #rospy.logerr('Provider IMU is not started.')
 
     def startDVL(self):
-        self.set_dvl_started_publisher.publish(True)
+        dvl_state= Bool()
+        dvl_state.data=True
+        self.set_dvl_started_publisher.publish(dvl_state)
 
     def stopDVL(self):
-        self.set_dvl_started_publisher.publish(False)
+        dvl_state= Bool()
+        dvl_state.data=False
+        self.set_dvl_started_publisher.publish(dvl_state)
 
     def startSonar(self):
-        self.set_sonar_started_publisher.publish(True)
+        #self.set_sonar_started_publisher.publish(True)
+        pass
 
     def stopSonar(self):
-        self.set_sonar_started_publisher.publish(False)
+        #self.set_sonar_started_publisher.publish(False)
+        pass
 
     def _reset_position(self):
 
@@ -236,7 +244,7 @@ class WaypointWidget(QMainWindow):
         # else:
         #     self.show_error('Control mode must be 0 to reset position')
     
-    def set_mpc_info(self, msg):
+    def set_mpc_info(self, msg: MpcInfo):
         self.current_mode_id = msg.mpc_mode
         if self.current_mode_id != 0:
             self.sendWaypointButton.setText("Send Waypoint")
@@ -250,7 +258,9 @@ class WaypointWidget(QMainWindow):
     #     self.z_pose
 
     def _clear_waypoint(self):
-        self.reset_trajectory_publisher.publish(True)
+        reset_state= Bool()
+        reset_state.data=True
+        self.reset_trajectory_publisher.publish(reset_state)
 
     def send_initial_position(self):
         try:
