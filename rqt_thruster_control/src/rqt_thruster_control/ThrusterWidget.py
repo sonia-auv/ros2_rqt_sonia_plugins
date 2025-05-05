@@ -1,8 +1,9 @@
 import os
-import asyncio
+import time
 from ament_index_python.packages import get_package_share_directory
 from rclpy.publisher import Publisher
 from .ThrusterAction import ThrusterAction
+from threading import Thread
 
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow
@@ -90,6 +91,7 @@ class ThrusterWidget(QMainWindow):
         self.thruster_7.handle_thruster_effort1500_clicked(None)
         self.thruster_8.handle_thruster_effort1500_clicked(None)
 
+
     def _handle_enableButton_clicked(self, checked):
         self.enableButton.setEnabled(False)
         self.disableButton.setEnabled(True)
@@ -131,23 +133,26 @@ class ThrusterWidget(QMainWindow):
         msg.motor8=self.pwms[7]     
 
         self.thruster_publisher.publish(msg)
-
-    async def dry_run(self):
+               
+    def _handle_start_test_triggered(self):
+        self.dry_test_thread= Thread(target=self.dry_run, daemon=True)
+        self.dry_test_thread.start()
+        
+    def dry_run(self):
         for i in range(8):
-            self.set_pwm(i, 1550)
+            self.set_pwm(i, 1535)
             self.send_pwms()
-            await asyncio.sleep(4)
+            time.sleep(3)
             self.set_pwm(i, 1500)
             self.send_pwms()
-            await asyncio.sleep(0.5)
-            
-    def _handle_start_test_triggered(self):
-        self.dry_run()
+            time.sleep(1)      
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
+        if self.dry_test_thread.is_alive:
+            self.thread1.join()
         self.thruster_publisher.destroy()
-        pass
+        
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:
@@ -158,19 +163,3 @@ class ThrusterWidget(QMainWindow):
         # TODO restore intrinsic configuration, usually using:
         # v = instance_settings.value(k)
         pass
-
-    #def trigger_configuration(self):
-        # Comment in to signal that the plugin has a way to configure
-        # This will enable a setting button (gear icon) in each dock widget title bar
-        # Usually used to open a modal configuration dialog
-#class Threads(threading.Thread):
-    #def __init__(self, dryTestService):
-        #super(Threads, self).__init__()
-        #self.dryTestService = dryTestService
-    
-    #def run(self):
-       # try:
-            #self.dryTestService.call()
-        #except rospy.ServiceException as e:
-            #print(e)
-            #rospy.logerr('Provider Thruster Node is not started')
