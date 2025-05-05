@@ -1,6 +1,7 @@
 import os
 import rclpy
 from threading import Thread
+from rclpy.node import Node
 from qt_gui.plugin import Plugin
 
 from .DepthIndicatorWidget import DepthIndicatorWidget
@@ -26,8 +27,9 @@ class DepthIndicator(Plugin):
         if not args.quiet:
             print('arguments: ', args)
             print('unknowns: ', unknowns)
-
-        self.__internal_node= rclpy.create_node('rqt_depth_indicator')
+        
+        #rclpy.init(context=context)
+        self.__internal_node= Node('rqt_depth_indicator')
         self._mainWindow = DepthIndicatorWidget(self.__internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
@@ -37,13 +39,17 @@ class DepthIndicator(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
-        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
-        
 
+        self._thread =Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True)
+        self._thread.start()
+        
     def shutdown_plugin(self):
-        # TODO unregister all publishers here
-        self._mainWindow.shutdown_plugin()
-        pass
+        self._thread.join()
+        if self.__internal_node:
+            self.__internal_node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+        self._mainWindow.shutdown_plugin()  
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

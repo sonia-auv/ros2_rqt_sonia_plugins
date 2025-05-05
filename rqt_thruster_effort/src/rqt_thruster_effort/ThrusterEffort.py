@@ -1,6 +1,7 @@
 from threading import Thread
 import rclpy
 from qt_gui.plugin import Plugin
+from rclpy.node import Node
 
 from .ThrusterEffortWidget import ThrusterEffortWidget
 
@@ -27,7 +28,8 @@ class ThrusterEffort(Plugin):
             print('arguments: ', args)
             print('unknowns: ', unknowns)
             
-        self.__internal_node=rclpy.create_node('rqt_thruster_effort_node')
+        #rclpy.init(context=context)
+        self.__internal_node=Node('rqt_thruster_effort_node')
 
         self._mainWindow = ThrusterEffortWidget(self.__internal_node)
 
@@ -37,14 +39,18 @@ class ThrusterEffort(Plugin):
         # Add widget to the user interface
         self._mainWindow.setPalette(context._handler._main_window.palette())
         self._mainWindow.setAutoFillBackground(True)
-        context.add_widget(self._mainWindow)
-        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
-        
+        context.add_widget(self._mainWindow)        
 
+        self._thread = Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True)
+        self._thread.start()
+        
     def shutdown_plugin(self):
-        # TODO unregister all publishers here
+        self._thread.join()
+        if self.__internal_node:
+            self.__internal_node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
         self._mainWindow.shutdown_plugin()
-        pass
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

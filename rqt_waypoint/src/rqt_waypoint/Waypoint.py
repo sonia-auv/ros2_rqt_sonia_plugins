@@ -1,6 +1,7 @@
 import os
 import rclpy
 
+from rclpy.node import Node
 from threading import Thread
 from qt_gui.plugin import Plugin
 import rclpy.executors
@@ -27,7 +28,8 @@ class Waypoint(Plugin):
         if not args.quiet:
             print('arguments: ', args)
             print('unknowns: ', unknowns)
-        self.__internal_node = rclpy.create_node('rqt_waypoint_node')
+        #rclpy.init(context=context)
+        self.__internal_node = Node('rqt_waypoint_node')
         self._mainWindow = WaypointWidget(self.__internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
@@ -37,12 +39,17 @@ class Waypoint(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
-        #Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
-
+    
+        self._thread = Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True)
+        self._thread.start()
+        
     def shutdown_plugin(self):
-        # TODO unregister all publishers here
+        self._thread.join()
+        if self.__internal_node:
+            self.__internal_node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
         self._mainWindow.shutdown_plugin()
-        pass
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

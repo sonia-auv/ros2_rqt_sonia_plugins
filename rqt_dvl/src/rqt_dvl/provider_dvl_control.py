@@ -2,6 +2,7 @@
 import os
 import rclpy
 from threading import Thread
+from rclpy.node import Node
 from qt_gui.plugin import Plugin
 
 from .DvlWidget import DvlWidget
@@ -21,7 +22,8 @@ class ProviderDvl(Plugin):
             print('arguments: ', args)
             print('unknowns: ', unknowns)
 
-        self.__internal_node = rclpy.create_node('rqt_dvl_node')
+        #rclpy.init(context=context)
+        self.__internal_node = Node('rqt_dvl_node')
         # Create QWidget
         self._mainWindow = DvlWidget(self.__internal_node)
         # Get path to UI file which should be in the "resource" folder of this package
@@ -33,11 +35,16 @@ class ProviderDvl(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
-        Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True).start()
-
+        self._thread =Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True)
+        self._thread.start()
+        
     def shutdown_plugin(self):
-        self._mainWindow.shutdown_plugin()
-        pass
+        self._thread.join()
+        if self.__internal_node:
+            self.__internal_node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+        self._mainWindow.shutdown_plugin()  
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

@@ -1,10 +1,10 @@
-import imp
 import os
-from threading import Thread
+from rclpy.node import Node
 import rclpy
 
 from qt_gui.plugin import Plugin
-from PyQt5.QtWidgets import QMainWindow, QToolBar
+from PyQt5.QtWidgets import QToolBar
+from PyQt5.QtCore import QTimer
 
 from .ToolbarSetControlMode import SetModeControlWidget
 from .ToolbarBatteryWidget import BatteryWidget
@@ -36,8 +36,9 @@ class ToolBar(Plugin):
         if not args.quiet:
             print("arguments: ", args)
             print("unknowns: ", unknowns)
-
-        self.__internal_node = rclpy.create_node('rqt_toolbar_node')
+        if not rclpy.ok():
+            rclpy.init()
+        self.__internal_node = Node('rqt_toolbar_node')
 
         self._toolbar = QToolBar()
         # self._palette = Palette()
@@ -62,12 +63,22 @@ class ToolBar(Plugin):
         context.add_toolbar(self._toolbar)
 
         # Spin this thread
-        self._thread3 = Thread(target=rclpy.spin, name="rqt_toolbar", args=[self.__internal_node], daemon=True)
-        self._thread3.start()
+        self._timer = QTimer()
+        self._timer.timeout.connect(self._spin_once)
+        self._timer.start(10)
+
+    def _spin_once(self):
+        if rclpy.ok() and self.__internal_node:
+            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
     
-    def shutdown_plugin(self):   
-        if(self._thread3.getName=="rqt_toolbar"):
-            self._thread3.join()
+    def shutdown_plugin(self):
+        self._timer.stop()
+        self._timer.timeout.disconnect(self._spin_once)
+        if self.__internal_node:
+            self.__internal_node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+        self._toolbar.destroy()
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

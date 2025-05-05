@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rclpy
-from threading import Thread
+from PyQt5.QtCore import QTimer
+from rclpy.node import Node
 from qt_gui.plugin import Plugin
 from .PowerWidget import PowerWidget
 
@@ -18,7 +19,10 @@ class ProviderPower(Plugin):
         if not args.quiet:
             print('arguments: ', args)
             print('unknowns: ', unknowns)
-        self.__internal_node = rclpy.create_node('rqt_power_node')
+    
+        if not rclpy.ok():
+            rclpy.init()
+        self.__internal_node = Node('rqt_power_node')
         # Create QWidget
         self._mainWindow = PowerWidget(self.__internal_node)
         # Get path to UI file which should be in the "resource" folder of this package
@@ -31,12 +35,23 @@ class ProviderPower(Plugin):
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
 
-        self._thread2 = Thread(target=rclpy.spin, name="rqt_power", args=[self.__internal_node], daemon=True)
-        self._thread2.start()
+        # Spin this thread
+        self._timer = QTimer()
+        self._timer.timeout.connect(self._spin_once)
+        self._timer.start(10)
+    
+    def _spin_once(self):
+        if rclpy.ok() and self.__internal_node:
+            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
 
     def shutdown_plugin(self):
-        if(self._thread2.getName=="rqt_power"):
-            self._thread2.join
+        self._timer.stop()
+        self._timer.timeout.disconnect(self._spin_once)
+        if self.__internal_node:
+            self.__internal_node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+        self._mainWindow.shutdown_plugin() 
 
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

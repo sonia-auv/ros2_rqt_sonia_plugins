@@ -1,5 +1,7 @@
 import rclpy
+from rclpy.node import Node
 from rqt_gui_py.plugin import Plugin
+from threading import Thread
 from .actuator_widget import ActuatorWidget
 
 class Actuator(Plugin):
@@ -8,7 +10,8 @@ class Actuator(Plugin):
         super(Actuator, self).__init__(context)
         self.setObjectName('Actuator')
 
-        self.__internal_node= rclpy.create_node('rqt_actuator')
+        #rclpy.init(context=context)
+        self.__internal_node= Node('rqt_actuator')
         self._widget = ActuatorWidget(self.__internal_node)
 
         if context.serial_number() > 1:
@@ -17,6 +20,9 @@ class Actuator(Plugin):
         self._widget.setAutoFillBackground(True)
         context.add_widget(self._widget)
 
+        self._thread =Thread(target=rclpy.spin, args=[self.__internal_node], daemon=True)
+        self._thread.start()
+
     def save_settings(self, plugin_settings, instance_settings):
         self._widget.save_settings(plugin_settings, instance_settings)
 
@@ -24,4 +30,7 @@ class Actuator(Plugin):
         self._widget.restore_settings(plugin_settings, instance_settings)
 
     def shutdown_plugin(self):
+        rclpy.shutdown()
+        self._thread.join()
+        self.__internal_node.destroy_node()
         self._widget.shutdown_plugin()
