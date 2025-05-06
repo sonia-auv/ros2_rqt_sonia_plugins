@@ -4,7 +4,6 @@ import rclpy
 from rclpy.client import Client
 import threading
 from ament_index_python import get_package_share_directory
-#from sonia_common_ros2.msg import ActuatorDoAction, ActuatorSendReply
 from sonia_common_ros2.srv import ActuatorService
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
@@ -20,8 +19,6 @@ class ActuatorWidget(QWidget):
 
         self.actuatorClient: Client = internal_node.create_client(ActuatorService, "/provider_actuator/do_action")
         self.req= ActuatorService.Request()
-        #self.actuatorSubscriber = internal_node.create_subscription("/provider_actuators/do_action_from_actuators", ActuatorSendReply, self.actuatorCallback)
-        #self.actuatorPublisher = internal_node.create_publisher(ActuatorDoAction,"/provider_actuators/do_action_to_actuators", queue_size=100)
         self.drop_port.clicked.connect(self._handle_drop_port)
         self.drop_starboard.clicked.connect(self._handle_drop_starboard)
         self.torpedo_port.clicked.connect(self._handle_torpedo_port)
@@ -116,7 +113,7 @@ class ActuatorWidget(QWidget):
         pass
 
     def shutdown_plugin(self):
-        self.actuatorSubscriber.unregister()
+        self.actuatorClient.destroy()
 
 
 class Threads(threading.Thread):
