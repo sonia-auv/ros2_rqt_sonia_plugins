@@ -72,7 +72,7 @@ class WaypointWidget(QMainWindow):
         self.single_add_pose_publisher: Publisher = ros_node.create_publisher(geoPose,"/proc_control/add_pose", 10)
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
-        self.auv7_tare_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/setDepthOffset", 10)
+        self.auv7_tare_publisher: Publisher = ros_node.create_publisher(Empty, "/provider_dvl/setDepthOffset", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
         #self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", 10)
         #self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
@@ -184,8 +184,7 @@ class WaypointWidget(QMainWindow):
         # Getting AUV name environnment variable.
         auv_name = os.getenv('AUV')
         if auv_name == "AUV7":
-            tare = Bool()
-            tare.data=True
+            tare = Empty.Request()
             self.auv7_tare_publisher.publish(tare)
         elif auv_name == "AUV8":
             try:
@@ -194,10 +193,8 @@ class WaypointWidget(QMainWindow):
             except Exception as e:
                 print(e)
                 rclpy.logging.get_logger().info('Provider depth is not started.')
-                #rospy.logerr('Provider depth is not started.')
         else:
             rclpy.logging.get_logger().info('AUV environment variable not properly set.')
-            #rospy.logerr('AUV environment variable not properly set.')
 
     def _tare_imu(self):
         try:
@@ -206,7 +203,6 @@ class WaypointWidget(QMainWindow):
         except Exception as e:
             print(e)
             rclpy.logging.get_logger().info('Provider IMU is not started.')
-            #rospy.logerr('Provider IMU is not started.')
 
     def startDVL(self):
         dvl_state= Bool()
