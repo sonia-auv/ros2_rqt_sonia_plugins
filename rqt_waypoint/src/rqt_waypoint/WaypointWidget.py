@@ -25,6 +25,7 @@ from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soni
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
 
 from std_srvs.srv import Trigger, Empty
+from std_msgs.msg import Empty as EmptyMsg
 import tf2_ros
  #.transformations import euler_from_quaternion
 
@@ -72,7 +73,7 @@ class WaypointWidget(QMainWindow):
         self.single_add_pose_publisher: Publisher = ros_node.create_publisher(geoPose,"/proc_control/add_pose", 10)
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
-        self.auv7_tare_publisher: Publisher = ros_node.create_publisher(Empty, "/provider_dvl/setDepthOffset", 10)
+        self.auv7_tare_publisher: Publisher = ros_node.create_publisher(EmptyMsg, "/provider_dvl/setDepthOffset", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
         #self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", 10)
         #self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
