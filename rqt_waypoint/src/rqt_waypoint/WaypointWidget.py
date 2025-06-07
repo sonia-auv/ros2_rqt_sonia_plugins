@@ -26,7 +26,7 @@ from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
 
 from std_srvs.srv import Trigger, Empty
 from std_msgs.msg import Empty as EmptyMsg
-import tf2_ros
+from tf_transformations import euler_from_quaternion
  #.transformations import euler_from_quaternion
 
 class WaypointWidget(QMainWindow):
@@ -293,9 +293,9 @@ class WaypointWidget(QMainWindow):
             self.xPositionCurrent.setText('%.2f' % data.position.x)
             self.yPositionCurrent.setText('%.2f' % data.position.y)
             self.zPositionCurrent.setText('%.2f' % data.position.z)
-            self.rollPositionCurrent.setText('%.2f' % math.degrees(tf2_ros.transformations.euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[2]))
-            self.pitchPositionCurrent.setText('%.2f' % math.degrees(tf2_ros.transformations.euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[1]))
-            self.yawPositionCurrent.setText('%.2f' % math.degrees(tf2_ros.transformations.euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[0]))
+            self.rollPositionCurrent.setText('%.2f' % math.degrees(euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[2]))
+            self.pitchPositionCurrent.setText('%.2f' % math.degrees(euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[1]))
+            self.yawPositionCurrent.setText('%.2f' % math.degrees(euler_from_quaternion([data.orientation.x,data.orientation.y,data.orientation.z,data.orientation.w],'szyx')[0]))
         except ValueError:
             pass
 
