@@ -57,6 +57,9 @@ class ThrusterWidget(QMainWindow):
         self.actionStart_test.setEnabled(False)
 
         self.pwms=[1500,1500,1500,1500,1500,1500,1500,1500,1500]
+        
+        #create dry test thread
+        self.dry_test_thread= Thread(target=self.dry_run, daemon=True)
 
     def _dry_run_callback(self, msg):
         if msg.data:
@@ -135,7 +138,6 @@ class ThrusterWidget(QMainWindow):
         self.thruster_publisher.publish(msg)
                
     def _handle_start_test_triggered(self):
-        self.dry_test_thread= Thread(target=self.dry_run, daemon=True)
         self.dry_test_thread.start()
         
     def dry_run(self):
@@ -149,9 +151,10 @@ class ThrusterWidget(QMainWindow):
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
-        if self.dry_test_thread.is_alive:
-            self.thread1.join()
+        if self.dry_test_thread.is_alive():
+            self.dry_test_thread.join()
         self.thruster_publisher.destroy()
+        self.dry_test_publisher.destroy()
         
 
     def save_settings(self, plugin_settings, instance_settings):

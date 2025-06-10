@@ -54,11 +54,11 @@ class ThrusterEffort(Plugin):
     def shutdown_plugin(self):
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once)
+        self._mainWindow.shutdown_plugin()
         if self.__internal_node:
             self.__internal_node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
-        self._mainWindow.shutdown_plugin()
         
     def save_settings(self, plugin_settings, instance_settings):
         # TODO save intrinsic configuration, usually using:

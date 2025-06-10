@@ -2,13 +2,9 @@ import os
 import threading
 from time import sleep, time
 
-#import rospy
-#import rospkg
 import math
 import rclpy
-import rclpy.exceptions
 import rclpy.logging
-import rclpy.service
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
@@ -19,14 +15,13 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Pose as geoPose
-from trajectory_msgs.msg import MultiDOFJointTrajectoryPoint
-#from sonia_common.msg import AddPose, MultiAddPose, MpcInfo, MissionTimer
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
 
 from std_srvs.srv import Trigger, Empty
 from std_msgs.msg import Empty as EmptyMsg
 from tf_transformations import euler_from_quaternion
+
  #.transformations import euler_from_quaternion
 
 class WaypointWidget(QMainWindow):
@@ -406,5 +401,13 @@ class WaypointWidget(QMainWindow):
     def shutdown_plugin(self):
         self.controller_info_subscriber.destroy()
         self.position_target_subscriber.destroy()
-        #self.timeout_subscriber.destroy()
-        
+        self.simulation_start_publisher.destroy()
+        self.single_add_pose_publisher.destroy()
+        self.multi_add_pose_publisher.destroy()
+        self.reset_trajectory_publisher.destroy()
+        self.auv7_tare_publisher.destroy()
+        self.set_dvl_started_publisher.destroy()
+        self.initial_position_service.destroy()
+        self.set_auv_service.destroy()
+        self.depth_tare_service.destroy()
+        self.imu_tare_service.destroy()
