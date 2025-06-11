@@ -8,6 +8,7 @@
   <license>Apache License 2.0</license>
 
   <depend>rclpy</depend>
+  <depend>tf_transformations</depend>
   <depend>rqt_gui</depend>
   <depend>rqt_gui_py</depend>
   
