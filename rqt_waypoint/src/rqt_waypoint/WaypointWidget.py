@@ -13,16 +13,14 @@ from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Empty as EmptyMsg
 from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
+
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
-
 from std_srvs.srv import Trigger, Empty
-from std_msgs.msg import Empty as EmptyMsg
-from tf_transformations import euler_from_quaternion
 
- #.transformations import euler_from_quaternion
+from tf_transformations import euler_from_quaternion
 
 class WaypointWidget(QMainWindow):
 
