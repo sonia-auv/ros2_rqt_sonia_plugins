@@ -141,14 +141,15 @@ class ThrusterWidget(QMainWindow):
         self.dry_test_thread.start()
         
     def dry_run(self):
-        for i in range(8):
+        i = 0
+        while i < 8:
             self.set_pwm(i, 1550)
             self.send_pwms()
             time.sleep(3)
             self.set_pwm(i, 1500)
             self.send_pwms()
             time.sleep(1) 
-        self.dry_test_thread.join()     
+        self.dry_test_thread = Thread(target=self.dry_run, daemon=True)   
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
