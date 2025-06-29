@@ -63,7 +63,7 @@ class WaypointWidget(QMainWindow):
 
         # Publishers
         self.simulation_start_publisher: Publisher= ros_node.create_publisher(geoPose, "/proc_simulation/start_simulation",10)
-        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(geoPose,"/proc_control/add_pose", 10)
+        self.single_add_pose_publisher: Publisher = ros_node.create_publisher(soniaPose,"/proc_control/add_pose", 10)
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
         self.auv7_tare_publisher: Publisher = ros_node.create_publisher(EmptyMsg, "/provider_dvl/setDepthOffset", 10)
