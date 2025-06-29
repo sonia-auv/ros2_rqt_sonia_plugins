@@ -193,7 +193,7 @@ class WaypointWidget(QMainWindow):
     def _tare_imu(self):
         try:
             req= Trigger.Request()
-            self.imu_tare_service.call(req)
+            self.imu_tare_service.call_async(req)
         except Exception as e:
             print(e)
             rclpy.logging.get_logger().info('Provider IMU is not started.')
