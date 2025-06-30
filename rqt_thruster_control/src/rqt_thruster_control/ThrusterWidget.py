@@ -105,7 +105,7 @@ class ThrusterWidget(QMainWindow):
         self.resetPwmButton.setEnabled(True)
         self.actionStart_test.setEnabled(True)
         state= Bool()
-        state.data=checked
+        state.data=True
         self.dry_test_publisher.publish(state)
 
     def _handle_disableButton_clicked(self, checked):
@@ -118,7 +118,7 @@ class ThrusterWidget(QMainWindow):
         self.resetPwmButton.setEnabled(False)
         self.actionStart_test.setEnabled(False)
         state= Bool()
-        state.data=checked
+        state.data=False
         self.dry_test_publisher.publish(state)
 
     def set_pwm(self, index, value):
