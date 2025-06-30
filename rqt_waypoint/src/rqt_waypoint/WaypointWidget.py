@@ -183,7 +183,7 @@ class WaypointWidget(QMainWindow):
         elif auv_name == "AUV8":
             try:
                 req = Empty.Request()
-                self.depth_tare_service.call(req)
+                self.depth_tare_service.call_async(req)
             except Exception as e:
                 print(e)
                 rclpy.logging.get_logger().info('Provider depth is not started.')
