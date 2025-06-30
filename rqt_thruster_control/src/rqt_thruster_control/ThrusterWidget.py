@@ -148,7 +148,8 @@ class ThrusterWidget(QMainWindow):
             time.sleep(3)
             self.set_pwm(i, 1500)
             self.send_pwms()
-            time.sleep(1) 
+            time.sleep(1)
+            i+=1
         self.dry_test_thread = Thread(target=self.dry_run, daemon=True)   
 
     def shutdown_plugin(self):
