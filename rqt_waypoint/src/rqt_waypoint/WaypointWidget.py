@@ -66,7 +66,6 @@ class WaypointWidget(QMainWindow):
         self.single_add_pose_publisher: Publisher = ros_node.create_publisher(soniaPose,"/proc_control/add_pose", 10)
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
-        self.auv7_tare_publisher: Publisher = ros_node.create_publisher(EmptyMsg, "/provider_dvl/setDepthOffset", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
         #self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", 10)
         #self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
@@ -74,7 +73,7 @@ class WaypointWidget(QMainWindow):
         # Services
         self.initial_position_service: Client = ros_node.create_client(ObjectPoseService,"/proc_simulation/auv_pose")
         self.set_auv_service: Client = ros_node.create_client(SetSimulationAUVService, "/proc_simulation/select_auv")
-        self.depth_tare_service: Client= ros_node.create_client(Empty, "/provider_depth/tare")
+        self.depth_tare_service: Client= ros_node.create_client(Trigger, "/provider_depth/tare")
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
 
         self.current_target_received.connect(self._current_target_received)
@@ -175,20 +174,15 @@ class WaypointWidget(QMainWindow):
         t.start()
 
     def _reset_depth(self):
-        # Getting AUV name environnment variable.
-        auv_name = os.getenv('AUV')
-        if auv_name == "AUV7":
-            tare = Empty.Request()
-            self.auv7_tare_publisher.publish(tare)
-        elif auv_name == "AUV8":
-            try:
-                req = Empty.Request()
-                self.depth_tare_service.call_async(req)
-            except Exception as e:
-                print(e)
-                rclpy.logging.get_logger().info('Provider depth is not started.')
-        else:
-            rclpy.logging.get_logger().info('AUV environment variable not properly set.')
+        try:
+            req = Empty.Request()
+            rep=self.depth_tare_service.call_async(req)
+            rclpy.spin_until_future_complete(self, rep)
+            if(rep.done()):
+                rclpy.logging.get_logger().info('Provider depth is tared.')
+        except Exception as e:
+            print(e)
+            rclpy.logging.get_logger().info('Provider depth is not started.')
 
     def _tare_imu(self):
         try:
