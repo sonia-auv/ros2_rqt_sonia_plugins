@@ -13,7 +13,7 @@ from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
-from std_msgs.msg import Bool, Empty as EmptyMsg
+from std_msgs.msg import Bool
 from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
 
@@ -54,6 +54,7 @@ class WaypointWidget(QMainWindow):
         self.prev_scene = ""
         self.prev_run = ""
         
+        self.rclpy_ros = ros_node
         self.tare_req = Trigger.Request()
 
         # Subscribers
@@ -107,7 +108,7 @@ class WaypointWidget(QMainWindow):
         if msg.status == 1:
             self.createLabel.emit(msg)
         else:
-            if msg.uniqueID in self.listMissionLabels:
+            if msg.unique_id in self.listMissionLabels:
                 if msg.status == 2:
                     self.missionComplete(msg)
                 elif msg.status == 3:
@@ -185,11 +186,11 @@ class WaypointWidget(QMainWindow):
         
     def tare_callback(self, rep):
         try:
-            fut= rep.result()
-            rclpy.logging.get_logger().info('tared.')
+            fut= rep.result().message
+            print(fut)
         except Exception as e:
             print(e)
-            rclpy.logging.get_logger().info('not tared.')
+            print('not tared.')
     def startDVL(self):
         dvl_state= Bool()
         dvl_state.data=True
@@ -261,6 +262,7 @@ class WaypointWidget(QMainWindow):
 
                 self.simulation_start_publisher.publish(pose)
             else:
+                
                 rclpy.logging.get_logger().info('AUV environment variable not properly set.')
                 #rospy.logerr('AUV environment variable not properly set.')
 

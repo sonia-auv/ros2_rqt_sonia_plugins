@@ -30,7 +30,8 @@ class ThrusterWidget(QMainWindow):
         self.resetPwmButton.setEnabled(False)
         self.enableButton.clicked[bool].connect(self._handle_enableButton_clicked)
         self.disableButton.clicked[bool].connect(self._handle_disableButton_clicked)
-        self.actionStart_test.triggered.connect(self._handle_start_test_triggered)
+        self.actionDry_motors.triggered.connect(self._handle_dry_motors_triggered)
+        self.actionSpin_sequence.triggered.connect(self._handle_spin_sequence_triggered)
         self.resetPwmButton.clicked[bool].connect(self._handle_resetPwmButton_clicked)
 
         self.thruster_1 = ThrusterAction(self, 0, 'T1')
@@ -54,12 +55,14 @@ class ThrusterWidget(QMainWindow):
         self.T3_T4.setEnabled(False)
         self.T5_T6.setEnabled(False)
         self.T7_T8.setEnabled(False)
-        self.actionStart_test.setEnabled(False)
+        self.actionDry_motors.setEnabled(False)
+        self.actionSpin_sequence.setEnabled(False)
 
         self.pwms=[1500,1500,1500,1500,1500,1500,1500,1500,1500]
         
-        #create dry test thread
-        self.dry_test_thread= Thread(target=self.dry_run, daemon=True)
+        #create dry test threads
+        self.spin_sequence_thread= Thread(target=self.spin_sequence, daemon=True)
+        self.dry_motors_thread= Thread(target=self.dry_motors, daemon=True)
 
     def _dry_run_callback(self, msg):
         if msg.data:
@@ -70,7 +73,8 @@ class ThrusterWidget(QMainWindow):
             self.T5_T6.setEnabled(True)
             self.T7_T8.setEnabled(True)
             self.resetPwmButton.setEnabled(True)
-            self.actionStart_test.setEnabled(True)
+            self.actionDry_motors.setEnabled(True)
+            self.actionSpin_sequence.setEnabled(True)
         else:
             self.enableButton.setEnabled(True)
             self.disableButton.setEnabled(False)
@@ -79,7 +83,8 @@ class ThrusterWidget(QMainWindow):
             self.T5_T6.setEnabled(False)
             self.T7_T8.setEnabled(False)
             self.resetPwmButton.setEnabled(False)
-            self.actionStart_test.setEnabled(False)
+            self.actionDry_motors.setEnabled(False)
+            self.actionSpin_sequence.setEnabled(False)
     
     def _handle_resetPwmButton_clicked(self, checked):
         
@@ -103,7 +108,8 @@ class ThrusterWidget(QMainWindow):
         self.T5_T6.setEnabled(True)
         self.T7_T8.setEnabled(True)
         self.resetPwmButton.setEnabled(True)
-        self.actionStart_test.setEnabled(True)
+        self.actionDry_motors.setEnabled(True)
+        self.actionSpin_sequence.setEnabled(True)
         state= Bool()
         state.data=True
         self.dry_test_publisher.publish(state)
@@ -116,7 +122,8 @@ class ThrusterWidget(QMainWindow):
         self.T5_T6.setEnabled(False)
         self.T7_T8.setEnabled(False)
         self.resetPwmButton.setEnabled(False)
-        self.actionStart_test.setEnabled(False)
+        self.actionDry_motors.setEnabled(False)
+        self.actionSpin_sequence.setEnabled(False)
         state= Bool()
         state.data=False
         self.dry_test_publisher.publish(state)
@@ -137,10 +144,12 @@ class ThrusterWidget(QMainWindow):
 
         self.thruster_publisher.publish(msg)
                
-    def _handle_start_test_triggered(self):
-        self.dry_test_thread.start()
+    def _handle_dry_motors_triggered(self):
+        self.dry_motors_thread.start()
+    def _handle_spin_sequence_triggered(self):
+        self.spin_sequence_thread.start()
         
-    def dry_run(self):
+    def spin_sequence(self):
         i = 0
         while i < 8:
             self.set_pwm(i, 1550)
@@ -150,12 +159,29 @@ class ThrusterWidget(QMainWindow):
             self.send_pwms()
             time.sleep(1)
             i+=1
-        self.dry_test_thread = Thread(target=self.dry_run, daemon=True)   
+        self.spin_sequence_thread = Thread(target=self.spin_sequence, daemon=True)   
+    def dry_motors(self):
+        i = 0
+        while i < 8:
+            self.set_pwm(i, 1540)
+            i+=1
+        self.send_pwms()
+        time.sleep(3)
+        #reset
+        i = 0
+        while i < 8:
+            self.set_pwm(i, 1500)
+            i+=1
+        self.send_pwms()
+        time.sleep(1)
+        self.dry_motors_thread = Thread(target=self.dry_motors, daemon=True)
 
     def shutdown_plugin(self):
         # TODO unregister all publishers here
-        if self.dry_test_thread.is_alive():
-            self.dry_test_thread.join()
+        if self.spin_sequence_thread.is_alive():
+            self.spin_sequence_thread.join()
+        if self.dry_motors_thread.is_alive():
+            self.dry_motors_thread.join()
         self.thruster_publisher.destroy()
         self.dry_test_publisher.destroy()
         
