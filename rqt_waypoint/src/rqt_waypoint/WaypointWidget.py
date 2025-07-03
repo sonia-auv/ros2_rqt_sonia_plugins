@@ -18,7 +18,7 @@ from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
 
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
-from std_srvs.srv import Trigger, Empty
+from std_srvs.srv import Trigger
 
 from tf_transformations import euler_from_quaternion
 
@@ -53,6 +53,8 @@ class WaypointWidget(QMainWindow):
         self.prev_auv = ""
         self.prev_scene = ""
         self.prev_run = ""
+        
+        self.tare_req = Trigger.Request()
 
         # Subscribers
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
@@ -123,8 +125,8 @@ class WaypointWidget(QMainWindow):
         label2.setText(f"{timeout:.1f}")
         self.missionGrid.addWidget(label2, self.labelsCreated, 1)
         self.labelsCreated += 1
-        self.listMissionLabels[msg.uniqueID] = [label1, label2]
-        t = threading.Thread(target = self.countdownThread, args=(msg.uniqueID, timeout))
+        self.listMissionLabels[msg.unique_id] = [label1, label2]
+        t = threading.Thread(target = self.countdownThread, args=(msg.unique_id, timeout))
         t.start()
     
     def countdownThread(self, uniqueID, timeout):
@@ -151,47 +153,43 @@ class WaypointWidget(QMainWindow):
 
     @pyqtSlot(MissionTimer)
     def missionComplete(self, msg):
-        label = self.listMissionLabels[msg.uniqueID][1]
+        label = self.listMissionLabels[msg.unique_id][1]
         label.setStyleSheet("background-color: green")
         label.setText(f"{label.text()} (Completed)")
-        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.uniqueID,))
+        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.unique_id,))
         t.start()
     
     @pyqtSlot(MissionTimer)
     def missionTimeout(self, msg):
-        label = self.listMissionLabels[msg.uniqueID][1]
+        label = self.listMissionLabels[msg.unique_id][1]
         label.setStyleSheet("background-color: red")
         label.setText(f"{0:.1f} (Timed Out)")
-        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.uniqueID,))
+        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.unique_id,))
         t.start()
     
     @pyqtSlot(MissionTimer)
     def missionFailed(self, msg):
-        label = self.listMissionLabels[msg.uniqueID][1]
+        label = self.listMissionLabels[msg.unique_id][1]
         label.setStyleSheet("background-color: red")
         label.setText(f"{label.text()} (Failed)")
-        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.uniqueID,))
+        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.unique_id,))
         t.start()
 
     def _reset_depth(self):
-        try:
-            req = Empty.Request()
-            rep=self.depth_tare_service.call_async(req)
-            rclpy.spin_until_future_complete(self, rep)
-            if(rep.done()):
-                rclpy.logging.get_logger().info('Provider depth is tared.')
-        except Exception as e:
-            print(e)
-            rclpy.logging.get_logger().info('Provider depth is not started.')
-
+        rep = self.depth_tare_service.call_async(self.tare_req)
+        rep.add_done_callback(self.tare_callback)
+        
     def _tare_imu(self):
+        rep=self.imu_tare_service.call_async(self.tare_req)
+        rep.add_done_callback(self.tare_callback)
+        
+    def tare_callback(self, rep):
         try:
-            req= Trigger.Request()
-            self.imu_tare_service.call_async(req)
+            fut= rep.result()
+            rclpy.logging.get_logger().info('tared.')
         except Exception as e:
             print(e)
-            rclpy.logging.get_logger().info('Provider IMU is not started.')
-
+            rclpy.logging.get_logger().info('not tared.')
     def startDVL(self):
         dvl_state= Bool()
         dvl_state.data=True
@@ -397,7 +395,6 @@ class WaypointWidget(QMainWindow):
         self.single_add_pose_publisher.destroy()
         self.multi_add_pose_publisher.destroy()
         self.reset_trajectory_publisher.destroy()
-        self.auv7_tare_publisher.destroy()
         self.set_dvl_started_publisher.destroy()
         self.initial_position_service.destroy()
         self.set_auv_service.destroy()
