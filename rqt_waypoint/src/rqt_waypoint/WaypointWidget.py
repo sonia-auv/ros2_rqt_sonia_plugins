@@ -60,7 +60,7 @@ class WaypointWidget(QMainWindow):
         # Subscribers
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(MpcInfo, "/proc_control/controller_info", self.set_mpc_info,10)
-        #self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info)
+        self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info,10)
         #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
         #self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
@@ -212,14 +212,14 @@ class WaypointWidget(QMainWindow):
     def _reset_position(self):
 
         pose = geoPose()
-        pose.position.x = 0
-        pose.position.y = 0
-        pose.position.z = 0
+        pose.position.x = 0.0
+        pose.position.y = 0.0
+        pose.position.z = 0.0
 
-        pose.orientation.x = 0
-        pose.orientation.y = 0
-        pose.orientation.z = 0
-        pose.orientation.w = 0
+        pose.orientation.x = 0.0
+        pose.orientation.y = 0.0
+        pose.orientation.z = 0.0
+        pose.orientation.w = 0.0
 
         self.simulation_start_publisher.publish(pose)
         # if self.current_mode_id == 0:
@@ -249,28 +249,33 @@ class WaypointWidget(QMainWindow):
         try:
             auv_name = os.getenv('AUV')
             if auv_name:
-                resp = self.initial_position_service.call(object_name=auv_name)
-                pose = geoPose()
-                pose.position.x = resp.object_pose.position.x
-                pose.position.y = resp.object_pose.position.y
-                pose.position.z = resp.object_pose.position.z
-
-                pose.orientation.x = resp.object_pose.orientation.x
-                pose.orientation.y = resp.object_pose.orientation.y
-                pose.orientation.z = resp.object_pose.orientation.z
-                pose.orientation.w = resp.object_pose.orientation.w
-
-                self.simulation_start_publisher.publish(pose)
+                obj= ObjectPoseService.Request()
+                obj.object_name=auv_name
+                resp = self.initial_position_service.call_async(obj)
+                resp.add_done_callback(self._initial_pos_service_cb) 
             else:
-                
-                rclpy.logging.get_logger().info('AUV environment variable not properly set.')
+                print('AUV environment variable not properly set.')
                 #rospy.logerr('AUV environment variable not properly set.')
 
         except Exception as e:
             print(e)
-            rclpy.logging.get_logger().info('Simulation is not started')
+            print('Simulation is not started')
             #rospy.logerr('Simulation is not started')
             self.show_error('Simulation is not started')
+
+    def _initial_pos_service_cb(self, resp):
+        pose = geoPose()
+        pose.position.x = resp.object_pose.position.x
+        pose.position.y = resp.object_pose.position.y
+        pose.position.z = resp.object_pose.position.z
+
+        pose.orientation.x = resp.object_pose.orientation.x
+        pose.orientation.y = resp.object_pose.orientation.y
+        pose.orientation.z = resp.object_pose.orientation.z
+        pose.orientation.w = resp.object_pose.orientation.w
+
+        self.simulation_start_publisher.publish(pose)
+        print('initial pose sent.')
 
     def _position_target_callback(self,data):
         self.current_target_received.emit(data)
@@ -299,8 +304,10 @@ class WaypointWidget(QMainWindow):
 
     def update_unity(self):
         if self.subChoice.currentText() != self.prev_auv:
+            obj= SetSimulationAUVService.Request()
             os.environ["AUV"] = self.subChoice.currentText()
-            self.set_auv_service.call(object_name=self.subChoice.currentText())
+            obj._object_name=self.subChoice.currentText()
+            self.set_auv_service.call_async(obj)
             self.prev_auv = self.subChoice.currentText()
 
         if self.sceneChoice.currentText() != self.prev_scene:
