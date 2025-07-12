@@ -1,0 +1,22 @@
+<library path="src">
+  <class name="Actuator" type="rqt_actuator.actuator.Actuator" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A Python GUI plugin to launch actuators
+    </description>
+    <qtgui>
+      <group>
+        <label>&amp;SONIA</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to visualization.</statustip>
+      </group>
+      <group>
+        <label>&amp;Devices</label>
+        <icon type="theme">folder</icon>
+      </group>
+
+      <label>&amp;Actuator</label>
+      <icon type="theme">view-fullscreen</icon>
+      <statustip>A convivial interface to load mission</statustip>
+    </qtgui>
+  </class>
+</library>

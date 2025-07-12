@@ -1,0 +1,22 @@
+<library path="src">
+  <class name="Thrusters" type="rqt_thruster_control.ThrusterControl.ThrusterControl" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      Provide interface to control thrusters
+    </description>
+    <qtgui>
+      
+      <group>
+        <label>&amp;SONIA</label>
+        <icon type="theme">folder</icon>
+      </group>
+      <group>
+        <label>&amp;Control</label>
+        <icon type="theme">folder</icon>
+      </group>
+      
+      <label>&amp;Thrusters Control</label>
+      <icon type="theme">utilities-system-monitor</icon>
+      <statustip>Provide interface to control thrusters</statustip>
+    </qtgui>
+  </class>
+</library>
