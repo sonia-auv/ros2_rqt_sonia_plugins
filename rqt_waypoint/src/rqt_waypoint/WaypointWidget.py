@@ -251,8 +251,9 @@ class WaypointWidget(QMainWindow):
             if auv_name:
                 obj= ObjectPoseService.Request()
                 obj.object_name=auv_name
-                resp = self.initial_position_service.call_async(obj)
-                resp.add_done_callback(self._initial_pos_service_cb) 
+                print('Start Simulation currently disabled')
+                #resp = self.initial_position_service.call_async(obj)
+                #resp.add_done_callback(self._initial_pos_service_cb) 
             else:
                 print('AUV environment variable not properly set.')
                 #rospy.logerr('AUV environment variable not properly set.')
@@ -263,19 +264,19 @@ class WaypointWidget(QMainWindow):
             #rospy.logerr('Simulation is not started')
             self.show_error('Simulation is not started')
 
-    def _initial_pos_service_cb(self, resp):
-        pose = geoPose()
-        pose.position.x = resp.object_pose.position.x
-        pose.position.y = resp.object_pose.position.y
-        pose.position.z = resp.object_pose.position.z
+    #def _initial_pos_service_cb(self, resp):
+     #   pose = geoPose()
+      #  pose.position.x = resp.object_pose.position.x
+       # pose.position.y = resp.object_pose.position.y
+        #pose.position.z = resp.object_pose.position.z
 
-        pose.orientation.x = resp.object_pose.orientation.x
-        pose.orientation.y = resp.object_pose.orientation.y
-        pose.orientation.z = resp.object_pose.orientation.z
-        pose.orientation.w = resp.object_pose.orientation.w
+        #pose.orientation.x = resp.object_pose.orientation.x
+        #pose.orientation.y = resp.object_pose.orientation.y
+        #pose.orientation.z = resp.object_pose.orientation.z
+        #pose.orientation.w = resp.object_pose.orientation.w
 
-        self.simulation_start_publisher.publish(pose)
-        print('initial pose sent.')
+        #self.simulation_start_publisher.publish(pose)
+        #print('initial pose sent.')
 
     def _position_target_callback(self,data):
         self.current_target_received.emit(data)
