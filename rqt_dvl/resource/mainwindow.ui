@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>550</width>
+    <height>350</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>550</width>
+    <height>350</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>661</width>
+    <height>800</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">Dvl</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>false</bool>
+  </property>
+
+  <!-- ===== Central Widget ===== -->
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="horizontalLayout">
+    <item row="0" column="0">
+    <!-- ===== Group 1 ===== -->
+    <widget class="QGroupBox" name="groupBox1">
+     <property name="title">
+      <string>Velocity</string>
+     </property>
+     <property name="alignment">
+            <set>Qt::AlignCenter</set>
+      </property>
+     <layout class="QGridLayout" name="gridLayout1">
+      <!-- Same content as before -->
+      <item row="0" column="0" alignment="Qt::AlignBottom">
+      <layout class="QVBoxLayout" name="Vbox1">
+      <item>
+       <widget class="QLineEdit" name="vel1Textfield">
+        <property name="readOnly"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item>
+        <widget class="QLabel" name="Vel1Label">
+        <property name="text"><string>Velocity 1</string></property>
+        <property name="alignment"><set>Qt::AlignHCenter</set></property>
+       </widget>
+       </item>
+       </layout>    
+      </item>
+      <item row="0" column="1" alignment="Qt::AlignBottom">
+      <layout class="QVBoxLayout" name="Vbox2">
+      <item>
+       <widget class="QLineEdit" name="vel2Textfield">
+        <property name="readOnly"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="Vel2Label">
+        <property name="text"><string>Velocity 2</string></property>
+        <property name="alignment"><set>Qt::AlignHCenter</set></property>
+       </widget>
+      </item>
+       </layout>    
+      </item>
+      <item row="1" column="0" alignment="Qt::AlignVCenter">
+      <layout class="QVBoxLayout" name="Vbox3">
+      <item>
+       <widget class="QLineEdit" name="vel3Textfield">
+        <property name="readOnly"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="Vel3Label">
+        <property name="text"><string>Velocity 3</string></property>
+        <property name="alignment"><set>Qt::AlignHCenter</set></property>
+       </widget>
+      </item>
+      </layout>    
+      </item>
+      <item row="1" column="1" alignment="Qt::AlignVCenter">
+      <layout class="QVBoxLayout" name="Vbox3">
+      <item>
+       <widget class="QLineEdit" name="vel4Textfield">
+        <property name="readOnly"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="Vel4Label">
+        <property name="text"><string>Velocity 4</string></property>
+        <property name="alignment"><set>Qt::AlignHCenter</set></property>
+       </widget>
+      </item>
+     </layout>
+     </item>
+     </layout> 
+    </widget>
+      </item>
+    <item row="0" column="1">
+    <!-- ===== Group 2 ===== -->
+    <widget class="QGroupBox" name="groupBox2">
+     <property name="title">
+      <string>Bottom tracking</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+      </property>
+     <layout class="QGridLayout" name="gridLayout2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="xVelLabel : ">
+        <property name="text"><string>x_vel_btm</string></property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="xVelTextfield">
+        <property name="readOnly"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="yVelLabel : ">
+        <property name="text"><string>y_vel_btm</string></property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="yVelTextfield">
+        <property name="readOnly"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="zVelLabel : ">
+        <property name="text"><string>z_vel_btm</string></property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="zVelTextfield">
+        <property name="readOnly"><bool>true</bool></property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="eVelLabel : ">
+        <property name="text"><string>e_vel_btm</string></property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="eVelTextfield">
+        <property name="readOnly"><bool>true</bool></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

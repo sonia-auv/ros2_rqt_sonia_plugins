@@ -256,18 +256,16 @@ class WaypointWidget(QMainWindow):
                 #resp.add_done_callback(self._initial_pos_service_cb) 
             else:
                 print('AUV environment variable not properly set.')
-                #rospy.logerr('AUV environment variable not properly set.')
 
         except Exception as e:
             print(e)
             print('Simulation is not started')
-            #rospy.logerr('Simulation is not started')
             self.show_error('Simulation is not started')
 
     #def _initial_pos_service_cb(self, resp):
-     #   pose = geoPose()
-      #  pose.position.x = resp.object_pose.position.x
-       # pose.position.y = resp.object_pose.position.y
+        #pose = geoPose()
+        #pose.position.x = resp.object_pose.position.x
+        #pose.position.y = resp.object_pose.position.y
         #pose.position.z = resp.object_pose.position.z
 
         #pose.orientation.x = resp.object_pose.orientation.x
