@@ -1,13 +1,10 @@
 import os
-import rclpy
-
 from rclpy.subscription import Subscription
 from sonia_common_ros2.msg import MissionStatus, KillStatus
 from ament_index_python.packages import get_package_share_directory
-from threading import Thread
 from python_qt_binding import loadUi
-from PyQt5.QtWidgets import QAction, QMenu, QWidget, QActionGroup
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import pyqtSignal
 
 class KillMissionWidget(QWidget):
     mission_received = pyqtSignal(MissionStatus)
@@ -26,8 +23,6 @@ class KillMissionWidget(QWidget):
 
         self.kill_switch: Subscription = ros_node.create_subscription(KillStatus, '/provider_rs485/kill_status', self._kill_switch_callback, 10)
         self.kill_received.connect(self._handle_kill_result)
-
-
 
     def _mission_switch_callback(self, data):
         self.mission_received.emit(data)

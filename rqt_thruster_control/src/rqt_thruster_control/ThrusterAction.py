@@ -1,4 +1,3 @@
-import time
 
 class ThrusterAction():
     def __init__(self, mainwindow, thruster_unique_id, thrusterName):

@@ -45,9 +45,6 @@ class ThrusterWidget(QMainWindow):
 
         self.thruster_publisher: Publisher = internal_node.create_publisher(MotorPwm,"/provider_thruster/thruster_pwm", 10)
         self.dry_test_publisher: Publisher = internal_node.create_publisher(Bool,"/telemetry/dry_run",10)
-        #self.dry_test_service = rospy.ServiceProxy('/provider_thruster/dry_test', Empty)
-
-        #self.dry_test_subscriber = rospy.Subscriber("/telemetry/dry_run", Bool, self._dry_run_callback)
 
         self.enableButton.setEnabled(True)
         self.disableButton.setEnabled(False)
@@ -163,7 +160,7 @@ class ThrusterWidget(QMainWindow):
     def dry_motors(self):
         i = 0
         while i < 8:
-            self.set_pwm(i, 1540)
+            self.set_pwm(i, 1545)
             i+=1
         self.send_pwms()
         time.sleep(3)
@@ -177,21 +174,9 @@ class ThrusterWidget(QMainWindow):
         self.dry_motors_thread = Thread(target=self.dry_motors, daemon=True)
 
     def shutdown_plugin(self):
-        # TODO unregister all publishers here
         if self.spin_sequence_thread.is_alive():
             self.spin_sequence_thread.join()
         if self.dry_motors_thread.is_alive():
             self.dry_motors_thread.join()
         self.thruster_publisher.destroy()
         self.dry_test_publisher.destroy()
-        
-
-    def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        # instance_settings.set_value(k, v)
-        pass
-
-    def restore_settings(self, plugin_settings, instance_settings):
-        # TODO restore intrinsic configuration, usually using:
-        # v = instance_settings.value(k)
-        pass

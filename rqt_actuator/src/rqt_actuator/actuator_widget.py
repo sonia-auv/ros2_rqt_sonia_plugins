@@ -54,13 +54,11 @@ class ActuatorWidget(QWidget):
         if self.open_arm.styleSheet() == "background-color: yellow":
             return
         self.open_arm.setStyleSheet("background-color: yellow")
-        #self.sendMessage(ActuatorDoAction.ELEMENT_ARM,ActuatorDoAction.ARM_OPEN,ActuatorDoAction.ACTION_ARM_EXEC)
 
     def _handle_close_robotic_arm(self):
         if self.close_arm.styleSheet() == "background-color: yellow":
             return
         self.close_arm.setStyleSheet("background-color: yellow")
-        #self.sendMessage(ActuatorDoAction.ELEMENT_ARM,ActuatorDoAction.ARM_CLOSE,ActuatorDoAction.ACTION_ARM_EXEC)
 
     def sendMessage(self, element, side, action):
         self.req.action=action
@@ -69,7 +67,6 @@ class ActuatorWidget(QWidget):
         self.future = self.actuatorClient.call_async(self.req)
         
         self.actuatorCallback(element,side,self.future.result())
-        #self.actuatorPublisher.publish(message)
 
     def actuatorCallback(self, element, side, response):
         button = ""
@@ -104,17 +101,8 @@ class ActuatorWidget(QWidget):
                 newThread = Threads(button)
                 newThread.start()
 
-    def restore_settings(self, plugin_settings, instance_settings):
-        pass
-
-    def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        # instance_settings.set_value(k, v)
-        pass
-
     def shutdown_plugin(self):
         self.actuatorClient.destroy()
-
 
 class Threads(threading.Thread):
     def __init__(self, button):

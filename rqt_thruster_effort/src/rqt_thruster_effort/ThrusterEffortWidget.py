@@ -29,9 +29,6 @@ class ThrusterEffortWidget(QWidget):
         self.monitor_thruster_pwm_msg.connect(self._received_thruster_pwm_msg)
 
     def _handle_thruster_newton_msg(self, msg:MotorPwm):
-        # print(msg)
-        # pwm_thrust=Int8MultiArray()
-        # pwm_thrust.data=msg
         self.monitor_thruster_newton_msg.emit(msg)
 
     def _handle_thruster_pwm_msg(self, msg):

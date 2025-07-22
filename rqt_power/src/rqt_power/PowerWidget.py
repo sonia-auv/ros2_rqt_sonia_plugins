@@ -153,7 +153,6 @@ class PowerWidget(QMainWindow):
                 eval(f"self.M{i+1}_{j}").setStyleSheet(f"background-color: {color}")
 
     def _handle_out_enable_all_clicked(self):
-        #self._set_all_bus_state(1)
         self.DisableAll.setEnabled(True)
         self.EnableAll.setEnabled(False)
         state=Bool()
@@ -161,21 +160,11 @@ class PowerWidget(QMainWindow):
         self.activate_all_motor.publish(state)
 
     def _handle_out_disable_all_clicked(self):
-        #self._set_all_bus_state(0)
         self.DisableAll.setEnabled(False)
         self.EnableAll.setEnabled(True)
         state=Bool()
         state.data=False
         self.activate_all_motor.publish(state)
-
-    # def _set_all_bus_state(self, state):
-    #     activation = activateAllPS()
-    #     activation.data = bool(state)
-    #     for i in range(0, 4):
-    #         activation.slave = i
-    #         for j in range(1, 3):
-    #             activation.bus = j
-    #             self.activate_all_ps.publish(activation)
 
     def _handle_start_test_triggered(self):
         pass
@@ -192,15 +181,3 @@ class PowerWidget(QMainWindow):
         self._motor_temperature_subscriber.destroy()
         self._voltage12V_subscriber.destroy()
         self._motor_feedback_subscriber.destroy()
-
-    def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        # instance_settings.set_value(k, v)
-        pass
-
-    def restore_settings(self, plugin_settings, instance_settings):
-        # TODO restore intrinsic configuration, usually using:
-        # v = instance_settings.value(k)
-        pass
-
-

@@ -42,14 +42,3 @@ class DvlWidget(QMainWindow):
         
     def shutdown_plugin(self):
         self._dvl_subscriber.destroy()
-       
-
-    def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        # instance_settings.set_value(k, v)
-        pass
-
-    def restore_settings(self, plugin_settings, instance_settings):
-        # TODO restore intrinsic configuration, usually using:
-        # v = instance_settings.value(k)
-        pass

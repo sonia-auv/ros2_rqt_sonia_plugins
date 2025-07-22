@@ -1,8 +1,5 @@
 import os
-import rclpy
-import rospkg
 from ament_index_python.packages import get_package_share_directory
-from threading import Thread
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
