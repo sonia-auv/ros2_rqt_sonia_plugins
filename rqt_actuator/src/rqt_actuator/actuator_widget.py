@@ -96,7 +96,7 @@ class ActuatorWidget(QWidget):
                 button.setStyleSheet("background-color: red")
                 newThread = Threads(button)
                 newThread.start()
-            else:#if response == ActuatorService.Response.success:
+            else:
                 button.setStyleSheet("background: rgb(88, 8, 24)")
                 newThread = Threads(button)
                 newThread.start()

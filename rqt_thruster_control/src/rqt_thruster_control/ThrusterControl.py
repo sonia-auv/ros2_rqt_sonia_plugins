@@ -25,9 +25,9 @@ class ThrusterControl(Plugin):
             print('unknowns: ', unknowns)
         if not rclpy.ok():
             rclpy.init()
-        self.__internal_node= Node('rqt_thruster_control_node')
+        self._internal_node= Node('rqt_thruster_control_node')
         # Create QWidget
-        self._mainWindow = ThrusterWidget(self.__internal_node)
+        self._mainWindow = ThrusterWidget(self._internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
         if context.serial_number() > 1:
@@ -43,15 +43,15 @@ class ThrusterControl(Plugin):
         self._timer.start(10)
     
     def _spin_once(self):
-        if rclpy.ok() and self.__internal_node:
-            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
+        if rclpy.ok() and self._internal_node:
+            rclpy.spin_once(self._internal_node, timeout_sec=0.0)
 
     def shutdown_plugin(self):
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once)
         self._mainWindow.shutdown_plugin()  
-        if self.__internal_node:
-            self.__internal_node.destroy_node()
+        if self._internal_node:
+            self._internal_node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
              

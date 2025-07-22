@@ -11,8 +11,8 @@ class Actuator(Plugin):
         self.setObjectName('Actuator')
 
         #rclpy.init(context=context)
-        self.__internal_node= Node('rqt_actuator')
-        self._widget = ActuatorWidget(self.__internal_node)
+        self._internal_node= Node('rqt_actuator')
+        self._widget = ActuatorWidget(self._internal_node)
 
         if context.serial_number() > 1:
             self._widget.setWindowTitle(self._widget.windowTitle() + (' (%d)' % context.serial_number()))
@@ -26,14 +26,14 @@ class Actuator(Plugin):
         self._timer.start(10)
     
     def _spin_once(self):
-        if rclpy.ok() and self.__internal_node:
-            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
+        if rclpy.ok() and self._internal_node:
+            rclpy.spin_once(self._internal_node, timeout_sec=0.0)
             
     def shutdown_plugin(self):
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once)
-        if self.__internal_node:
-            self.__internal_node.destroy_node()
+        if self._internal_node:
+            self._internal_node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
         self._widget.shutdown_plugin()

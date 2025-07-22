@@ -5,7 +5,6 @@ from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 
-import rclpy.subscription
 from sonia_common_ros2.msg import MotorPwm
 from std_msgs.msg import Int8MultiArray
 

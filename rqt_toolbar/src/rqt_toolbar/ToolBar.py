@@ -11,8 +11,6 @@ from .ToolbarBatteryWidget import BatteryWidget
 from .ToolbarCpuTempWidget import CpuTempWidget
 from .ToolbarKillmissionWidget import KillMissionWidget
 from .ToolbarCameraWidget import CameraWidget
-from .Palette import Palette
-from .ToolbarWarningsWidget import WarningsWidget
 
 
 class ToolBar(Plugin):
@@ -38,18 +36,18 @@ class ToolBar(Plugin):
             print("unknowns: ", unknowns)
         if not rclpy.ok():
             rclpy.init()
-        self.__internal_node = Node('rqt_toolbar_node')
+        self._internal_node = Node('rqt_toolbar_node')
 
         self._toolbar = QToolBar()
         # self._palette = Palette()
-        self._setControlModeWidget = SetModeControlWidget(self.__internal_node)
+        self._setControlModeWidget = SetModeControlWidget(self._internal_node)
         # self._warnings = WarningsWidget()
         self._camera = CameraWidget()
         # context._handler._main_window.setPalette(self._palette.palette())
-        self._batteryWidget1 = BatteryWidget(1, self.__internal_node)
-        self._batteryWidget2 = BatteryWidget(2, self.__internal_node)
-        self._killMissionWidget = KillMissionWidget(self.__internal_node)
-        self._tempWidget1 = CpuTempWidget(os.getenv("AUV", "AUV"), self.__internal_node)
+        self._batteryWidget1 = BatteryWidget(1, self._internal_node)
+        self._batteryWidget2 = BatteryWidget(2, self._internal_node)
+        self._killMissionWidget = KillMissionWidget(self._internal_node)
+        self._tempWidget1 = CpuTempWidget(os.getenv("AUV", "AUV"), self._internal_node)
 
         # Add widget to the user interface
         self._toolbar.addWidget(self._setControlModeWidget)
@@ -68,13 +66,13 @@ class ToolBar(Plugin):
         self._timer.start(10)
 
     def _spin_once(self):
-        if rclpy.ok() and self.__internal_node:
-            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
+        if rclpy.ok() and self._internal_node:
+            rclpy.spin_once(self._internal_node, timeout_sec=0.0)
     
     def shutdown_plugin(self):
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once)
-        if self.__internal_node:
-            self.__internal_node.destroy_node()
+        if self._internal_node:
+            self._internal_node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()             

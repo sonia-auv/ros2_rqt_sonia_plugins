@@ -6,7 +6,6 @@ from qt_gui.plugin import Plugin
 
 from .DepthIndicatorWidget import DepthIndicatorWidget
 
-
 class DepthIndicator(Plugin):
 
     def __init__(self, context):
@@ -29,8 +28,8 @@ class DepthIndicator(Plugin):
             print('unknowns: ', unknowns)
         
         #rclpy.init(context=context)
-        self.__internal_node= Node('rqt_depth_indicator')
-        self._mainWindow = DepthIndicatorWidget(self.__internal_node)
+        self._internal_node= Node('rqt_depth_indicator')
+        self._mainWindow = DepthIndicatorWidget(self._internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
         if context.serial_number() > 1:
@@ -46,14 +45,14 @@ class DepthIndicator(Plugin):
         self._timer.start(10)
 
     def _spin_once(self):
-        if rclpy.ok() and self.__internal_node:
-            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
+        if rclpy.ok() and self._internal_node:
+            rclpy.spin_once(self._internal_node, timeout_sec=0.0)
     
     def shutdown_plugin(self):
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once)
         self._mainWindow.shutdown_plugin()
-        if self.__internal_node:
-            self.__internal_node.destroy_node()
+        if self._internal_node:
+            self._internal_node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()

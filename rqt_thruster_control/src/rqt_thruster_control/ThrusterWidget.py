@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import QMainWindow
 
 from sonia_common_ros2.msg import MotorPwm
 from std_msgs.msg import Bool
-from std_srvs.srv import Empty
 
 class ThrusterWidget(QMainWindow):
 

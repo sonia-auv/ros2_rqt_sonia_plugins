@@ -166,11 +166,11 @@ class PowerWidget(QMainWindow):
         state.data=False
         self.activate_all_motor.publish(state)
 
-    def _handle_start_test_triggered(self):
-        pass
+    #def _handle_start_test_triggered(self):
+    #    pass
 
-    def _execute_test(self):
-        pass
+    #def _execute_test(self):
+    #    pass
 
     def shutdown_plugin(self):
         self._battery_voltage_subscriber.destroy()
