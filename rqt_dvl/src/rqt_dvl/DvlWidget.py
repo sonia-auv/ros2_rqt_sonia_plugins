@@ -1,6 +1,5 @@
 import os
 
-from rclpy.subscription import Subscription
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow
@@ -12,7 +11,7 @@ class DvlWidget(QMainWindow):
 
     dvl_velocity_recieved = pyqtSignal(BodyVelocityDVL)
 
-    def __init__(self, ros_node):
+    def __init__(self):
         super(DvlWidget, self).__init__()
         # Give QObjects reasonable names
         self.setObjectName('DvlControlWidget')
@@ -21,8 +20,6 @@ class DvlWidget(QMainWindow):
         loadUi(ui_file, self)
 
         self.setObjectName('MyDvlControlWidget')
-
-        self._dvl_subscriber: Subscription= ros_node.create_subscription(BodyVelocityDVL,"/provider_dvl/dvl_velocity", self._dvl_subscriber_cb, 10)
         
         self.dvl_velocity_recieved.connect(self.show_dvl_velocity)
 
@@ -39,6 +36,3 @@ class DvlWidget(QMainWindow):
         self.vel2Textfield.setText('%.5f' % msg.velocity2)
         self.vel3Textfield.setText('%.5f' % msg.velocity3)
         self.vel4Textfield.setText('%.5f' % msg.velocity4)     
-        
-    def shutdown_plugin(self):
-        self._dvl_subscriber.destroy()
