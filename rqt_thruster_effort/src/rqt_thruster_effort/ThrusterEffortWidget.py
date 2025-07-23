@@ -5,7 +5,6 @@ from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 
-import rclpy.subscription
 from sonia_common_ros2.msg import MotorPwm
 from std_msgs.msg import Int8MultiArray
 
@@ -29,9 +28,6 @@ class ThrusterEffortWidget(QWidget):
         self.monitor_thruster_pwm_msg.connect(self._received_thruster_pwm_msg)
 
     def _handle_thruster_newton_msg(self, msg:MotorPwm):
-        # print(msg)
-        # pwm_thrust=Int8MultiArray()
-        # pwm_thrust.data=msg
         self.monitor_thruster_newton_msg.emit(msg)
 
     def _handle_thruster_pwm_msg(self, msg):

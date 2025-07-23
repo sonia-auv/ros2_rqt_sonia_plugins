@@ -4,7 +4,7 @@ package_name = 'rqt_power'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='1.0.0',
     packages=[package_name],
     package_dir={'': 'src'},
     data_files=[
@@ -16,10 +16,10 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    author='Dorian Scholz',
-    maintainer='Dirk Thomas, Dorian Scholz, Austin Hendrix',
-    maintainer_email='dthomas@osrfoundation.org',
-    keywords=['ROS'],
+    author='Software Team',
+    maintainer='Software Team',
+    maintainer_email='log.club.sonia@etsmtl.net',
+    keywords=['ROS2', 'RQT'],
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',

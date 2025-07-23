@@ -2,15 +2,16 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rqt_toolbar</name>
-  <version>0.0.0</version>
-  <description>My RQT plugin</description>
-  <maintainer email="my.address@gmail.com">Sam</maintainer>
+  <version>1.0.0</version>
+  <description>Plugin to visualize multiple system information</description>
+  <maintainer email="log.club.sonia@etsmtl.net">Software Team</maintainer>
   <license>Apache License 2.0</license>
 
   <depend>rclpy</depend>
   <depend>rqt_gui</depend>
   <depend>rqt_gui_py</depend>
   <depend>std_msgs</depend>
+  <depend>sonia_common_ros2</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

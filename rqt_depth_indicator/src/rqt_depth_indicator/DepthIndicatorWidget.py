@@ -1,5 +1,4 @@
 import os
-import math
 from rclpy.subscription import Subscription
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
@@ -7,8 +6,6 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 
 from std_msgs.msg import Float32
-#from tf_transformations import euler_from_quaternion
-
 
 class DepthIndicatorWidget(QWidget):
     odometry_received = pyqtSignal('PyQt_PyObject')

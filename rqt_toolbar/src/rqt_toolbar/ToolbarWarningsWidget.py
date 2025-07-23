@@ -140,4 +140,4 @@ class WarningsWidget(QWidget):
 
     def shutdown_plugin(self):
         self.motor_feedback_subscriber.destroy()
-        #self.other_feedback_subscriber.unregister()
+        

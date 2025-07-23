@@ -1,10 +1,8 @@
-import os
 import rclpy
 
 from rclpy.node import Node
 from PyQt5.QtCore import QTimer
 from qt_gui.plugin import Plugin
-import rclpy.executors
 
 from .WaypointWidget import WaypointWidget
 
@@ -15,23 +13,11 @@ class Waypoint(Plugin):
 
         # Give QObjects reasonable names
         self.setObjectName('WaypointWidget')
-
-        # Process standalone plugin command-line arguments
-        from argparse import ArgumentParser
-        parser = ArgumentParser()
-        # Add argument(s) to the parser.
-        parser.add_argument("-q", "--quiet", action="store_true",
-                      dest="quiet",
-                      help="Put plugin in silent mode")
-        args, unknowns = parser.parse_known_args(context.argv())
-
-        if not args.quiet:
-            print('arguments: ', args)
-            print('unknowns: ', unknowns)
+        
         if not rclpy.ok():
             rclpy.init()
-        self.__internal_node = Node('rqt_waypoint_node')
-        self._mainWindow = WaypointWidget(self.__internal_node)
+        self._internal_node = Node('rqt_waypoint_node')
+        self._mainWindow = WaypointWidget(self._internal_node)
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())
         if context.serial_number() > 1:
@@ -47,29 +33,14 @@ class Waypoint(Plugin):
         self._timer.start(10)
 
     def _spin_once(self):
-        if rclpy.ok() and self.__internal_node:
-            rclpy.spin_once(self.__internal_node, timeout_sec=0.0)
+        if rclpy.ok() and self._internal_node:
+            rclpy.spin_once(self._internal_node, timeout_sec=0.0)
     
     def shutdown_plugin(self):
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once)
         self._mainWindow.shutdown_plugin()
-        if self.__internal_node:
-            self.__internal_node.destroy_node()
+        if self._internal_node:
+            self._internal_node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
-
-    def save_settings(self, plugin_settings, instance_settings):
-        # TODO save intrinsic configuration, usually using:
-        # instance_settings.set_value(k, v)
-        pass
-
-    def restore_settings(self, plugin_settings, instance_settings):
-        # TODO restore intrinsic configuration, usually using:
-        # v = instance_settings.value(k)
-        pass
-
-    #def trigger_configuration(self):
-        # Comment in to signal that the plugin has a way to configure
-        # This will enable a setting button (gear icon) in each dock widget title bar
-        # Usually used to open a modal configuration dialog

@@ -1,0 +1,21 @@
+<library path="lib/libagent_gui">
+  <class name="ProviderDvl" type="rqt_dvl.provider_dvl_control.ProviderDvl" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A Python GUI plugin for provider dvl
+    </description>
+    <qtgui>
+      <group>
+        <label>&amp;SONIA</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to visualization.</statustip>
+      </group>
+      <group>
+        <label>&amp;Devices</label>
+        <icon type="theme">folder</icon>
+      </group>
+      <label>&amp;Dvl</label>
+      <icon type="theme">view-fullscreen</icon>
+      <statustip>A convivial interface to show data of dvl supply</statustip>
+    </qtgui>
+  </class>
+</library>
