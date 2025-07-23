@@ -42,7 +42,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="waypointTab">
        <attribute name="title">
@@ -550,7 +550,7 @@
               <property name="currentText">
                <string>AUV8</string>
               </property>
-              <property name="placeholderText">
+              <property name="placeholderText" stdset="0">
                <string/>
               </property>
               <item>
@@ -633,7 +633,7 @@
               <property name="currentText">
                <string>Maryland</string>
               </property>
-              <property name="placeholderText">
+              <property name="placeholderText" stdset="0">
                <string/>
               </property>
               <item>
@@ -721,7 +721,7 @@
               <property name="currentText">
                <string>Prequalif</string>
               </property>
-              <property name="placeholderText">
+              <property name="placeholderText" stdset="0">
                <string/>
               </property>
               <item>
@@ -804,16 +804,26 @@
        <attribute name="title">
         <string>Missions</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
+       <layout class="QVBoxLayout" name="vLayout_4">
+       <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QComboBox" name="missionListDropDown"/>
+            <item>
+           <widget class="QComboBox" name="missionListDropDown">
+            <property name="editable">
+               <bool>false</bool>
+              </property>
+              <property name="currentText">
+               <string>Nimai</string>
+              </property>
+              <property name="placeholderText" stdset="0">
+               <string>Nimai</string>
+              </property>
+           </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="loadMissionBtn">
             <property name="text">
-             <string>PushButton</string>
+             <string>Load Mission</string>
             </property>
            </widget>
           </item>
@@ -825,15 +835,15 @@
            </widget>
           </item>
          </layout>
-        </item>
-        <item>
+         </item>
+         <item>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
            <widget class="QListWidget" name="nodeListWidget"/>
           </item>
          </layout>
-        </item>
-       </layout>
+         </item>
+         </layout>
       </widget>
      </widget>
     </item>
@@ -845,7 +855,7 @@
      <x>0</x>
      <y>0</y>
      <width>661</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSimulation">
