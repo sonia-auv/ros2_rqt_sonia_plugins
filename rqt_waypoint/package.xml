@@ -4,7 +4,7 @@
   <name>rqt_waypoint</name>
   <version>1.0.0</version>
   <description>The rqt waypoint system package</description>
-  <maintainer email="my.address@gmail.com">Sam</maintainer>
+  <maintainer email="log.club.sonia@etsmtl.net">Software Team</maintainer>
   <license>Apache License 2.0</license>
 
   <depend>rclpy</depend>

@@ -3,8 +3,8 @@
 <package format="3">
   <name>rqt_dvl</name>
   <version>1.0.0</version>
-  <description>dvl plugin</description>
-  <maintainer email="my.address@gmail.com">Sam</maintainer>
+  <description>Dvl plugin to showcase velocity and bottom tracking</description>
+  <maintainer email="log.club.sonia@etsmtl.net">Software Team</maintainer>
   <license>Apache License 2.0</license>
 
   <depend>rclpy</depend>

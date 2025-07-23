@@ -9,16 +9,7 @@ class ProviderPower(Plugin):
     def __init__(self, context):
         super(ProviderPower, self).__init__(context)
         self.setObjectName('ProviderPower')
-        from argparse import ArgumentParser
-        parser = ArgumentParser()
-        parser.add_argument("-q", "--quiet", action="store_true",
-                      dest="quiet",
-                      help="Put plugin in silent mode")
-        args, unknowns = parser.parse_known_args(context.argv())
-        if not args.quiet:
-            print('arguments: ', args)
-            print('unknowns: ', unknowns)
-    
+        
         if not rclpy.ok():
             rclpy.init()
         self._internal_node = Node('rqt_power_node')

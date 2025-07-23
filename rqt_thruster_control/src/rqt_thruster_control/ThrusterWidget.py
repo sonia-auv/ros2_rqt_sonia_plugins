@@ -21,8 +21,6 @@ class ThrusterWidget(QMainWindow):
         ui_file = os.path.join(get_package_share_directory('rqt_thruster_control'), 'resource', 'Mainwindow.ui')
         loadUi(ui_file, self)
 
-        self.setObjectName('MyThrusterControlWidget')
-
         # Subscribe to slot
         self.enableButton.setEnabled(True)
         self.disableButton.setEnabled(False)

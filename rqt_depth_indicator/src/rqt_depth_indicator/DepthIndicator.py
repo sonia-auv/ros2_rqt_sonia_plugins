@@ -13,21 +13,9 @@ class DepthIndicator(Plugin):
 
         # Give QObjects reasonable names
         self.setObjectName('DepthIndicator')
-
-        # Process standalone plugin command-line arguments
-        from argparse import ArgumentParser
-        parser = ArgumentParser()
-        # Add argument(s) to the parser.
-        parser.add_argument("-q", "--quiet", action="store_true",
-                      dest="quiet",
-                      help="Put plugin in silent mode")
-        args, unknowns = parser.parse_known_args(context.argv())
-
-        if not args.quiet:
-            print('arguments: ', args)
-            print('unknowns: ', unknowns)
         
-        #rclpy.init(context=context)
+        if not rclpy.ok():
+            rclpy.init()
         self._internal_node= Node('rqt_depth_indicator')
         self._mainWindow = DepthIndicatorWidget(self._internal_node)
 

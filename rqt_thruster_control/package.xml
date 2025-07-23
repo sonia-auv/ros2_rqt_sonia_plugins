@@ -3,8 +3,8 @@
 <package format="3">
   <name>rqt_thruster_control</name>
   <version>1.0.0</version>
-  <description>thruster control</description>
-  <maintainer email="my.address@gmail.com">Sam</maintainer>
+  <description>A plugin for motor control </description>
+  <maintainer email="log.club.sonia@etsmtl.net">Software Team</maintainer>
   <license>Apache License 2.0</license>
 
   <depend>rclpy</depend>

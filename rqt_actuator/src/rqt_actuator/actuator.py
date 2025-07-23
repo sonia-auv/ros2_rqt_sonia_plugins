@@ -10,7 +10,8 @@ class Actuator(Plugin):
         super(Actuator, self).__init__(context)
         self.setObjectName('Actuator')
 
-        #rclpy.init(context=context)
+        if not rclpy.ok():
+            rclpy.init()
         self._internal_node= Node('rqt_actuator')
         self._widget = ActuatorWidget(self._internal_node)
 
