@@ -8,6 +8,7 @@ import rclpy.logging
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
+from rclpy.action.client import ActionClient
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
@@ -18,6 +19,7 @@ from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
 
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
+from sonia_common_ros2.action import MissionControl
 from std_srvs.srv import Trigger
 
 from tf_transformations import euler_from_quaternion
@@ -54,15 +56,12 @@ class WaypointWidget(QMainWindow):
         self.prev_scene = ""
         self.prev_run = ""
         
-        self.rclpy_ros = ros_node
         self.tare_req = Trigger.Request()
 
         # Subscribers
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(MpcInfo, "/proc_control/controller_info", self.set_mpc_info,10)
         self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info,10)
-        #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
-        #self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
         # Publishers
         self.simulation_start_publisher: Publisher= ros_node.create_publisher(geoPose, "/proc_simulation/start_simulation",10)
@@ -70,14 +69,15 @@ class WaypointWidget(QMainWindow):
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
-        #self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", 10)
-        #self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
 
         # Services
         self.initial_position_service: Client = ros_node.create_client(ObjectPoseService,"/proc_simulation/auv_pose")
         self.set_auv_service: Client = ros_node.create_client(SetSimulationAUVService, "/proc_simulation/select_auv")
         self.depth_tare_service: Client= ros_node.create_client(Trigger, "/provider_depth/tare")
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
+
+        #Actions
+        self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
 
         self.current_target_received.connect(self._current_target_received)
         self.createLabel.connect(self.addButton)
@@ -94,8 +94,6 @@ class WaypointWidget(QMainWindow):
         self.actionTare_IMU.triggered.connect(self._tare_imu)
         self.actionStart_DVL.triggered.connect(self.startDVL)
         self.actionStop_DVL.triggered.connect(self.stopDVL)
-        self.actionStart_SONAR.triggered.connect(self.startSonar)
-        self.actionStop_SONAR.triggered.connect(self.stopSonar)
 
         # Waypoint tab buttons
         self.resetTrajectory.clicked.connect(self._clear_waypoint)
@@ -103,6 +101,10 @@ class WaypointWidget(QMainWindow):
 
         # Unity tab buttons
         self.updateUnityButton.clicked.connect(self.update_unity)
+
+        # Mission tab buttons
+        self.loadMissionBtn.clicked.connect(self._mission_load_action)
+        self.refreshBtn.clicked.connect(self._mission_dropdown_refresh)
     
     def timeout_info(self, msg):
         if msg.status == 1:
@@ -201,13 +203,10 @@ class WaypointWidget(QMainWindow):
         dvl_state.data=False
         self.set_dvl_started_publisher.publish(dvl_state)
 
-    def startSonar(self):
-        #self.set_sonar_started_publisher.publish(True)
-        pass
-
-    def stopSonar(self):
-        #self.set_sonar_started_publisher.publish(False)
-        pass
+    def _mission_load_action(self):
+        print("mission loaded")
+    def _mission_dropdown_refresh(self):
+        print("mission refresh")
 
     def _reset_position(self):
 
