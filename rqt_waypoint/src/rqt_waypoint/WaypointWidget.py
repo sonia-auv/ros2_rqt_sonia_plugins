@@ -3,8 +3,6 @@ import threading
 from time import sleep, time
 
 import math
-import rclpy
-import rclpy.logging
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
@@ -51,10 +49,9 @@ class WaypointWidget(QMainWindow):
         self.frameChoice.setCurrentIndex(1)
 
         self.prev_auv = ""
-        self.prev_scene = ""
-        self.prev_run = ""
+        self.prev_scene = self.sceneChoice.currentText()
+        self.prev_run = self.runChoice.currentText()
         
-        self.rclpy_ros = ros_node
         self.tare_req = Trigger.Request()
 
         # Subscribers
@@ -70,7 +67,6 @@ class WaypointWidget(QMainWindow):
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
-        #self.set_sonar_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_sonar/enable_disable_ping", 10)
         #self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
 
         # Services
@@ -94,8 +90,6 @@ class WaypointWidget(QMainWindow):
         self.actionTare_IMU.triggered.connect(self._tare_imu)
         self.actionStart_DVL.triggered.connect(self.startDVL)
         self.actionStop_DVL.triggered.connect(self.stopDVL)
-        self.actionStart_SONAR.triggered.connect(self.startSonar)
-        self.actionStop_SONAR.triggered.connect(self.stopSonar)
 
         # Waypoint tab buttons
         self.resetTrajectory.clicked.connect(self._clear_waypoint)
@@ -201,14 +195,6 @@ class WaypointWidget(QMainWindow):
         dvl_state.data=False
         self.set_dvl_started_publisher.publish(dvl_state)
 
-    def startSonar(self):
-        #self.set_sonar_started_publisher.publish(True)
-        pass
-
-    def stopSonar(self):
-        #self.set_sonar_started_publisher.publish(False)
-        pass
-
     def _reset_position(self):
 
         pose = geoPose()
@@ -219,7 +205,7 @@ class WaypointWidget(QMainWindow):
         pose.orientation.x = 0.0
         pose.orientation.y = 0.0
         pose.orientation.z = 0.0
-        pose.orientation.w = 0.0
+        pose.orientation.w = 1.0
 
         self.simulation_start_publisher.publish(pose)
         # if self.current_mode_id == 0:
@@ -321,7 +307,6 @@ class WaypointWidget(QMainWindow):
 
     def send_position(self):
         try:
-            print("Sending waypoint.")
             z_axis_problem = False
             x_val = float(self.xPositionTarget.text())
             y_val = float(self.yPositionTarget.text())

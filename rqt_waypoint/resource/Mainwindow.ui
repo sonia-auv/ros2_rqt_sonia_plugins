@@ -834,13 +834,6 @@
     <property name="title">
      <string>Sensors</string>
     </property>
-    <widget class="QMenu" name="menuSONAR">
-     <property name="title">
-      <string>SONAR</string>
-     </property>
-     <addaction name="actionStart_SONAR"/>
-     <addaction name="actionStop_SONAR"/>
-    </widget>
     <widget class="QMenu" name="menuDVL">
      <property name="title">
       <string>DVL</string>
@@ -851,7 +844,6 @@
     <addaction name="actionReset_Depth"/>
     <addaction name="actionTare_IMU"/>
     <addaction name="menuDVL"/>
-    <addaction name="menuSONAR"/>
    </widget>
    <addaction name="menuSimulation"/>
    <addaction name="menuSensors"/>
@@ -888,17 +880,7 @@
    <property name="text">
     <string>Stop DVL</string>
    </property>
-  </action>
-  <action name="actionStart_SONAR">
-   <property name="text">
-    <string>Start SONAR</string>
-   </property>
-  </action>
-  <action name="actionStop_SONAR">
-   <property name="text">
-    <string>Stop SONAR</string>
-   </property>
-  </action>
+  </action>  
  </widget>
  <tabstops>
   <tabstop>xPositionTarget</tabstop>

@@ -14,19 +14,18 @@ class DvlWidget(QMainWindow):
     def __init__(self):
         super(DvlWidget, self).__init__()
         # Give QObjects reasonable names
-        self.setObjectName('DvlControlWidget')
 
         ui_file = os.path.join(get_package_share_directory('rqt_dvl'), 'resource', 'mainwindow.ui')
         loadUi(ui_file, self)
 
-        self.setObjectName('MyDvlControlWidget')
+        self.setObjectName('DvlControlWidget')
         
-        self.dvl_velocity_recieved.connect(self.show_dvl_velocity)
+        self.dvl_velocity_recieved.connect(self._show_dvl_velocity)
 
     def _dvl_subscriber_cb(self, data):
         self.dvl_velocity_recieved.emit(data)
 
-    def show_dvl_velocity(self, msg: BodyVelocityDVL):
+    def _show_dvl_velocity(self, msg: BodyVelocityDVL):
         self.xVelTextfield.setText('%.5f' % msg.x_vel_btm)
         self.yVelTextfield.setText('%.5f' % msg.y_vel_btm)
         self.zVelTextfield.setText('%.5f' % msg.z_vel_btm)
