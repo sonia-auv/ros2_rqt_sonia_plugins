@@ -17,7 +17,7 @@ from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
 
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
-from sonia_common_ros2.action import MissionControl
+#from sonia_common_ros2.action import MissionControl
 from std_srvs.srv import Trigger
 
 from tf_transformations import euler_from_quaternion
@@ -75,7 +75,7 @@ class WaypointWidget(QMainWindow):
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
 
         #Actions
-        self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
+        #self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
 
         self.current_target_received.connect(self._current_target_received)
         self.createLabel.connect(self.addButton)
@@ -206,7 +206,7 @@ class WaypointWidget(QMainWindow):
     def _mission_dropdown_refresh(self):
         print("mission refresh")
 
-
+    def _reset_position(self):
         pose = geoPose()
         pose.position.x = 0.0
         pose.position.y = 0.0
@@ -248,8 +248,8 @@ class WaypointWidget(QMainWindow):
                 obj= ObjectPoseService.Request()
                 obj.object_name=auv_name
                 print('Start Simulation currently disabled')
-                #resp = self.initial_position_service.call_async(obj)
-                #resp.add_done_callback(self._initial_pos_service_cb) 
+                resp = self.initial_position_service.call_async(obj)
+                resp.add_done_callback(self._initial_pos_service_cb) 
             else:
                 print('AUV environment variable not properly set.')
 
@@ -258,19 +258,19 @@ class WaypointWidget(QMainWindow):
             print('Simulation is not started')
             self.show_error('Simulation is not started')
 
-    #def _initial_pos_service_cb(self, resp):
-        #pose = geoPose()
-        #pose.position.x = resp.object_pose.position.x
-        #pose.position.y = resp.object_pose.position.y
-        #pose.position.z = resp.object_pose.position.z
+    def _initial_pos_service_cb(self, resp):
+        pose = geoPose()
+        pose.position.x = resp.object_pose.position.x
+        pose.position.y = resp.object_pose.position.y
+        pose.position.z = resp.object_pose.position.z
 
-        #pose.orientation.x = resp.object_pose.orientation.x
-        #pose.orientation.y = resp.object_pose.orientation.y
-        #pose.orientation.z = resp.object_pose.orientation.z
-        #pose.orientation.w = resp.object_pose.orientation.w
+        pose.orientation.x = resp.object_pose.orientation.x
+        pose.orientation.y = resp.object_pose.orientation.y
+        pose.orientation.z = resp.object_pose.orientation.z
+        pose.orientation.w = resp.object_pose.orientation.w
 
-        #self.simulation_start_publisher.publish(pose)
-        #print('initial pose sent.')
+        self.simulation_start_publisher.publish(pose)
+        print('initial pose sent.')
 
     def _position_target_callback(self,data):
         self.current_target_received.emit(data)
