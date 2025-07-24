@@ -27,18 +27,20 @@ class ProviderDvl(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
+
+        self._dvl_subscriber: Subscription = self._internal_node.create_subscription(BodyVelocityDVL,"/provider_dvl/dvl_velocity", self._mainWindow._dvl_subscriber_cb, 10)
+
          # Spin this thread
         self._timer = QTimer()
         self._timer.timeout.connect(self._spin_once)
         self._timer.start(10)
         
-        self._dvl_subscriber: Subscription = self._internal_node.create_subscription(BodyVelocityDVL,"/provider_dvl/dvl_velocity", self._mainWindow._dvl_subscriber_cb, 10)
-    
     def _spin_once(self):
         if rclpy.ok() and self._internal_node:
             rclpy.spin_once(self._internal_node, timeout_sec=0.0)
 
     def shutdown_plugin(self):
+        self._dvl_subscriber.destroy()
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once) 
         if self._internal_node:
