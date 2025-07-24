@@ -67,10 +67,6 @@ class WaypointWidget(QMainWindow):
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
-<<<<<<< HEAD
-=======
-        #self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
->>>>>>> develop
 
         # Services
         self.initial_position_service: Client = ros_node.create_client(ObjectPoseService,"/proc_simulation/auv_pose")
@@ -205,15 +201,11 @@ class WaypointWidget(QMainWindow):
         dvl_state.data=False
         self.set_dvl_started_publisher.publish(dvl_state)
 
-<<<<<<< HEAD
     def _mission_load_action(self):
         print("mission loaded")
     def _mission_dropdown_refresh(self):
         print("mission refresh")
 
-=======
->>>>>>> develop
-    def _reset_position(self):
 
         pose = geoPose()
         pose.position.x = 0.0
