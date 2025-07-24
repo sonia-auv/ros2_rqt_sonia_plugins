@@ -247,7 +247,6 @@ class WaypointWidget(QMainWindow):
             if auv_name:
                 obj= ObjectPoseService.Request()
                 obj.object_name=auv_name
-                print('Start Simulation currently disabled')
                 resp = self.initial_position_service.call_async(obj)
                 resp.add_done_callback(self._initial_pos_service_cb) 
             else:
