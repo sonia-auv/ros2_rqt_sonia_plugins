@@ -13,12 +13,11 @@ class DvlWidget(QMainWindow):
 
     def __init__(self):
         super(DvlWidget, self).__init__()
-        # Give QObjects reasonable names
-
+        # Give QObjects reasonable names 
+        self.setObjectName('DvlControlWidget')
+               
         ui_file = os.path.join(get_package_share_directory('rqt_dvl'), 'resource', 'mainwindow.ui')
         loadUi(ui_file, self)
-
-        self.setObjectName('DvlControlWidget')
         
         self.dvl_velocity_recieved.connect(self._show_dvl_velocity)
 
