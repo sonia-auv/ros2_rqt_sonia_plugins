@@ -259,14 +259,14 @@ class WaypointWidget(QMainWindow):
 
     def _initial_pos_service_cb(self, resp):
         pose = geoPose()
-        pose.position.x = resp.object_pose.position.x
-        pose.position.y = resp.object_pose.position.y
-        pose.position.z = resp.object_pose.position.z
+        pose.position.x = resp.result().object_pose.position.x
+        pose.position.y = resp.result().object_pose.position.y
+        pose.position.z = resp.result().object_pose.position.z
 
-        pose.orientation.x = resp.object_pose.orientation.x
-        pose.orientation.y = resp.object_pose.orientation.y
-        pose.orientation.z = resp.object_pose.orientation.z
-        pose.orientation.w = resp.object_pose.orientation.w
+        pose.orientation.x = resp.result().object_pose.orientation.x
+        pose.orientation.y = resp.result().object_pose.orientation.y
+        pose.orientation.z = resp.result().object_pose.orientation.z
+        pose.orientation.w = resp.result().object_pose.orientation.w
 
         self.simulation_start_publisher.publish(pose)
         print('initial pose sent.')
