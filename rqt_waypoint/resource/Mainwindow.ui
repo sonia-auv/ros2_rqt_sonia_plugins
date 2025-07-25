@@ -804,11 +804,46 @@
        <attribute name="title">
         <string>Missions</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <layout class="QGridLayout" name="missionGrid"/>
-        </item>
-       </layout>
+       <layout class="QVBoxLayout" name="vLayout_4">
+       <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+           <widget class="QComboBox" name="missionListDropDown">
+            <property name="editable">
+               <bool>false</bool>
+              </property>
+              <property name="currentText">
+               <string>Nimai</string>
+              </property>
+              <property name="placeholderText" stdset="0">
+               <string>Nimai</string>
+              </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="loadMissionBtn">
+            <property name="text">
+             <string>Load Mission</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="refreshBtn">
+            <property name="text">
+             <string>Refresh</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+         </item>
+         <item>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QListWidget" name="nodeListWidget"/>
+          </item>
+         </layout>
+         </item>
+         </layout>
       </widget>
      </widget>
     </item>

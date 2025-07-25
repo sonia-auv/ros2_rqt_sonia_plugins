@@ -6,6 +6,7 @@ import math
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
+from rclpy.action.client import ActionClient
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
@@ -16,6 +17,7 @@ from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
 
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
+#from sonia_common_ros2.action import MissionControl
 from std_srvs.srv import Trigger
 
 from tf_transformations import euler_from_quaternion
@@ -58,8 +60,6 @@ class WaypointWidget(QMainWindow):
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(MpcInfo, "/proc_control/controller_info", self.set_mpc_info,10)
         self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info,10)
-        #self.auv_position_subscriber: Subscription= ros_node.create_subscription(Odometry, "/proc_nav/auv_states", self.auv_pose_callback)
-        #self.auv_position_subscriber = rospy.Subscriber("/telemetry/auv_states", Odometry, self.auv_pose_callback)
 
         # Publishers
         self.simulation_start_publisher: Publisher= ros_node.create_publisher(geoPose, "/proc_simulation/start_simulation",10)
@@ -67,13 +67,15 @@ class WaypointWidget(QMainWindow):
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
-        #self.set_initial_position_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_nav/reset_pos", 10)
 
         # Services
         self.initial_position_service: Client = ros_node.create_client(ObjectPoseService,"/proc_simulation/auv_pose")
         self.set_auv_service: Client = ros_node.create_client(SetSimulationAUVService, "/proc_simulation/select_auv")
         self.depth_tare_service: Client= ros_node.create_client(Trigger, "/provider_depth/tare")
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
+
+        #Actions
+        #self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
 
         self.current_target_received.connect(self._current_target_received)
         self.createLabel.connect(self.addButton)
@@ -97,6 +99,10 @@ class WaypointWidget(QMainWindow):
 
         # Unity tab buttons
         self.updateUnityButton.clicked.connect(self.update_unity)
+
+        # Mission tab buttons
+        self.loadMissionBtn.clicked.connect(self._mission_load_action)
+        self.refreshBtn.clicked.connect(self._mission_dropdown_refresh)
     
     def timeout_info(self, msg):
         if msg.status == 1:
@@ -195,8 +201,12 @@ class WaypointWidget(QMainWindow):
         dvl_state.data=False
         self.set_dvl_started_publisher.publish(dvl_state)
 
-    def _reset_position(self):
+    def _mission_load_action(self):
+        print("mission loaded")
+    def _mission_dropdown_refresh(self):
+        print("mission refresh")
 
+    def _reset_position(self):
         pose = geoPose()
         pose.position.x = 0.0
         pose.position.y = 0.0
@@ -237,9 +247,8 @@ class WaypointWidget(QMainWindow):
             if auv_name:
                 obj= ObjectPoseService.Request()
                 obj.object_name=auv_name
-                print('Start Simulation currently disabled')
-                #resp = self.initial_position_service.call_async(obj)
-                #resp.add_done_callback(self._initial_pos_service_cb) 
+                resp = self.initial_position_service.call_async(obj)
+                resp.add_done_callback(self._initial_pos_service_cb) 
             else:
                 print('AUV environment variable not properly set.')
 
@@ -248,19 +257,19 @@ class WaypointWidget(QMainWindow):
             print('Simulation is not started')
             self.show_error('Simulation is not started')
 
-    #def _initial_pos_service_cb(self, resp):
-        #pose = geoPose()
-        #pose.position.x = resp.object_pose.position.x
-        #pose.position.y = resp.object_pose.position.y
-        #pose.position.z = resp.object_pose.position.z
+    def _initial_pos_service_cb(self, resp):
+        pose = geoPose()
+        pose.position.x = resp.result().object_pose.position.x
+        pose.position.y = resp.result().object_pose.position.y
+        pose.position.z = resp.result().object_pose.position.z
 
-        #pose.orientation.x = resp.object_pose.orientation.x
-        #pose.orientation.y = resp.object_pose.orientation.y
-        #pose.orientation.z = resp.object_pose.orientation.z
-        #pose.orientation.w = resp.object_pose.orientation.w
+        pose.orientation.x = resp.result().object_pose.orientation.x
+        pose.orientation.y = resp.result().object_pose.orientation.y
+        pose.orientation.z = resp.result().object_pose.orientation.z
+        pose.orientation.w = resp.result().object_pose.orientation.w
 
-        #self.simulation_start_publisher.publish(pose)
-        #print('initial pose sent.')
+        self.simulation_start_publisher.publish(pose)
+        print('initial pose sent.')
 
     def _position_target_callback(self,data):
         self.current_target_received.emit(data)
