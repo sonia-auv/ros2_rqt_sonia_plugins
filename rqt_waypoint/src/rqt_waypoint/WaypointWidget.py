@@ -17,7 +17,7 @@ from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
 
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
-#from sonia_common_ros2.action import MissionControl
+from sonia_common_ros2.action import MissionControl
 from std_srvs.srv import Trigger
 
 from tf_transformations import euler_from_quaternion
@@ -49,6 +49,7 @@ class WaypointWidget(QMainWindow):
         self.sendWaypointButton.setText("Choose a mode")
 
         self.frameChoice.setCurrentIndex(1)
+        self.missionListDropdown.addItems(["root", "failedTest"])
 
         self.prev_auv = ""
         self.prev_scene = self.sceneChoice.currentText()
@@ -75,7 +76,7 @@ class WaypointWidget(QMainWindow):
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
 
         #Actions
-        #self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
+        self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
 
         self.current_target_received.connect(self._current_target_received)
         self.createLabel.connect(self.addButton)
@@ -202,10 +203,29 @@ class WaypointWidget(QMainWindow):
         self.set_dvl_started_publisher.publish(dvl_state)
 
     def _mission_load_action(self):
-        print("mission loaded")
+        mission = self.missionListDropdown.currentText()
+        self.loadMissionBtn.setStyleSheet("background-color: orange;") 
+        self.loadMissionBtn.setEnabled(False) 
+        self.mission_future =self._send_goal(mission)
+        self.mission_future.add_done_callback(self._goal_response_callback)
+        
+    def _goal_response_callback(self, future):
+        goal = future.result()
+        if goal.accepted:
+            self.loadMissionBtn.setStyleSheet("background-color: green;") 
+        else:
+            self.loadMissionBtn.setStyleSheet("background-color: red;") 
+        
     def _mission_dropdown_refresh(self):
+        self.loadMissionBtn.setStyleSheet("background-color: None") 
+        self.loadMissionBtn.setEnabled(True) 
         print("mission refresh")
 
+    def _send_goal(self, mission):
+        goal_msg = MissionControl.Goal()
+        goal_msg.mission = mission
+        self.mission_client.wait_for_server()
+        return self.mission_client.send_goal_async(goal_msg)
     def _reset_position(self):
         pose = geoPose()
         pose.position.x = 0.0

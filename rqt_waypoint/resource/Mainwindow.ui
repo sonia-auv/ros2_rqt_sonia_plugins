@@ -808,15 +808,15 @@
        <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-           <widget class="QComboBox" name="missionListDropDown">
+           <widget class="QComboBox" name="missionListDropdown">
             <property name="editable">
                <bool>false</bool>
               </property>
               <property name="currentText">
-               <string>Nimai</string>
+               <string>NA</string>
               </property>
               <property name="placeholderText" stdset="0">
-               <string>Nimai</string>
+               <string/>
               </property>
            </widget>
           </item>
