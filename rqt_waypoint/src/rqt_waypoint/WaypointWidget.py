@@ -215,6 +215,9 @@ class WaypointWidget(QMainWindow):
             self.loadMissionBtn.setStyleSheet("background-color: green;") 
         else:
             self.loadMissionBtn.setStyleSheet("background-color: red;") 
+    def _feedback_callback(self, feedback_msg):
+        fd_cb = feedback_msg.feedback
+        print(fd_cb.status)
         
     def _mission_dropdown_refresh(self):
         self.loadMissionBtn.setStyleSheet("background-color: None") 
@@ -225,7 +228,7 @@ class WaypointWidget(QMainWindow):
         goal_msg = MissionControl.Goal()
         goal_msg.mission = mission
         self.mission_client.wait_for_server()
-        return self.mission_client.send_goal_async(goal_msg)
+        return self.mission_client.send_goal_async(goal_msg, self._feedback_callback)
     def _reset_position(self):
         pose = geoPose()
         pose.position.x = 0.0
