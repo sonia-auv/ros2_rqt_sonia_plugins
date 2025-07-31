@@ -7,6 +7,7 @@ from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
 from rclpy.action.client import ActionClient
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
@@ -55,6 +56,9 @@ class WaypointWidget(QMainWindow):
         self.prev_run = self.runChoice.currentText()
         
         self.tare_req = Trigger.Request()
+        qos_dvl = QoSProfile(depth=1)
+        qos_dvl.reliability= ReliabilityPolicy.RELIABLE
+        qos_dvl.durability= DurabilityPolicy.TRANSIENT_LOCAL
 
         # Subscribers
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
@@ -66,7 +70,7 @@ class WaypointWidget(QMainWindow):
         self.single_add_pose_publisher: Publisher = ros_node.create_publisher(soniaPose,"/proc_control/add_pose", 10)
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
-        self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", 10)
+        self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", qos_dvl)
 
         # Services
         self.initial_position_service: Client = ros_node.create_client(ObjectPoseService,"/proc_simulation/auv_pose")
