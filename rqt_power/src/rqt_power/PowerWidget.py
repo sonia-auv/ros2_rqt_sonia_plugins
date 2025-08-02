@@ -3,6 +3,7 @@ import os
 from ament_index_python import get_package_share_directory
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
@@ -28,17 +29,27 @@ class PowerWidget(QMainWindow):
         loadUi(ui_file, self)
 
         self.setObjectName('MyPowerControlWidget')
-
-        self._battery_voltage_subscriber :Subscription= ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_voltages", self._battery_voltage_callback, 10)
-        self._motor_voltage_subscriber :Subscription= ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_voltages", self._motor_voltage_callback, 10)
         
-        self._battery_current_subscriber: Subscription = ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_currents", self._battery_current_callback, 10)
-        self._motor_current_subscriber: Subscription = ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_currents", self._motor_current_callback, 10)
-        self._battery_temperature_subscriber: Subscription =ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_temperatures",  self._battery_temperature_callback, 10)
-        self._motor_temperature_subscriber: Subscription =ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_temperatures",  self._motor_temperature_callback, 10)
-        self._motor_feedback_subscriber: Subscription = ros_node.create_subscription(MotorFeedback,"/provider_power/motor_feedback", self.motor_feedback_callback, 10)
+        qos_rel = QoSProfile(depth=10)
+        qos_rel.reliability= ReliabilityPolicy.RELIABLE
+        qos_rel.durability= DurabilityPolicy.VOLATILE
+        qos_rel.history= HistoryPolicy.KEEP_LAST
+        
+        qos_best = QoSProfile(depth=10)
+        qos_best.reliability= ReliabilityPolicy.BEST_EFFORT
+        qos_best.durability= DurabilityPolicy.VOLATILE
+        qos_rel.history= HistoryPolicy.KEEP_LAST
 
-        self._enable_disable_motors: Publisher = ros_node.create_publisher(Bool, '/provider_power/activate_motors',100)
+        self._battery_voltage_subscriber :Subscription= ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_voltages", self._battery_voltage_callback, qos_best)
+        self._motor_voltage_subscriber :Subscription= ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_voltages", self._motor_voltage_callback, qos_rel)
+        
+        self._battery_current_subscriber: Subscription = ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_currents", self._battery_current_callback, qos_best)
+        self._motor_current_subscriber: Subscription = ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_currents", self._motor_current_callback, qos_rel)
+        self._battery_temperature_subscriber: Subscription =ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_temperatures",  self._battery_temperature_callback, qos_best)
+        self._motor_temperature_subscriber: Subscription =ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_temperatures",  self._motor_temperature_callback, qos_rel)
+        self._motor_feedback_subscriber: Subscription = ros_node.create_subscription(MotorFeedback,"/provider_power/motor_feedback", self.motor_feedback_callback, qos_rel)
+
+        self._enable_disable_motors: Publisher = ros_node.create_publisher(Bool, '/provider_power/activate_motors', qos_rel)
 
         self.battery_voltage_result_received.connect(self.show_battery_Voltage)
         self.motor_voltage_result_received.connect(self.show_motor_Voltage)

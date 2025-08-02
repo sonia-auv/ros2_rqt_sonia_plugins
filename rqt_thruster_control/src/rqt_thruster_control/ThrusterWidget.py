@@ -2,6 +2,7 @@ import os
 import time
 from ament_index_python.packages import get_package_share_directory
 from rclpy.publisher import Publisher
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from .ThrusterAction import ThrusterAction
 from threading import Thread
 
@@ -41,7 +42,12 @@ class ThrusterWidget(QMainWindow):
         self.thruster_7 = ThrusterAction(self, 6, 'T7')
         self.thruster_8 = ThrusterAction(self, 7, 'T8')
 
-        self.thruster_publisher: Publisher = internal_node.create_publisher(MotorPwm,"/provider_thruster/thruster_pwm", 10)
+        qos_rel = QoSProfile(depth=10)
+        qos_rel.reliability= ReliabilityPolicy.RELIABLE
+        qos_rel.durability= DurabilityPolicy.VOLATILE
+        qos_rel.history= HistoryPolicy.KEEP_LAST
+        
+        self.thruster_publisher: Publisher = internal_node.create_publisher(MotorPwm,"/provider_thruster/thruster_pwm", qos_rel)
         self.dry_test_publisher: Publisher = internal_node.create_publisher(Bool,"/telemetry/dry_run",10)
 
         self.enableButton.setEnabled(True)
