@@ -9,8 +9,9 @@ from rclpy.client import Client
 from rclpy.action.client import ActionClient
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QLabel
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QHeaderView, QLabel, QTableWidget, QTableWidgetItem
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtGui import QBrush, QColor
 
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Pose as geoPose
@@ -50,7 +51,11 @@ class WaypointWidget(QMainWindow):
 
         self.frameChoice.setCurrentIndex(1)
         self.missionListDropdown.addItems(["root", "failedTest"])
-
+        
+        self.nodeTable.setHorizontalHeaderLabels(["BT Node", "Status"])
+        self.nodeTable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
+        self.mission_history =[]       
+        
         self.prev_auv = ""
         self.prev_scene = self.sceneChoice.currentText()
         self.prev_run = self.runChoice.currentText()
@@ -215,13 +220,36 @@ class WaypointWidget(QMainWindow):
             self.loadMissionBtn.setStyleSheet("background-color: green;") 
         else:
             self.loadMissionBtn.setStyleSheet("background-color: red;") 
+            
     def _feedback_callback(self, feedback_msg):
-        fd_cb = feedback_msg.feedback
-        print(fd_cb.status)
+        fb = feedback_msg.feedback
+        for item in self.mission_history:
+            if item['uid'] == fb.uid:
+                item['status'] = fb.status
+                continue
+        ex = any(row['uid']==fb.uid for row in self.mission_history)
+        if not ex:        
+            self.mission_history.append({'uid': fb.uid, 'name': fb.node_name, 'status': fb.status}) 
+        self.nodeTable.setRowCount(len(self.mission_history))
+        for i, node in enumerate(self.mission_history):
+            color = "gray"
+            if node['status'] == "RUNNING":
+                color = "orange"
+            elif node['status'] == "FAILURE":
+               color = "red"
+            elif node['status'] == "SUCCESS":
+                color = "green"
+            item = QTableWidgetItem(node['status'])
+            item.setBackground(QBrush(QColor(color)))  
+             
+            self.nodeTable.setItem(i, 0, QTableWidgetItem(node['name']))
+            self.nodeTable.setItem(i, 1, item)
         
     def _mission_dropdown_refresh(self):
         self.loadMissionBtn.setStyleSheet("background-color: None") 
         self.loadMissionBtn.setEnabled(True) 
+        self.mission_history.clear()
+        self.nodeTable.setRowCount(0)
         print("mission refresh")
 
     def _send_goal(self, mission):
