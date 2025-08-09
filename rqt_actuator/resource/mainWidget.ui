@@ -71,6 +71,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="stop_arm">
+        <property name="text">
+         <string>Stop Robotic Arm</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="close_arm">
         <property name="text">
          <string>Close Robotic Arm</string>
