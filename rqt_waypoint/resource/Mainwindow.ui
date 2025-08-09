@@ -550,7 +550,7 @@
               <property name="currentText">
                <string>AUV8</string>
               </property>
-              <property name="placeholderText">
+              <property name="placeholderText" stdset="0">
                <string/>
               </property>
               <item>
@@ -633,7 +633,7 @@
               <property name="currentText">
                <string>Maryland</string>
               </property>
-              <property name="placeholderText">
+              <property name="placeholderText" stdset="0">
                <string/>
               </property>
               <item>
@@ -721,7 +721,7 @@
               <property name="currentText">
                <string>Prequalif</string>
               </property>
-              <property name="placeholderText">
+              <property name="placeholderText" stdset="0">
                <string/>
               </property>
               <item>
@@ -815,7 +815,7 @@
             <property name="currentText">
              <string/>
             </property>
-            <property name="placeholderText">
+            <property name="placeholderText" stdset="0">
              <string/>
             </property>
            </widget>
