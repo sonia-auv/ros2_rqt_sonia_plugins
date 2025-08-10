@@ -46,7 +46,7 @@ class PowerWidget(QMainWindow):
         self._battery_current_subscriber: Subscription = ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_currents", self._battery_current_callback, qos_best)
         self._motor_current_subscriber: Subscription = ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_currents", self._motor_current_callback, qos_rel)
         self._battery_temperature_subscriber: Subscription =ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_temperatures",  self._battery_temperature_callback, qos_best)
-        self._motor_temperature_subscriber: Subscription =ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_temperatures",  self._motor_temperature_callback, qos_rel)
+        self._motor_temperature_subscriber: Subscription =ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_temperatures",  self._motor_temperature_callback, qos_best)
         self._motor_feedback_subscriber: Subscription = ros_node.create_subscription(MotorFeedback,"/provider_power/motor_feedback", self.motor_feedback_callback, qos_rel)
 
         self._enable_disable_motors: Publisher = ros_node.create_publisher(Bool, '/provider_power/activate_motors', qos_rel)
