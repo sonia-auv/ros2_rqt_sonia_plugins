@@ -44,8 +44,6 @@ class ThrusterWidget(QMainWindow):
 
         qos_rel = QoSProfile(depth=10)
         qos_rel.reliability= ReliabilityPolicy.RELIABLE
-        qos_rel.durability= DurabilityPolicy.VOLATILE
-        qos_rel.history= HistoryPolicy.KEEP_LAST
         
         self.thruster_publisher: Publisher = internal_node.create_publisher(MotorPwm,"/provider_thruster/thruster_pwm", qos_rel)
         self.dry_test_publisher: Publisher = internal_node.create_publisher(Bool,"/telemetry/dry_run",10)

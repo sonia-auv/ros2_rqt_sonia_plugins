@@ -29,10 +29,8 @@ class ProviderDvl(Plugin):
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
         
-        qos_dvl = QoSProfile(depth=1)
-        qos_dvl.reliability= ReliabilityPolicy.BEST_EFFORT
-        qos_dvl.durability= DurabilityPolicy.VOLATILE
-        qos_dvl.history= HistoryPolicy.KEEP_LAST
+        qos_dvl = QoSProfile(depth=10)
+        qos_dvl.reliability= ReliabilityPolicy.RELIABLE
 
         self._dvl_subscriber: Subscription = self._internal_node.create_subscription(BodyVelocityDVL,"/provider_dvl/dvl_velocity", self._mainWindow._dvl_subscriber_cb, qos_dvl)
 

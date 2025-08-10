@@ -17,9 +17,7 @@ class DepthIndicatorWidget(QWidget):
         self.setWindowTitle('Depth Indicator')
 
         qos = QoSProfile(depth=10)
-        qos.reliability= ReliabilityPolicy.BEST_EFFORT
-        qos.durability= DurabilityPolicy.VOLATILE
-        qos.history= HistoryPolicy.KEEP_LAST
+        qos.reliability= ReliabilityPolicy.RELIABLE
 
         self._odom_subscriber:Subscription = internal_node.create_subscription(Float32,'/provider_depth/depth', self._odom_callback, qos)
 

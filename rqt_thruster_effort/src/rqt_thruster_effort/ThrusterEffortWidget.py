@@ -24,8 +24,6 @@ class ThrusterEffortWidget(QWidget):
 
         qos_rel = QoSProfile(depth=10)
         qos_rel.reliability= ReliabilityPolicy.RELIABLE
-        qos_rel.durability= DurabilityPolicy.VOLATILE
-        qos_rel.history= HistoryPolicy.KEEP_LAST
         
         self._thruster_newton_subscriber: Subscription = internal_node.create_subscription(Int8MultiArray, "/telemetry/thruster_newton" , self._handle_thruster_newton_msg,10)
         self._thruster_pwm_subscriber: Subscription = internal_node.create_subscription(MotorPwm, "/provider_thruster/thruster_pwm", self._handle_thruster_pwm_msg, qos_rel)

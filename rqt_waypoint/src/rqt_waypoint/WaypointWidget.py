@@ -58,7 +58,6 @@ class WaypointWidget(QMainWindow):
         self.tare_req = Trigger.Request()
         qos_dvl = QoSProfile(depth=1)
         qos_dvl.reliability= ReliabilityPolicy.RELIABLE
-        qos_dvl.durability= DurabilityPolicy.VOLATILE
 
         # Subscribers
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
