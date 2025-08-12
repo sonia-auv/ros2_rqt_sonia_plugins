@@ -20,7 +20,6 @@ class ActuatorWidget(QWidget):
 
         self.actuatorClient: Client = internal_node.create_client(ActuatorService, "/provider_actuator/do_action")
         self.req= ActuatorService.Request()
-        self.req_arm= ActuatorService.Request()
         self.drop_port.clicked.connect(self._handle_drop_port)
         self.drop_starboard.clicked.connect(self._handle_drop_starboard)
         self.torpedo_port.clicked.connect(self._handle_torpedo_port)
@@ -56,6 +55,7 @@ class ActuatorWidget(QWidget):
         if self.open_arm.styleSheet() == "background-color: yellow":
             return
         self.open_arm.setStyleSheet("background-color: yellow")
+        print("ActuatorService.Request.ELEMENT_GRABBER",ActuatorService.Request.ELEMENT_GRABBER)
         self.sendMessage(ActuatorService.Request.ELEMENT_GRABBER, ActuatorService.Request.SIDE_PORT, ActuatorService.Request.ACTION_GRABBER_OPEN)
 
 
@@ -64,6 +64,7 @@ class ActuatorWidget(QWidget):
         if self.close_arm.styleSheet() == "background-color: yellow":
             return
         self.close_arm.setStyleSheet("background-color: yellow")
+        print("ActuatorService.Request.ELEMENT_GRABBER",ActuatorService.Request.ELEMENT_GRABBER)
         self.sendMessage(ActuatorService.Request.ELEMENT_GRABBER, ActuatorService.Request.SIDE_PORT, ActuatorService.Request.ACTION_GRABBER_CLOSE)
 
     def sendMessage(self, element, side, action):
@@ -96,7 +97,7 @@ class ActuatorWidget(QWidget):
         if button == "":
             rclpy.logerr(f"{element} has an invalid side or element")
         else:
-            if response == True:
+            if response:
                 button.setStyleSheet("background-color: green")
                 newThread = Threads(button)
                 newThread.start()
