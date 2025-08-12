@@ -158,10 +158,10 @@ class ThrusterWidget(QMainWindow):
     def dry_motors(self):
         i = 0
         while i < 8:
-            self.set_pwm(i, 1545)
+            self.set_pwm(i, 1575)
             i+=1
         self.send_pwms()
-        time.sleep(3)
+        time.sleep(5)
         #reset
         i = 0
         while i < 8:
