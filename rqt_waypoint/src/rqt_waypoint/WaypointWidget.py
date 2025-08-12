@@ -50,7 +50,7 @@ class WaypointWidget(QMainWindow):
         self.sendWaypointButton.setText("Choose a mode")
 
         self.frameChoice.setCurrentIndex(1)
-        self.missionListDropdown.addItems(["root", "failedTest"])
+        #self.missionListDropdown.addItems(["root", "failedTest"])
         
         self.nodeTable.setHorizontalHeaderLabels(["BT Node", "Status"])
         self.nodeTable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
@@ -208,7 +208,7 @@ class WaypointWidget(QMainWindow):
         self.set_dvl_started_publisher.publish(dvl_state)
 
     def _mission_load_action(self):
-        mission = self.missionListDropdown.currentText()
+        mission = self.missionTextfield.currentText()
         self.loadMissionBtn.setStyleSheet("background-color: orange;") 
         self.loadMissionBtn.setEnabled(False) 
         self.mission_future =self._send_goal(mission)
