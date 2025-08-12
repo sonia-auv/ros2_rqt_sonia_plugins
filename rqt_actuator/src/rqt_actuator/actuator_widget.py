@@ -7,6 +7,7 @@ from ament_index_python import get_package_share_directory
 from sonia_common_ros2.srv import ActuatorService
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
+from functools import partial
 
 
 # main class inherits from the ui window class
@@ -54,27 +55,29 @@ class ActuatorWidget(QWidget):
         if self.open_arm.styleSheet() == "background-color: yellow":
             return
         self.open_arm.setStyleSheet("background-color: yellow")
+        print("ActuatorService.Request.ELEMENT_GRABBER",ActuatorService.Request.ELEMENT_GRABBER)
+        self.sendMessage(ActuatorService.Request.ELEMENT_GRABBER, ActuatorService.Request.SIDE_PORT, ActuatorService.Request.ACTION_GRABBER_OPEN)
+
+
 
     def _handle_close_robotic_arm(self):
         if self.close_arm.styleSheet() == "background-color: yellow":
             return
         self.close_arm.setStyleSheet("background-color: yellow")
+        print("ActuatorService.Request.ELEMENT_GRABBER",ActuatorService.Request.ELEMENT_GRABBER)
+        self.sendMessage(ActuatorService.Request.ELEMENT_GRABBER, ActuatorService.Request.SIDE_PORT, ActuatorService.Request.ACTION_GRABBER_CLOSE)
 
     def sendMessage(self, element, side, action):
         self.req.action=action
         self.req.side=side
         self.req.element=element
         self.future = self.actuatorClient.call_async(self.req)
+        self.future.add_done_callback(partial(self.actuatorCallback, element=element,side=side,action=action))
         
-        self.actuatorCallback(element,side,self.future.result())
-
-    def actuatorCallback(self, element, side, response):
+    
+    def actuatorCallback(self, future, element, side,action):
         button = ""
-        #if data.element == ActuatorSendReply.ELEMENT_ARM:
-            #if data.side == ActuatorSendReply.ARM_CLOSE:
-                #button = self.close_arm
-            #elif data.side == ActuatorSendReply.ARM_OPEN:
-                #button = self.open_arm
+        response=future.result().success
         if element == ActuatorService.Request.ELEMENT_DROPPER:
             if side == ActuatorService.Request.SIDE_PORT:
                 button = self.drop_port
@@ -85,19 +88,26 @@ class ActuatorWidget(QWidget):
                 button = self.torpedo_port
             elif side == ActuatorService.Request.SIDE_STARBOARD:
                 button = self.torpedo_starboard
+
+        elif element == ActuatorService.Request.ELEMENT_GRABBER:
+            if action == ActuatorService.Request.ACTION_GRABBER_OPEN:
+                button = self.open_arm
+            elif action == ActuatorService.Request.ACTION_GRABBER_CLOSE:
+                button = self.close_arm
         if button == "":
             rclpy.logerr(f"{element} has an invalid side or element")
         else:
-            if response == ActuatorService.Response.success:
+            if response:
                 button.setStyleSheet("background-color: green")
                 newThread = Threads(button)
                 newThread.start()
-            elif response != ActuatorService.Response.success:
-                button.setStyleSheet("background-color: red")
+            
+            elif response == None:
+                button.setStyleSheet("background: rgb(0, 0, 255)")
                 newThread = Threads(button)
                 newThread.start()
             else:
-                button.setStyleSheet("background: rgb(88, 8, 24)")
+                button.setStyleSheet("background-color: red")
                 newThread = Threads(button)
                 newThread.start()
 
