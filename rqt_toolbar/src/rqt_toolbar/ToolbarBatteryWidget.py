@@ -21,8 +21,8 @@ class BatteryWidget(QWidget):
         self.setObjectName('BatteryWidget')
         self.store_index = store_index
         self.bat_max = 16.8
-        self.bat_min = 14.5
-        self.bat_warning = 14.8
+        self.bat_min = 15.12
+        self.bat_warning = 15.12
 
         ui_file = os.path.join(get_package_share_directory('rqt_toolbar'), 'resource', 'battery.ui')
         loadUi(ui_file, self)
