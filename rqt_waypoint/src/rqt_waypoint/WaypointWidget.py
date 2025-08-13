@@ -15,7 +15,7 @@ from PyQt5.QtGui import QBrush, QColor
 
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Pose as geoPose
-from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose
+from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose, MissionStatus, KillStatus
 
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
 from sonia_common_ros2.action import MissionControl
@@ -45,6 +45,7 @@ class WaypointWidget(QMainWindow):
         self.current_mode_id = 0
         self.z_pose = 0
         self.labelsCreated = 0
+        self.mission_switch_status= False
 
         self.sendWaypointButton.setEnabled(False)
         self.sendWaypointButton.setText("Choose a mode")
@@ -66,6 +67,7 @@ class WaypointWidget(QMainWindow):
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(MpcInfo, "/proc_control/controller_info", self.set_mpc_info,10)
         self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info,10)
+        self._mission_switch: Subscription = ros_node.create_subscription(MissionStatus, '/provider_rs485/mission_status', self._mission_switch_callback, 10)
 
         # Publishers
         self.simulation_start_publisher: Publisher= ros_node.create_publisher(geoPose, "/proc_simulation/start_simulation",10)
@@ -208,11 +210,14 @@ class WaypointWidget(QMainWindow):
         self.set_dvl_started_publisher.publish(dvl_state)
 
     def _mission_load_action(self):
-        mission = self.missionTextfield.currentText()
-        self.loadMissionBtn.setStyleSheet("background-color: orange;") 
-        self.loadMissionBtn.setEnabled(False) 
-        self.mission_future =self._send_goal(mission)
-        self.mission_future.add_done_callback(self._goal_response_callback)
+        if self.mission_switch_status:
+            self.show_error("The mission switch is pulled, push the switch to load mission")
+        else:
+            mission = self.missionTextfield.text()
+            self.loadMissionBtn.setStyleSheet("background-color: orange;") 
+            self.loadMissionBtn.setEnabled(False) 
+            self.mission_future =self._send_goal(mission)
+            self.mission_future.add_done_callback(self._goal_response_callback)            
         
     def _goal_response_callback(self, future):
         goal = future.result()
@@ -324,6 +329,8 @@ class WaypointWidget(QMainWindow):
 
     def _position_target_callback(self,data):
         self.current_target_received.emit(data)
+    def _mission_switch_callback(self, msg: KillStatus):
+        self.mission_switch_status= msg.status
 
     def _current_target_received(self, data):
         try:
@@ -435,7 +442,7 @@ class WaypointWidget(QMainWindow):
 
     def show_error(self, message):
         msgBox = QMessageBox()
-        msgBox.setIcon(QMessageBox.warning)
+        msgBox.setIcon(QMessageBox.Warning)
         msgBox.setText(message)
         msgBox.setWindowTitle("Error")
         msgBox.setStandardButtons(QMessageBox.Ok)
