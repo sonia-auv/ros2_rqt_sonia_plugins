@@ -216,8 +216,9 @@ class WaypointWidget(QMainWindow):
             mission = self.missionTextfield.text()
             self.loadMissionBtn.setStyleSheet("background-color: orange;") 
             self.loadMissionBtn.setEnabled(False) 
-            self.mission_future =self._send_goal(mission)
-            self.mission_future.add_done_callback(self._goal_response_callback)            
+            check_server=self.mission_future =self._send_goal(mission)
+            if check_server:
+                self.mission_future.add_done_callback(self._goal_response_callback)            
         
     def _goal_response_callback(self, future):
         goal = future.result()
@@ -260,7 +261,10 @@ class WaypointWidget(QMainWindow):
     def _send_goal(self, mission):
         goal_msg = MissionControl.Goal()
         goal_msg.mission = mission
-        self.mission_client.wait_for_server()
+        server_ready = self.mission_client.wait_for_server(5)
+        if not server_ready:
+            self.show_error("Server isn't responding or running")
+            return False
         return self.mission_client.send_goal_async(goal_msg, self._feedback_callback)
     def _reset_position(self):
         pose = geoPose()
