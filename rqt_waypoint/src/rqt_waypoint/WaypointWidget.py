@@ -278,10 +278,6 @@ class WaypointWidget(QMainWindow):
         pose.orientation.w = 1.0
 
         self.simulation_start_publisher.publish(pose)
-        # if self.current_mode_id == 0:
-        #     self.set_initial_position_publisher.publish(data=True)
-        # else:
-        #     self.show_error('Control mode must be 0 to reset position')
     
     def set_mpc_info(self, msg: MpcInfo):
         self.current_mode_id = msg.mpc_mode
