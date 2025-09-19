@@ -1,5 +1,6 @@
 import os
 from rclpy.subscription import Subscription
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
@@ -15,7 +16,10 @@ class DepthIndicatorWidget(QWidget):
         loadUi(ui_file, self)
         self.setWindowTitle('Depth Indicator')
 
-        self._odom_subscriber:Subscription = internal_node.create_subscription(Float32,'/provider_depth/depth', self._odom_callback, 100)
+        qos = QoSProfile(depth=10)
+        qos.reliability= ReliabilityPolicy.RELIABLE
+
+        self._odom_subscriber:Subscription = internal_node.create_subscription(Float32,'/provider_depth/depth', self._odom_callback, qos)
 
         self.odometry_received.connect(self._handle_result)
 

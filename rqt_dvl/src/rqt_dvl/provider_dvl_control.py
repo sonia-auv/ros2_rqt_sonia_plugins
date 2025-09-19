@@ -4,6 +4,7 @@ from rclpy.node import Node
 from qt_gui.plugin import Plugin
 from .DvlWidget import DvlWidget
 from rclpy.subscription import Subscription
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 
 from sonia_common_ros2.msg import BodyVelocityDVL
 
@@ -27,8 +28,11 @@ class ProviderDvl(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
+        
+        qos_dvl = QoSProfile(depth=10)
+        qos_dvl.reliability= ReliabilityPolicy.RELIABLE
 
-        self._dvl_subscriber: Subscription = self._internal_node.create_subscription(BodyVelocityDVL,"/provider_dvl/dvl_velocity", self._mainWindow._dvl_subscriber_cb, 10)
+        self._dvl_subscriber: Subscription = self._internal_node.create_subscription(BodyVelocityDVL,"/provider_dvl/dvl_velocity", self._mainWindow._dvl_subscriber_cb, qos_dvl)
 
          # Spin this thread
         self._timer = QTimer()

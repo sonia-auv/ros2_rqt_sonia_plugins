@@ -58,8 +58,6 @@ class ActuatorWidget(QWidget):
         print("ActuatorService.Request.ELEMENT_GRABBER",ActuatorService.Request.ELEMENT_GRABBER)
         self.sendMessage(ActuatorService.Request.ELEMENT_GRABBER, ActuatorService.Request.SIDE_PORT, ActuatorService.Request.ACTION_GRABBER_OPEN)
 
-
-
     def _handle_close_robotic_arm(self):
         if self.close_arm.styleSheet() == "background-color: yellow":
             return

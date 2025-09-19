@@ -1,6 +1,7 @@
 import os
 from ament_index_python import get_package_share_directory
 from rclpy.subscription import Subscription
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
@@ -21,8 +22,11 @@ class ThrusterEffortWidget(QWidget):
         loadUi(ui_file, self)
         self.setWindowTitle('Thruster Effort')
 
+        qos_rel = QoSProfile(depth=10)
+        qos_rel.reliability= ReliabilityPolicy.RELIABLE
+        
         self._thruster_newton_subscriber: Subscription = internal_node.create_subscription(Int8MultiArray, "/telemetry/thruster_newton" , self._handle_thruster_newton_msg,10)
-        self._thruster_pwm_subscriber: Subscription = internal_node.create_subscription(MotorPwm, "/provider_thruster/thruster_pwm", self._handle_thruster_pwm_msg,10)
+        self._thruster_pwm_subscriber: Subscription = internal_node.create_subscription(MotorPwm, "/provider_thruster/thruster_pwm", self._handle_thruster_pwm_msg, qos_rel)
 
         self.monitor_thruster_newton_msg.connect(self._received_thruster_newton_msg)
         self.monitor_thruster_pwm_msg.connect(self._received_thruster_pwm_msg)
