@@ -1,6 +1,6 @@
 import os
 from ament_index_python.packages import get_package_share_directory
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from rclpy.subscription import Subscription
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget, QMessageBox
@@ -29,8 +29,6 @@ class BatteryWidget(QWidget):
         # TODO: ROS CHANGE
         qos_best = QoSProfile(depth=10)
         qos_best.reliability= ReliabilityPolicy.BEST_EFFORT
-        qos_best.durability= DurabilityPolicy.VOLATILE
-        qos_best.history= HistoryPolicy.KEEP_LAST
         
         self._power_supply: Subscription = internal_node.create_subscription(BatteryPowerMessages, '/provider_power/battery_voltages', self._power_supply_callback, qos_best)
         self.psu_received.connect(self._handle_result)

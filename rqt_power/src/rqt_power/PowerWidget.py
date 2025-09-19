@@ -3,7 +3,7 @@ import os
 from ament_index_python import get_package_share_directory
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
@@ -32,13 +32,9 @@ class PowerWidget(QMainWindow):
         
         qos_rel = QoSProfile(depth=10)
         qos_rel.reliability= ReliabilityPolicy.RELIABLE
-        qos_rel.durability= DurabilityPolicy.VOLATILE
-        qos_rel.history= HistoryPolicy.KEEP_LAST
         
         qos_best = QoSProfile(depth=10)
         qos_best.reliability= ReliabilityPolicy.BEST_EFFORT
-        qos_best.durability= DurabilityPolicy.VOLATILE
-        qos_rel.history= HistoryPolicy.KEEP_LAST
 
         self._battery_voltage_subscriber :Subscription= ros_node.create_subscription(BatteryPowerMessages,"/provider_power/battery_voltages", self._battery_voltage_callback, qos_best)
         self._motor_voltage_subscriber :Subscription= ros_node.create_subscription(MotorPowerMessages,"/provider_power/motor_voltages", self._motor_voltage_callback, qos_rel)

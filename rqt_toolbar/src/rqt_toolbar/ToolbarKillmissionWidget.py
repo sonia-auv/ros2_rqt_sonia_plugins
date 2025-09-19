@@ -1,7 +1,7 @@
 import os
 from rclpy.subscription import Subscription
 from sonia_common_ros2.msg import MissionStatus, KillStatus
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from ament_index_python.packages import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
@@ -21,8 +21,6 @@ class KillMissionWidget(QWidget):
         
         qos_rel = QoSProfile(depth=10)
         qos_rel.reliability= ReliabilityPolicy.RELIABLE
-        qos_rel.durability= DurabilityPolicy.VOLATILE
-        qos_rel.history= HistoryPolicy.KEEP_LAST
 
         self._mission_switch: Subscription = ros_node.create_subscription(MissionStatus, '/provider_rs485/mission_status', self._mission_switch_callback, qos_rel)
         self.mission_received.connect(self._handle_mission_result)
