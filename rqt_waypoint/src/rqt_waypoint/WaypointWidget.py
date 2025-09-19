@@ -214,7 +214,7 @@ class WaypointWidget(QMainWindow):
 
     def _mission_load_action(self):
         if self.mission_switch_status:
-            self.show_error("The mission switch is pulled, push the switch to load mission")
+            self.show_error("The mission switch is pushed, pull the switch to load mission")
         else:
             mission = self.missionTextfield.text()
             self.loadMissionBtn.setStyleSheet("background-color: orange;") 
