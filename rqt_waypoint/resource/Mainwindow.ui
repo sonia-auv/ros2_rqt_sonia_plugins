@@ -38,7 +38,7 @@
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <layout class="QHBoxLayout" name="horizontalLayout_14">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
@@ -550,7 +550,7 @@
               <property name="currentText">
                <string>AUV8</string>
               </property>
-              <property name="placeholderText" stdset="0">
+              <property name="placeholderText">
                <string/>
               </property>
               <item>
@@ -633,7 +633,7 @@
               <property name="currentText">
                <string>Maryland</string>
               </property>
-              <property name="placeholderText" stdset="0">
+              <property name="placeholderText">
                <string/>
               </property>
               <item>
@@ -721,7 +721,7 @@
               <property name="currentText">
                <string>Prequalif</string>
               </property>
-              <property name="placeholderText" stdset="0">
+              <property name="placeholderText">
                <string/>
               </property>
               <item>
@@ -808,10 +808,14 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-            <widget class="QLineEdit" name="missionTextfield">
-            <property name="readOnly"><bool>false</bool></property>
-            <property name="text"><string/></property>
-            </widget>
+           <widget class="QLineEdit" name="missionTextfield">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="readOnly">
+             <bool>false</bool>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="loadMissionBtn">
@@ -889,6 +893,16 @@
             </attribute>
             <column/>
             <column/>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="missionAbortBtn">
+            <property name="text">
+             <string>Abort</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: red;</string>
+            </property>
            </widget>
           </item>
          </layout>

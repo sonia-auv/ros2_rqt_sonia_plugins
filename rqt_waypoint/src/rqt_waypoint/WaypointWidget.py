@@ -7,10 +7,11 @@ from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
 from rclpy.action.client import ActionClient
-from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+from rclpy.task import Future
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QHeaderView, QLabel, QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QHeaderView, QLabel, QTableWidgetItem
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QBrush, QColor
 
@@ -52,7 +53,6 @@ class WaypointWidget(QMainWindow):
         self.sendWaypointButton.setText("Choose a mode")
 
         self.frameChoice.setCurrentIndex(1)
-        #self.missionListDropdown.addItems(["root", "failedTest"])
         
         self.nodeTable.setHorizontalHeaderLabels(["BT Node", "Status"])
         self.nodeTable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
@@ -114,6 +114,7 @@ class WaypointWidget(QMainWindow):
         # Mission tab buttons
         self.loadMissionBtn.clicked.connect(self._mission_load_action)
         self.refreshBtn.clicked.connect(self._mission_dropdown_refresh)
+        self.missionAbortBtn.clicked.connect(self._mission_abort_cb)
     
     def timeout_info(self, msg):
         if msg.status == 1:
@@ -219,13 +220,13 @@ class WaypointWidget(QMainWindow):
             mission = self.missionTextfield.text()
             self.loadMissionBtn.setStyleSheet("background-color: orange;") 
             self.loadMissionBtn.setEnabled(False) 
-            check_server=self.mission_future =self._send_goal(mission)
-            if check_server:
-                self.mission_future.add_done_callback(self._goal_response_callback)            
+            self._send_goal(mission)
+            #self.mission_future.add_done_callback(self._goal_response_callback)        
         
-    def _goal_response_callback(self, future):
+    def _goal_response_callback(self, future: Future):
         goal = future.result()
-        if goal.accepted:
+        print("This print")
+        if goal:
             self.loadMissionBtn.setStyleSheet("background-color: green;") 
         else:
             self.loadMissionBtn.setStyleSheet("background-color: red;") 
@@ -267,8 +268,10 @@ class WaypointWidget(QMainWindow):
         server_ready = self.mission_client.wait_for_server(5)
         if not server_ready:
             self.show_error("Server isn't responding or running")
-            return False
-        return self.mission_client.send_goal_async(goal_msg, self._feedback_callback)
+            return
+        self.mission_future=self.mission_client.send_goal_async(goal_msg, self._feedback_callback)
+        self.mission_future.add_done_callback(self._goal_response_callback)
+        
     def _reset_position(self):
         pose = geoPose()
         pose.position.x = 0.0
@@ -291,9 +294,8 @@ class WaypointWidget(QMainWindow):
             self.sendWaypointButton.setText("Choose a mode")
             self.sendWaypointButton.setEnabled(False)
 
-    # def auv_pose_callback(self, msg):
-    #     self.z_pose = float(msg.pose.pose.position.z)
-    #     self.z_pose
+    def _mission_abort_cb(self):
+        print('Mission abort.')
 
     def _clear_waypoint(self):
         reset_state= Bool()
