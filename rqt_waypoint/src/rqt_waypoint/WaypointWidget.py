@@ -6,7 +6,7 @@ import math
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
-from rclpy.action.client import ClientGoalHandle, ActionClient
+from rclpy.action.client import ClientGoalHandle, ActionClient, UUID
 from rclpy.task import Future
 from rclpy.qos import QoSProfile, ReliabilityPolicy
 from ament_index_python import get_package_share_directory
@@ -87,7 +87,7 @@ class WaypointWidget(QMainWindow):
 
         #Actions
         self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
-        self.goal_handle=None
+        self.goal_handle = None
 
         self.current_target_received.connect(self._current_target_received)
         self.createLabel.connect(self.addButton)
@@ -221,12 +221,10 @@ class WaypointWidget(QMainWindow):
             mission = self.missionTextfield.text()
             self.loadMissionBtn.setStyleSheet("background-color: orange;") 
             self.loadMissionBtn.setEnabled(False) 
-            self._send_goal(mission)
-            #self.mission_future.add_done_callback(self._goal_response_callback)        
+            self._send_goal(mission)     
         
     def _goal_response_callback(self, future: Future):
         self.goal_handle = future.result()
-        print("This print")
         if self.goal_handle:
             self.loadMissionBtn.setStyleSheet("background-color: green;") 
         else:
@@ -296,15 +294,19 @@ class WaypointWidget(QMainWindow):
             self.sendWaypointButton.setEnabled(False)
 
     def _mission_abort_cb(self):
+        if self.mission_future is None :
+            print("No mission Future")
+            return
         cancel_req = self.mission_client._cancel_goal_async(self.goal_handle)
         cancel_req.add_done_callback(self._cancel_response_cb)
 
     def _cancel_response_cb(self, h : Future):
         cancel_resp = h.result()
         if(cancel_resp):
-            print('Mission abort.')
+            self._clear_waypoint(self)
+            print('Mission cancelled.')
         else:
-            print('Mission abort rejected.')
+            print('Mission cancel request rejected.')
 
     def _clear_waypoint(self):
         reset_state= Bool()
