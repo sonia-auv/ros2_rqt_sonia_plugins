@@ -61,6 +61,7 @@ class WaypointWidget(QMainWindow):
         self.prev_auv = ""
         self.prev_scene = self.sceneChoice.currentText()
         self.prev_run = self.runChoice.currentText()
+        self.mission_future = None
         
         self.tare_req = Trigger.Request()
         qos_dvl = QoSProfile(depth=1)
@@ -215,10 +216,12 @@ class WaypointWidget(QMainWindow):
         self.set_dvl_started_publisher.publish(dvl_state)
 
     def _mission_load_action(self):
+        mission = self.missionTextfield.text()
         if self.mission_switch_status:
             self.show_error("The mission switch is pushed, pull the switch to load mission")
+        elif not mission:
+            self.show_error("Mission name empty")
         else:
-            mission = self.missionTextfield.text()
             self.loadMissionBtn.setStyleSheet("background-color: orange;") 
             self.loadMissionBtn.setEnabled(False) 
             self._send_goal(mission)     
@@ -303,7 +306,8 @@ class WaypointWidget(QMainWindow):
     def _cancel_response_cb(self, h : Future):
         cancel_resp = h.result()
         if(cancel_resp):
-            self._clear_waypoint(self)
+            self._clear_waypoint()
+            self.mission_future = None
             print('Mission cancelled.')
         else:
             print('Mission cancel request rejected.')
