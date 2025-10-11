@@ -836,6 +836,24 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
+           <widget class="QLineEdit" name="debugMsg">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="mouseTracking">
+             <bool>false</bool>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QTableWidget" name="nodeTable">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
@@ -897,11 +915,11 @@
           </item>
           <item>
            <widget class="QPushButton" name="missionAbortBtn">
-            <property name="text">
-             <string>Abort</string>
-            </property>
             <property name="styleSheet">
              <string notr="true">background-color: red;</string>
+            </property>
+            <property name="text">
+             <string>Abort</string>
             </property>
            </widget>
           </item>
