@@ -6,7 +6,7 @@ import math
 from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
-from rclpy.action.client import ClientGoalHandle, ActionClient, UUID
+from rclpy.action.client import ActionClient
 from rclpy.task import Future
 from rclpy.qos import QoSProfile, ReliabilityPolicy
 from ament_index_python import get_package_share_directory
