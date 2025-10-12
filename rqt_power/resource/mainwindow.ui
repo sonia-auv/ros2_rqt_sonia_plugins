@@ -449,7 +449,7 @@
              <property name="maximumSize">
               <size>
                <width>282</width>
-               <height>500</height>
+               <height>400</height>
               </size>
              </property>
              <property name="text">
@@ -1216,7 +1216,7 @@
              <property name="maximumSize">
               <size>
                <width>282</width>
-               <height>500</height>
+               <height>400</height>
               </size>
              </property>
              <property name="text">
@@ -2007,7 +2007,7 @@
              <property name="maximumSize">
               <size>
                <width>282</width>
-               <height>500</height>
+               <height>400</height>
               </size>
              </property>
              <property name="text">
