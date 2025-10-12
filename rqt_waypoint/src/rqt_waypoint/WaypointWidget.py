@@ -62,6 +62,7 @@ class WaypointWidget(QMainWindow):
         self.prev_scene = self.sceneChoice.currentText()
         self.prev_run = self.runChoice.currentText()
         self.mission_future = None
+        self.goal_handle = None
         
         self.tare_req = Trigger.Request()
         qos_dvl = QoSProfile(depth=1)
@@ -87,9 +88,8 @@ class WaypointWidget(QMainWindow):
         self.depth_tare_service: Client= ros_node.create_client(Trigger, "/provider_depth/tare")
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
         
-        #Actions
+        # Actions
         self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
-        self.goal_handle = None
 
         self.current_target_received.connect(self._current_target_received)
         self.createLabel.connect(self.addButton)
@@ -116,7 +116,7 @@ class WaypointWidget(QMainWindow):
 
         # Mission tab buttons
         self.loadMissionBtn.clicked.connect(self._mission_load_action)
-        self.refreshBtn.clicked.connect(self._mission_dropdown_refresh)
+        self.refreshBtn.clicked.connect(self._mission_dash_refresh)
         self.missionAbortBtn.clicked.connect(self._mission_abort_cb)
     
     def timeout_info(self, msg):
@@ -225,10 +225,16 @@ class WaypointWidget(QMainWindow):
         
     def _goal_response_callback(self, future: Future):
         self.goal_handle = future.result()
-        if self.goal_handle:
+        if self.goal_handle.accepted:
+            self.refreshBtn.setEnabled(False)
+            res = self.goal_handle.get_result_async()
+            res.add_done_callback(self._get_Result_cb)
             self.loadMissionBtn.setStyleSheet("background-color: green;") 
         else:
-            self.loadMissionBtn.setStyleSheet("background-color: red;") 
+            self.loadMissionBtn.setStyleSheet("background-color: red;")   
+                 
+    def _get_Result_cb(self, future):
+            self.refreshBtn.setEnabled(True)
             
     def _feedback_callback(self, feedback_msg):
         fb = feedback_msg.feedback
@@ -254,13 +260,13 @@ class WaypointWidget(QMainWindow):
             self.nodeTable.setItem(i, 0, QTableWidgetItem(node['name']))
             self.nodeTable.setItem(i, 1, item)
         
-    def _mission_dropdown_refresh(self):
+    def _mission_dash_refresh(self):
         self.loadMissionBtn.setStyleSheet("background-color: None") 
         self.loadMissionBtn.setEnabled(True) 
         self.mission_history.clear()
         self.nodeTable.setRowCount(0)
         self.debugMsg.clear()
-        print("mission refresh")
+        self.missionTextfield.clear()
 
     def _send_goal(self, mission):
         goal_msg = MissionControl.Goal()
@@ -296,12 +302,12 @@ class WaypointWidget(QMainWindow):
 
     def _mission_abort_cb(self):
         if self.mission_future is None :
-            print("No mission Future")
             return
         cancel_req = self.mission_client._cancel_goal_async(self.goal_handle)
         cancel_req.add_done_callback(self._cancel_response_cb)
 
     def _cancel_response_cb(self, resp : Future):
+        self.refreshBtn.setEnabled(True) 
         cancel_resp = resp.result()
         if(cancel_resp):
             self._clear_waypoint()
