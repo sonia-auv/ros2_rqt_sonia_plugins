@@ -845,6 +845,9 @@
             <property name="mouseTracking">
              <bool>false</bool>
             </property>
+            <property name="focusPolicy">
+             <enum>Qt::NoFocus</enum>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>

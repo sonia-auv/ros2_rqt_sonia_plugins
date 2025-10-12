@@ -234,7 +234,7 @@ class WaypointWidget(QMainWindow):
             self.loadMissionBtn.setStyleSheet("background-color: red;")   
                  
     def _get_Result_cb(self, future):
-            self.refreshBtn.setEnabled(True)
+        self.refreshBtn.setEnabled(True)
             
     def _feedback_callback(self, feedback_msg):
         fb = feedback_msg.feedback
