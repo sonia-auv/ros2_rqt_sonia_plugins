@@ -7,14 +7,15 @@ from rclpy.subscription import Subscription
 from rclpy.publisher import Publisher
 from rclpy.client import Client
 from rclpy.action.client import ActionClient
-from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+from rclpy.task import Future
+from rclpy.qos import QoSProfile, ReliabilityPolicy
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QHeaderView, QLabel, QTableWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QHeaderView, QLabel, QTableWidgetItem
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QBrush, QColor
 
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool,String
 from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose, MissionStatus, KillStatus
 
@@ -52,7 +53,6 @@ class WaypointWidget(QMainWindow):
         self.sendWaypointButton.setText("Choose a mode")
 
         self.frameChoice.setCurrentIndex(1)
-        #self.missionListDropdown.addItems(["root", "failedTest"])
         
         self.nodeTable.setHorizontalHeaderLabels(["BT Node", "Status"])
         self.nodeTable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
@@ -61,6 +61,8 @@ class WaypointWidget(QMainWindow):
         self.prev_auv = ""
         self.prev_scene = self.sceneChoice.currentText()
         self.prev_run = self.runChoice.currentText()
+        self.mission_future = None
+        self.goal_handle = None
         
         self.tare_req = Trigger.Request()
         qos_dvl = QoSProfile(depth=1)
@@ -71,6 +73,7 @@ class WaypointWidget(QMainWindow):
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(MpcInfo, "/proc_control/controller_info", self.set_mpc_info,10)
         self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info,10)
         self._mission_switch: Subscription = ros_node.create_subscription(MissionStatus, '/provider_rs485/mission_status', self._mission_switch_callback, 10)
+        self.mission_report_sub: Subscription= ros_node.create_subscription(String, "/mission_server/status_report", self.mission_report_cb, 1)
 
         # Publishers
         self.simulation_start_publisher: Publisher= ros_node.create_publisher(geoPose, "/proc_simulation/start_simulation",10)
@@ -84,8 +87,8 @@ class WaypointWidget(QMainWindow):
         self.set_auv_service: Client = ros_node.create_client(SetSimulationAUVService, "/proc_simulation/select_auv")
         self.depth_tare_service: Client= ros_node.create_client(Trigger, "/provider_depth/tare")
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
-
-        #Actions
+        
+        # Actions
         self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
 
         self.current_target_received.connect(self._current_target_received)
@@ -113,7 +116,8 @@ class WaypointWidget(QMainWindow):
 
         # Mission tab buttons
         self.loadMissionBtn.clicked.connect(self._mission_load_action)
-        self.refreshBtn.clicked.connect(self._mission_dropdown_refresh)
+        self.refreshBtn.clicked.connect(self._mission_dash_refresh)
+        self.missionAbortBtn.clicked.connect(self._mission_abort_cb)
     
     def timeout_info(self, msg):
         if msg.status == 1:
@@ -196,12 +200,8 @@ class WaypointWidget(QMainWindow):
         rep.add_done_callback(self.tare_callback)
         
     def tare_callback(self, rep):
-        try:
-            fut= rep.result().message
-            print(fut)
-        except Exception as e:
-            print(e)
-            print('not tared.')
+        print(rep.result().message)
+        
     def startDVL(self):
         dvl_state= Bool()
         dvl_state.data=True
@@ -213,22 +213,28 @@ class WaypointWidget(QMainWindow):
         self.set_dvl_started_publisher.publish(dvl_state)
 
     def _mission_load_action(self):
+        mission = self.missionTextfield.text()
         if self.mission_switch_status:
             self.show_error("The mission switch is pushed, pull the switch to load mission")
+        elif not mission:
+            self.show_error("Mission name empty")
         else:
-            mission = self.missionTextfield.text()
             self.loadMissionBtn.setStyleSheet("background-color: orange;") 
             self.loadMissionBtn.setEnabled(False) 
-            check_server=self.mission_future =self._send_goal(mission)
-            if check_server:
-                self.mission_future.add_done_callback(self._goal_response_callback)            
+            self._send_goal(mission)     
         
-    def _goal_response_callback(self, future):
-        goal = future.result()
-        if goal.accepted:
+    def _goal_response_callback(self, future: Future):
+        self.goal_handle = future.result()
+        if self.goal_handle.accepted:
+            self.refreshBtn.setEnabled(False)
+            res = self.goal_handle.get_result_async()
+            res.add_done_callback(self._get_Result_cb)
             self.loadMissionBtn.setStyleSheet("background-color: green;") 
         else:
-            self.loadMissionBtn.setStyleSheet("background-color: red;") 
+            self.loadMissionBtn.setStyleSheet("background-color: red;")   
+                 
+    def _get_Result_cb(self, future):
+        self.refreshBtn.setEnabled(True)
             
     def _feedback_callback(self, feedback_msg):
         fb = feedback_msg.feedback
@@ -254,12 +260,13 @@ class WaypointWidget(QMainWindow):
             self.nodeTable.setItem(i, 0, QTableWidgetItem(node['name']))
             self.nodeTable.setItem(i, 1, item)
         
-    def _mission_dropdown_refresh(self):
+    def _mission_dash_refresh(self):
         self.loadMissionBtn.setStyleSheet("background-color: None") 
         self.loadMissionBtn.setEnabled(True) 
         self.mission_history.clear()
         self.nodeTable.setRowCount(0)
-        print("mission refresh")
+        self.debugMsg.clear()
+        self.missionTextfield.clear()
 
     def _send_goal(self, mission):
         goal_msg = MissionControl.Goal()
@@ -267,8 +274,10 @@ class WaypointWidget(QMainWindow):
         server_ready = self.mission_client.wait_for_server(5)
         if not server_ready:
             self.show_error("Server isn't responding or running")
-            return False
-        return self.mission_client.send_goal_async(goal_msg, self._feedback_callback)
+            return
+        self.mission_future=self.mission_client.send_goal_async(goal_msg, self._feedback_callback)
+        self.mission_future.add_done_callback(self._goal_response_callback)
+        
     def _reset_position(self):
         pose = geoPose()
         pose.position.x = 0.0
@@ -291,10 +300,24 @@ class WaypointWidget(QMainWindow):
             self.sendWaypointButton.setText("Choose a mode")
             self.sendWaypointButton.setEnabled(False)
 
-    # def auv_pose_callback(self, msg):
-    #     self.z_pose = float(msg.pose.pose.position.z)
-    #     self.z_pose
+    def _mission_abort_cb(self):
+        if self.mission_future is None :
+            return
+        cancel_req = self.mission_client._cancel_goal_async(self.goal_handle)
+        cancel_req.add_done_callback(self._cancel_response_cb)
 
+    def _cancel_response_cb(self, resp : Future):
+        self.refreshBtn.setEnabled(True) 
+        cancel_resp = resp.result()
+        if(cancel_resp):
+            self._clear_waypoint()
+            self.mission_future = None
+        else:
+            print('Mission cancel request rejected.')
+
+    def mission_report_cb(self, data):
+        self.debugMsg.setText(data.data)
+        
     def _clear_waypoint(self):
         reset_state= Bool()
         reset_state.data=True
@@ -453,6 +476,7 @@ class WaypointWidget(QMainWindow):
 
     def shutdown_plugin(self):
         self.controller_info_subscriber.destroy()
+        self.mission_report_sub.destroy()
         self.position_target_subscriber.destroy()
         self.simulation_start_publisher.destroy()
         self.single_add_pose_publisher.destroy()
