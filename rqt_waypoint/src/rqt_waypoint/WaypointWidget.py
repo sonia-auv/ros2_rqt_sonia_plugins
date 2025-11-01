@@ -272,6 +272,10 @@ class WaypointWidget(QMainWindow):
     def _mission_list_reload(self):
         self.missionDropDown.clear()
         srv_req = MissionListService.Request()
+        server_ready = self.mission_list_service.wait_for_service(5)
+        if not server_ready:
+            self.show_error("Server isn't responding or running")
+            return
         srv_resp = self.mission_list_service.call_async(srv_req)
         srv_resp.add_done_callback(self._mission_fetch_list)
         
@@ -287,6 +291,7 @@ class WaypointWidget(QMainWindow):
 
     def _mission_fetch_list(self, future):
         resp = future.result().missions
+        resp.sort()
         self.missionDropDown.addItems(resp)
         self.missionDropDown.setCurrentText("")
         
