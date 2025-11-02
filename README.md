@@ -6,6 +6,8 @@ The project provides sonia's custom made **RQT** plugins used to operate the **A
 
 ## rqt_actuator
 
+*plugin description*
+
 ### Registered Topics / Services / Actions
 
 | Type                  | Name                               | Direction       | Message/Service Type                    | Description                        |
@@ -16,6 +18,8 @@ The project provides sonia's custom made **RQT** plugins used to operate the **A
 
 ## rqt_depth_indicator
 
+*plugin description*
+
 ### Registered Topics / Services / Actions
 
 | Type                             | Name                      | Direction       | Message/Service Type    | Description                                 |
@@ -25,6 +29,8 @@ The project provides sonia's custom made **RQT** plugins used to operate the **A
 ---
 
 ## rqt_dvl
+
+*plugin description*
 
 ### Registered Topics / Services / Actions
 
@@ -67,6 +73,8 @@ The `rqt_thruster_control` plugin provides a graphical interface for monitoring 
 
 ## rqt_thruster_effort
 
+*plugin description*
+
 ### Registered Topics / Services / Actions
 
 | Type          | Name                                    | Direction       | Message/Service Type                    | Description                                       |
@@ -77,6 +85,8 @@ The `rqt_thruster_control` plugin provides a graphical interface for monitoring 
 ---
 
 ## rqt_toolbar
+
+*plugin description*
 
 ### Registered Topics / Services / Actions
 
@@ -91,6 +101,8 @@ The `rqt_thruster_control` plugin provides a graphical interface for monitoring 
 ---
 
 ## rqt_waypoint
+
+*plugin description*
 
 ### Registered Topics / Services / Actions
 
