@@ -26,6 +26,11 @@ The project provides sonia's custom made **RQT** plugins used to operate the **A
 
 ## rqt_dvl
 
+### Registered Topics / Services / Actions
+
+| Type                  | Name                               | Direction       | Message/Service Type                 | Description                        |
+| --------------------- | ---------------------------------- | ----------------| ------------------------------------ | ---------------------------------- |
+| Topic                 | `/provider_dvl/dvl_velocity`       | Subscribed      | `sonia_common_ros2/msg/BodyVelocity` | Body velocity data from the dvl    |
 ---
 
 ## rqt_power
@@ -73,20 +78,41 @@ The `rqt_thruster_control` plugin provides a graphical interface for monitoring 
 
 ## rqt_toolbar
 
-## Registered Topics / Services / Actions
+### Registered Topics / Services / Actions
 
-### RS485
+| Type                  | Name                              | Direction       | Message/Service Type                        | Description                        |
+| --------------------- | --------------------------------- | ----------------| ------------------------------------------- | ---------------------------------- |
+| Topic                 | `/provider_power/battery_voltages`| Subscribed      | `sonia_common_ros2/msg/BatteryPowerMessages`| The measured battery voltages      |
+| Topic                 | `/provider_rs485/mission_status`  | Subscribed      | `sonia_common_ros2/msg/KillStatus`          | The status of the mission switch   |
+| Topic                 | `/provider_rs485/kill_status`     | Subscribed      | `sonia_common_ros2/msg/MissionStatus`       | The status of the kill switch      |
+| Topic                 | `/proc_control/controller_info`   | Subscribed      | `sonia_common_ros2/msg/MpcInfo`             | Information for the control        |
+| Topic                 | `/proc_control/set_mode`          | Published       | `sonia_common_ros2/msg/Uint8`               | Running mode of the control        |
 
-| Type                  | Name                             | Direction       | Message/Service Type                    | Description                        |
-| --------------------- | -------------------------------- | ----------------| --------------------------------------- | ---------------------------------- |
-| Topic                 | `/provider_rs485/mission_status` | Subscribed      | `sonia_common_ros2/msg/KillStatus`      | The status of the mission switch   |
-| Topic                 | `/provider_rs485/kill_status`    | Subscribed      | `sonia_common_ros2/msg/MissionStatus`   | The status of the kill switch      |
 ---
 
 ## rqt_waypoint
 
+### Registered Topics / Services / Actions
 
-| Service                          | `/provider_depth/tare`    | Client Server   | `std_srvs/srv/Trigger`  | Resets the depth sensor to current position |
+| Type             | Name                               | Direction       | Message/Service Type                            | Description                                   |
+| -----------------| ---------------------------------  | ----------------| ----------------------------------------------- | --------------------------------------------- |
+| Topic            | `/proc_control/controller_info`    | Subscribed      | `sonia_common_ros2/msg/MpcInfo`                 | Information for the control                   |
+| Topic            | `/proc_control/current_target`     | Subscribed      | `geometry/msg/Pose`                             | Geometry pose information                     |
+| Topic            | `/sonia_behaviors/timeout`         | Subscribed      | `sonia_common_ros2/msg/MissionTimer`            | Mission timer                                 |
+| Topic            | `/provider_rs485/mission_status`   | Subscribed      | `sonia_common_ros2/msg/KillStatus`              | The status of the mission switch              |
+| Topic            | `/mission_server/status_report`    | Subscribed      | `std_msgs/msg/String`                           | State of the mission server while running     |
+| Topic            | `/proc_simulation/start_simulation`| Published       | `geometry/msg/Pose`                             | Geometry pose information                     |
+| Topic            | `/proc_control/add_pose`           | Published       | `sonia_common_ros2/msg/Pose`                    | Sonia geometry pose information               |
+| Topic            | `/proc_planner/send_pose_array`    | Published       | `sonia_common_ros2/msg/PoseArray`               | Sonia geometry pose array information         |
+| Topic            | `/proc_control/reset_trajectory`   | Published       | `std_msgs/msg/Bool`                             | Signal the reset the trajectory               |
+| Topic            | `/provider_dvl/enable_disable_dvl` | Published       | `std_msgs/msg/Bool`                             | Signal the dvl to start or stop               |
+| Service          | `/proc_simulation/auv_pose`        | Client Server   | `ssonia_common_ros2/srv/ObjectPoseService`      | Service to grab geometry pose                 |
+| Service          | `/proc_simulation/select_auv`      | Client Server   | `ssonia_common_ros2/srv/SetSimulationAUVService`| Service to set AUV for the simulation         |
+| Service          | `/provider_depth/tare`             | Client Server   | `std_srvs/srv/Trigger`                          | Resets the depth sensor to current position   |
+| Service          | `/provider_imu/tare`               | Client Server   | `std_srvs/srv/Trigger`                          | Resets the imu sensor to current orientation  |
+| Service          | `/mission_server/mission_list`     | Client Server   | `sonia_common_ros2/srv/MissionListService`      | Returns a list of missions                    |
+| Action           | `MissionControl`                   | Client Server   | `sonia_common_ros2/action/MissionControl`       | Handles mission launch requests               |
+
 ---
 
 ## Dependencies
