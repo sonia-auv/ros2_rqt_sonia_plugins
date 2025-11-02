@@ -145,10 +145,14 @@ The `rqt_waypoint` plugin is used to control the movements of the prototype and 
 
 * `sonia_common_ros2`
 
+### External packages
+
+* `tf_transformations`
+
 ---
 
 ## Build Instructions
-To build all the plugins within the project, the following commands should be run directly from your ROS2 workspace.
+To build all the plugins within the project, the following commands should be run directly from your **ROS2** workspace.
 
 ```bash
 colcon build --paths src/ros2_rqt_sonia_plugins/* --symlink-install
