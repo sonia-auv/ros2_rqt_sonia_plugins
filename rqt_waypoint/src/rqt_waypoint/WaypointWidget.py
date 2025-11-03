@@ -19,7 +19,7 @@ from std_msgs.msg import Bool,String
 from geometry_msgs.msg import Pose as geoPose
 from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose, MissionStatus, KillStatus
 
-from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService
+from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService, MissionListService
 from sonia_common_ros2.action import MissionControl
 from std_srvs.srv import Trigger
 
@@ -56,7 +56,9 @@ class WaypointWidget(QMainWindow):
         
         self.nodeTable.setHorizontalHeaderLabels(["BT Node", "Status"])
         self.nodeTable.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.mission_history =[]       
+        self.missionDropDown.lineEdit().setPlaceholderText("Select mission")
+        self.mission_history =[]
+        self.missionDropDown_list = []       
         
         self.prev_auv = ""
         self.prev_scene = self.sceneChoice.currentText()
@@ -87,6 +89,7 @@ class WaypointWidget(QMainWindow):
         self.set_auv_service: Client = ros_node.create_client(SetSimulationAUVService, "/proc_simulation/select_auv")
         self.depth_tare_service: Client= ros_node.create_client(Trigger, "/provider_depth/tare")
         self.imu_tare_service: Client= ros_node.create_client(Trigger, "/provider_imu/tare")
+        self.mission_list_service: Client= ros_node.create_client(MissionListService, "/mission_server/mission_list")
         
         # Actions
         self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
@@ -117,6 +120,7 @@ class WaypointWidget(QMainWindow):
         # Mission tab buttons
         self.loadMissionBtn.clicked.connect(self._mission_load_action)
         self.refreshBtn.clicked.connect(self._mission_dash_refresh)
+        self.reloadListBtn.clicked.connect(self._mission_list_reload)
         self.missionAbortBtn.clicked.connect(self._mission_abort_cb)
     
     def timeout_info(self, msg):
@@ -213,7 +217,10 @@ class WaypointWidget(QMainWindow):
         self.set_dvl_started_publisher.publish(dvl_state)
 
     def _mission_load_action(self):
-        mission = self.missionTextfield.text()
+        mission = self.missionDropDown.currentText()
+        if self.missionDropDown.findText(mission) == -1:
+            self.debugMsg.setText(mission+" is not an option, choose a mission from the list")
+            return
         if self.mission_switch_status:
             self.show_error("The mission switch is pushed, pull the switch to load mission")
         elif not mission:
@@ -227,6 +234,8 @@ class WaypointWidget(QMainWindow):
         self.goal_handle = future.result()
         if self.goal_handle.accepted:
             self.refreshBtn.setEnabled(False)
+            self.missionDropDown.setEnabled(False)
+            self.reloadListBtn.setEnabled(False)
             res = self.goal_handle.get_result_async()
             res.add_done_callback(self._get_Result_cb)
             self.loadMissionBtn.setStyleSheet("background-color: green;") 
@@ -260,14 +269,32 @@ class WaypointWidget(QMainWindow):
             self.nodeTable.setItem(i, 0, QTableWidgetItem(node['name']))
             self.nodeTable.setItem(i, 1, item)
         
+    def _mission_list_reload(self):
+        self.missionDropDown.clear()
+        srv_req = MissionListService.Request()
+        server_ready = self.mission_list_service.wait_for_service(5)
+        if not server_ready:
+            self.show_error("Server isn't responding or running")
+            return
+        srv_resp = self.mission_list_service.call_async(srv_req)
+        srv_resp.add_done_callback(self._mission_fetch_list)
+        
     def _mission_dash_refresh(self):
         self.loadMissionBtn.setStyleSheet("background-color: None") 
-        self.loadMissionBtn.setEnabled(True) 
+        self.loadMissionBtn.setEnabled(True)
+        self.missionDropDown.setEnabled(True)
+        self.reloadListBtn.setEnabled(True) 
         self.mission_history.clear()
         self.nodeTable.setRowCount(0)
         self.debugMsg.clear()
-        self.missionTextfield.clear()
+        self.missionDropDown.clearEditText()
 
+    def _mission_fetch_list(self, future):
+        resp = future.result().missions
+        resp.sort()
+        self.missionDropDown.addItems(resp)
+        self.missionDropDown.setCurrentText("")
+        
     def _send_goal(self, mission):
         goal_msg = MissionControl.Goal()
         goal_msg.mission = mission

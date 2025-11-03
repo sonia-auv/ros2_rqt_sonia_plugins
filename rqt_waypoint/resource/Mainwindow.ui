@@ -808,17 +808,53 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QLineEdit" name="missionTextfield">
-            <property name="text">
-             <string/>
+           <widget class="QComboBox" name="missionDropDown">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="readOnly">
-             <bool>false</bool>
+            <property name="editable">
+               <bool>true</bool>
+              </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="reloadListBtn">
+            <property name="icon">
+            <iconset theme="view-refresh">
+            <normaloff>.</normaloff>.</iconset>
             </property>
            </widget>
           </item>
           <item>
+           <spacer name="horizontalSpacer_13">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <widget class="QPushButton" name="loadMissionBtn">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>Load Mission</string>
             </property>
@@ -848,11 +884,11 @@
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
