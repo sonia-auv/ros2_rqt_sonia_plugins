@@ -22,7 +22,7 @@ class CameraWidget(QWidget):
         self.activateBtn.clicked.connect(self.handle_activation_click)
 
     def handle_activation_click(self):
-        server_ready = self.mission_list_service.wait_for_service(3)
+        server_ready = self.ai_activate_service.wait_for_service(3)
         if not server_ready:
             return
         request = AiActivationService.Request()
