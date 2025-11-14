@@ -37,6 +37,7 @@ The `rqt_dvl` plugin displays information about the dvl output.
 | Type                  | Name                               | Direction       | Message/Service Type                 | Description                        |
 | --------------------- | ---------------------------------- | ----------------| ------------------------------------ | ---------------------------------- |
 | Topic                 | `/provider_dvl/dvl_velocity`       | Subscribed      | `sonia_common_ros2/msg/BodyVelocity` | Body velocity data from the dvl    |
+
 ---
 
 ## rqt_power
@@ -93,10 +94,11 @@ The `rqt_toolbar` plugin provides important information and the prototype state 
 | Type                  | Name                              | Direction       | Message/Service Type                        | Description                        |
 | --------------------- | --------------------------------- | ----------------| ------------------------------------------- | ---------------------------------- |
 | Topic                 | `/provider_power/battery_voltages`| Subscribed      | `sonia_common_ros2/msg/BatteryPowerMessages`| The measured battery voltages      |
-| Topic                 | `/provider_rs485/mission_status`  | Subscribed      | `sonia_common_ros2/msg/KillStatus`          | The status of the mission switch   |
-| Topic                 | `/provider_rs485/kill_status`     | Subscribed      | `sonia_common_ros2/msg/MissionStatus`       | The status of the kill switch      |
+| Topic                 | `/provider_rs485/mission_status`  | Subscribed      | `sonia_common_ros2/msg/MissionStatus`       | The status of the mission switch   |
+| Topic                 | `/provider_rs485/kill_status`     | Subscribed      | `sonia_common_ros2/msg/KillStatus`          | The status of the kill switch      |
 | Topic                 | `/proc_control/controller_info`   | Subscribed      | `sonia_common_ros2/msg/MpcInfo`             | Information for the control        |
 | Topic                 | `/proc_control/set_mode`          | Published       | `sonia_common_ros2/msg/Uint8`               | Running mode of the control        |
+| Service               | `/proc_vision/ai_activation`      | Client Server   | `sonia_common_ros2/srv/AiActivationService` | Activates/Deativates Ai model      |
 
 ---
 
@@ -111,7 +113,7 @@ The `rqt_waypoint` plugin is used to control the movements of the prototype and 
 | Topic            | `/proc_control/controller_info`    | Subscribed      | `sonia_common_ros2/msg/MpcInfo`                 | Information for the control                   |
 | Topic            | `/proc_control/current_target`     | Subscribed      | `geometry/msg/Pose`                             | Geometry pose information                     |
 | Topic            | `/sonia_behaviors/timeout`         | Subscribed      | `sonia_common_ros2/msg/MissionTimer`            | Mission timer                                 |
-| Topic            | `/provider_rs485/mission_status`   | Subscribed      | `sonia_common_ros2/msg/KillStatus`              | The status of the mission switch              |
+| Topic            | `/provider_rs485/mission_status`   | Subscribed      | `sonia_common_ros2/msg/MissionStatus`           | The status of the mission switch              |
 | Topic            | `/mission_server/status_report`    | Subscribed      | `std_msgs/msg/String`                           | State of the mission server while running     |
 | Topic            | `/proc_simulation/start_simulation`| Published       | `geometry/msg/Pose`                             | Geometry pose information                     |
 | Topic            | `/proc_control/add_pose`           | Published       | `sonia_common_ros2/msg/Pose`                    | Sonia geometry pose information               |
