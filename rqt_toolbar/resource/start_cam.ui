@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
-    <height>57</height>
+    <width>390</width>
+    <height>60</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,20 +31,27 @@
     </spacer>
    </item>
    <item>
+    <widget class="QLabel" name="procVisionLabel">
+     <property name="text">
+      <string>Proc_vision</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QComboBox" name="cameraPick">
      <property name="editable">
       <bool>false</bool>
      </property>
-      <item>
-     <property name="text">
-      <string>Front</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Bottom</string>
-     </property>
-    </item>
+     <item>
+      <property name="text">
+       <string>Front</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bottom</string>
+      </property>
+     </item>
      <item>
       <property name="text">
        <string>Both</string>
@@ -58,13 +65,23 @@
    <item>
     <widget class="QPushButton" name="activateBtn">
      <property name="minimumSize">
-     <size>
-        <width>0</width>
-        <height>22</height>
-     </size>
+      <size>
+       <width>0</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
      </property>
      <property name="text">
-      <string>Ai Activate</string>
+      <string>Activate</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="deactivateBtn">
+     <property name="text">
+      <string>Deactivate</string>
      </property>
     </widget>
    </item>
