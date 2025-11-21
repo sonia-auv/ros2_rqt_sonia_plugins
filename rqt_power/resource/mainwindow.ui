@@ -44,7 +44,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_6">
        <property name="maximumSize">
@@ -242,7 +242,7 @@
                   <widget class="QLabel" name="label_105">
                    <property name="maximumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>33</height>
                     </size>
                    </property>
@@ -456,7 +456,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap>AUV8_Top_filaire_transparent_Rotate.png</pixmap>
+              <pixmap>AUV8.1_Top_filaire_transparent_Rotate.png</pixmap>
              </property>
              <property name="scaledContents">
               <bool>true</bool>
@@ -617,7 +617,7 @@
                   <widget class="QLabel" name="label_101">
                    <property name="maximumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>33</height>
                     </size>
                    </property>
@@ -1009,7 +1009,7 @@
                   <widget class="QLabel" name="label_114">
                    <property name="maximumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>33</height>
                     </size>
                    </property>
@@ -1223,7 +1223,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap>AUV8_Top_filaire_transparent_Rotate.png</pixmap>
+              <pixmap>AUV8.1_Top_filaire_transparent_Rotate.png</pixmap>
              </property>
              <property name="scaledContents">
               <bool>true</bool>
@@ -1396,7 +1396,7 @@
                   <widget class="QLabel" name="label_124">
                    <property name="maximumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>33</height>
                     </size>
                    </property>
@@ -1800,7 +1800,7 @@
                   <widget class="QLabel" name="label_134">
                    <property name="maximumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>33</height>
                     </size>
                    </property>
@@ -2014,7 +2014,7 @@
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap>AUV8_Top_filaire_transparent_Rotate.png</pixmap>
+              <pixmap>AUV8.1_Top_filaire_transparent_Rotate.png</pixmap>
              </property>
              <property name="scaledContents">
               <bool>true</bool>
@@ -2187,7 +2187,7 @@
                   <widget class="QLabel" name="label_144">
                    <property name="maximumSize">
                     <size>
-                     <width>60</width>
+                     <width>70</width>
                      <height>33</height>
                     </size>
                    </property>
