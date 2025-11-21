@@ -43,6 +43,7 @@ class CameraWidget(QWidget):
             rep=self.ai_activate_service.call_async(request)
             rep.add_done_callback(self._activation_cb)
             self.activateBtn.setText("Deactivate")
+            self.activateBtn.setStyleSheet("background-color: red")
         else:
             server_ready = self.ai_activate_service.wait_for_service(3)
             if not server_ready:
@@ -53,6 +54,7 @@ class CameraWidget(QWidget):
             rep=self.ai_activate_service.call_async(request)
             rep.add_done_callback(self._activation_cb)
             self.activateBtn.setText("Activate")
+            self.activateBtn.setStyleSheet("background-color: green")
         
     def _activation_cb(self, future):
         self.modelName.setText(future.result().model_name)     
