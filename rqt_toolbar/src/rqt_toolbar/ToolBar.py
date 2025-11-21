@@ -29,7 +29,7 @@ class ToolBar(Plugin):
         # self._palette = Palette()
         self._setControlModeWidget = SetModeControlWidget(self._internal_node)
         # self._warnings = WarningsWidget()
-        self._camera = CameraWidget()
+        self._camera = CameraWidget(self._internal_node)
         # context._handler._main_window.setPalette(self._palette.palette())
         self._batteryWidget1 = BatteryWidget(1, self._internal_node)
         self._batteryWidget2 = BatteryWidget(2, self._internal_node)

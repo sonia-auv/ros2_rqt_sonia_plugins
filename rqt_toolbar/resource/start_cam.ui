@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>284</width>
-    <height>57</height>
+    <width>390</width>
+    <height>60</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,23 +24,73 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>68</width>
+       <width>40</width>
        <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <widget class="QPushButton" name="btnFront">
+    <widget class="QLabel" name="procVisionLabel">
      <property name="text">
-      <string>Start Front</string>
+      <string>Proc_vision</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnBottom">
+    <widget class="QComboBox" name="cameraPick">
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>Front</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Bottom</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Both</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSpinBox" name="nbModel"/>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="modelName">
+    <property name="readOnly">
+      <bool>true</bool>
+    </property>
+    <property name="mouseTracking">
+        <bool>false</bool>
+    </property>
+    <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="alignment">
+        <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="activateBtn">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
      <property name="text">
-      <string>Start Bottom</string>
+      <string>Activate</string>
      </property>
     </widget>
    </item>
