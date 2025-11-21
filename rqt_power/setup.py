@@ -11,7 +11,6 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name + '/resource', ['resource/mainwindow.ui']),
-        #('share/' + package_name + '/resource', ['resource/AUV8_Top_filaire_transparent.png']),
         ('share/' + package_name + '/resource', ['resource/AUV8.1_Top.png']),
         ('share/' + package_name + '/resource', ['resource/AUV8.1_Top_filaire_transparent_Rotate.png']),
         ('share/' + package_name, ['package.xml']),
