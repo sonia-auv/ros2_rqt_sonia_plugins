@@ -18,45 +18,41 @@ class CameraWidget(QWidget):
         loadUi(ui_file, self)
         
         self.activateBtn.setStyleSheet("background-color: green")
-        self.deactivateBtn.setStyleSheet("background-color: red")
+        self.activateBtn.setCheckable(True)
         
         # Services
         self.ai_activate_service: Client = ros_node.create_client(AiActivationService,"/proc_vision/ai_activation")
 
-        self.activateBtn.clicked.connect(self.handle_activation_click)
-        self.deactivateBtn.clicked.connect(self.handle_deactivation_click)
+        self.activateBtn.toggled.connect(self.handle_activation_click)
 
-    def handle_activation_click(self):
-        server_ready = self.ai_activate_service.wait_for_service(3)
-        if not server_ready:
-            return
-        request = AiActivationService.Request()
-        request.model_choice = self.nbModel.value()
-        cam = self.cameraPick.currentText()
-        if cam == "Front":
-            request.camera_choice = 1
-        elif cam == "Bottom":
-            request.camera_choice = 2
-        elif cam == "Both":
-            request.camera_choice = 3
-        
-        rep=self.ai_activate_service.call_async(request)
-        rep.add_done_callback(self._activation_cb)
+    def handle_activation_click(self, checked):
+        if checked:
+            server_ready = self.ai_activate_service.wait_for_service(3)
+            if not server_ready:
+                return
+            request = AiActivationService.Request()
+            request.model_choice = self.nbModel.value()
+            cam = self.cameraPick.currentText()
+            if cam == "Front":
+                request.camera_choice = 1
+            elif cam == "Bottom":
+                request.camera_choice = 2
+            elif cam == "Both":
+                request.camera_choice = 3
+            
+            rep=self.ai_activate_service.call_async(request)
+            rep.add_done_callback(self._activation_cb)
+            self.activateBtn.setText("Deactivate")
+        else:
+            server_ready = self.ai_activate_service.wait_for_service(3)
+            if not server_ready:
+                return
+            request = AiActivationService.Request()
+            request.camera_choice = 0
+            
+            rep=self.ai_activate_service.call_async(request)
+            rep.add_done_callback(self._activation_cb)
+            self.activateBtn.setText("Activate")
         
     def _activation_cb(self, future):
-        self.activateBtn.setEnabled(False)
-        print(future.result().model_name)
-        
-    def handle_deactivation_click(self):
-        server_ready = self.ai_activate_service.wait_for_service(3)
-        if not server_ready:
-            return
-        request = AiActivationService.Request()
-        request.camera_choice = 0
-        
-        rep=self.ai_activate_service.call_async(request)
-        rep.add_done_callback(self._deactivation_cb)
-    
-    def _deactivation_cb(self, future):
-        self.activateBtn.setEnabled(True)
-        
+        self.modelName.setText(future.result().model_name)     
