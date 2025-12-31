@@ -7,16 +7,15 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from sonia_common_ros2.msg import BodyVelocityDVL
 
-class DvlWidget(QMainWindow):
+class MonitorWidget(QMainWindow):
 
-    dvl_velocity_recieved = pyqtSignal(BodyVelocityDVL)
 
     def __init__(self):
-        super(DvlWidget, self).__init__()
+        super(MonitorWidget, self).__init__()
         # Give QObjects reasonable names 
-        self.setObjectName('DvlControlWidget')
+        self.setObjectName('MonitorWidget')
                
-        ui_file = os.path.join(get_package_share_directory('rqt_dvl'), 'resource', 'mainwindow.ui')
+        ui_file = os.path.join(get_package_share_directory('rqt_monitor'), 'resource', 'mainwindow.ui')
         loadUi(ui_file, self)
         
         self.dvl_velocity_recieved.connect(self._show_dvl_velocity)

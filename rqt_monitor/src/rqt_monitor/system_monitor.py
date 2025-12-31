@@ -2,23 +2,23 @@ import rclpy
 from PyQt5.QtCore import QTimer
 from rclpy.node import Node
 from qt_gui.plugin import Plugin
-from .DvlWidget import DvlWidget
+from .MonitorWidget import MonitorWidget
 from rclpy.subscription import Subscription
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 
 from sonia_common_ros2.msg import BodyVelocityDVL
 
-class ProviderDvl(Plugin):
+class SystemMonitor(Plugin):
 
     def __init__(self, context):
-        super(ProviderDvl, self).__init__(context)
-        self.setObjectName('ProviderDvl')
+        super(SystemMonitor, self).__init__(context)
+        self.setObjectName('SystemMonitor')
     
         if not rclpy.ok():
             rclpy.init()
-        self._internal_node = Node('rqt_dvl_node')
+        self._internal_node = Node('rqt_monitor_node')
         # Create QWidget
-        self._mainWindow = DvlWidget()
+        self._mainWindow = MonitorWidget()
         # Get path to UI file which should be in the "resource" folder of this package
 
         self._mainWindow.setWindowTitle(self._mainWindow.windowTitle())

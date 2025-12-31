@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string notr="true">Dvl</string>
+   <string notr="true">System</string>
   </property>
   <property name="autoFillBackground">
    <bool>true</bool>
