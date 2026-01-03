@@ -17,6 +17,7 @@ class MonitorWidget(QMainWindow):
                
         ui_file = os.path.join(get_package_share_directory('rqt_monitor'), 'resource', 'mainwindow.ui')
         loadUi(ui_file, self)
+        
         self.header = ["Node", "State", "Quality"]
         self.state_list = ["STOPPED", "INITIALIZING", "RUNNING","IDLE"]
         self.quality_list = [["UNKNOWN", "OK", "WARNING", "ERROR"], ["#d6d6d6", "#c8f7c5", "#fff3cd", "#f5c6cb"]]
@@ -27,7 +28,7 @@ class MonitorWidget(QMainWindow):
         self.monitorTable.setModel(self.model) 
         self.monitorTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)   
 
-    def _table_fill(self, nodes):
+    def _monitor_display(self, nodes):
         self.model.clear()
         self.model.setHorizontalHeaderLabels(self.header)
         for m in nodes:

@@ -7,10 +7,10 @@ from rclpy.subscription import Subscription
 
 from sonia_common_ros2.msg import SystemStatus
 
-class SystemMonitor(Plugin):
+class Monitor(Plugin):
 
     def __init__(self, context):
-        super(SystemMonitor, self).__init__(context)
+        super(Monitor, self).__init__(context)
         self.setObjectName('SystemMonitor')
     
         if not rclpy.ok():
@@ -28,15 +28,16 @@ class SystemMonitor(Plugin):
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
 
-        self._monitor_subscriber: Subscription = self._internal_node.create_subscription(SystemStatus, "/system_monitor/system_status", self._system_feedback, 1)
+        # Create ROS subscribers
+        self._monitor_subscriber: Subscription = self._internal_node.create_subscription(SystemStatus, "/system_monitor/system_status", self._system_feedback_cb, 1)
 
         # Spin this thread
         self._timer = QTimer()
         self._timer.timeout.connect(self._spin_once)
         self._timer.start(10)
         
-    def _system_feedback(self, msg: SystemStatus):
-        self._mainWindow._table_fill(msg.nodes)
+    def _system_feedback_cb(self, msg: SystemStatus):
+        self._mainWindow._monitor_display(msg.nodes)
         
     def _spin_once(self):
         if rclpy.ok() and self._internal_node:

@@ -1,5 +1,5 @@
 <library path="lib/libagent_gui">
-  <class name="SystemMonitor" type="rqt_monitor.system_monitor.SystemMonitor" base_class_type="rqt_gui_py::Plugin">
+  <class name="SystemMonitor" type="rqt_monitor.Monitor.Monitor" base_class_type="rqt_gui_py::Plugin">
     <description>
       A Python GUI plugin for system monitoring
     </description>
