@@ -34,9 +34,9 @@ The `rqt_monitor` plugin displays information running **ROS2** nodes on the syst
 
 ### Registered Topics / Services / Actions
 
-| Type                  | Name                               | Direction       | Message/Service Type                 | Description                        |
-| --------------------- | ---------------------------------- | ----------------| ------------------------------------ | ---------------------------------- |
-| Topic                 | ``       | Subscribed      | `sonia_common_ros2/msg/BodyVelocity` | Body velocity data from the dvl    |
+| Type             | Name                               | Direction       | Message/Service Type                 | Description                               |
+| ---------------- | ---------------------------------- | ----------------| ------------------------------------ | ----------------------------------------- |
+| Topic            | `/system_monitor/system_status`    | Subscribed      | `sonia_common_ros2/msg/SystemStatus` | Message contains node status information  |
 
 ---
 

@@ -3,7 +3,7 @@ import os
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QHeaderView
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
 from sonia_common_ros2.msg import NodeStatus
 
@@ -17,20 +17,24 @@ class MonitorWidget(QMainWindow):
                
         ui_file = os.path.join(get_package_share_directory('rqt_monitor'), 'resource', 'mainwindow.ui')
         loadUi(ui_file, self)
+        self.header = ["Node", "State", "Quality"]
+        self.state_list = ["STOPPED", "INITIALIZING", "RUNNING","IDLE"]
+        self.quality_list = [["UNKNOWN", "OK", "WARNING", "ERROR"], ["#d6d6d6", "#c8f7c5", "#fff3cd", "#f5c6cb"]]
         
         self.model = QStandardItemModel(0, 3)
-        self.model.setHorizontalHeaderLabels(["Node", "State", "Quality"])
+        self.model.setHorizontalHeaderLabels(self.header)
                 
         self.monitorTable.setModel(self.model) 
         self.monitorTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)   
 
     def _table_fill(self, nodes):
         self.model.clear()
-        self.model.setHorizontalHeaderLabels(["Node", "State", "Quality"])
+        self.model.setHorizontalHeaderLabels(self.header)
         for m in nodes:
-            self.model.appendRow([
-                QStandardItem(str(m.node_name)),
-                QStandardItem(str(m.state)),
-                QStandardItem(str(m.quality))
-            ])
+            node_name = QStandardItem(str(m.node_name))
+            state = QStandardItem(self.state_list[m.state])
+            quality = QStandardItem(self.quality_list[0][m.quality])
+            quality.setBackground(QColor(self.quality_list[1][m.quality]))
+            
+            self.model.appendRow([node_name, state, quality])
    
