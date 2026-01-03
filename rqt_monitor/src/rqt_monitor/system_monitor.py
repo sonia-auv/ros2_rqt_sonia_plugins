@@ -4,9 +4,8 @@ from rclpy.node import Node
 from qt_gui.plugin import Plugin
 from .MonitorWidget import MonitorWidget
 from rclpy.subscription import Subscription
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 
-from sonia_common_ros2.msg import BodyVelocityDVL
+from sonia_common_ros2.msg import SystemStatus
 
 class SystemMonitor(Plugin):
 
@@ -28,23 +27,23 @@ class SystemMonitor(Plugin):
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
         context.add_widget(self._mainWindow)
-        
-        qos_dvl = QoSProfile(depth=10)
-        qos_dvl.reliability= ReliabilityPolicy.RELIABLE
 
-        self._dvl_subscriber: Subscription = self._internal_node.create_subscription(BodyVelocityDVL,"/provider_dvl/dvl_velocity", self._mainWindow._dvl_subscriber_cb, qos_dvl)
+        self._monitor_subscriber: Subscription = self._internal_node.create_subscription(SystemStatus, "/system_monitor/system_status", self._system_feedback, 1)
 
-         # Spin this thread
+        # Spin this thread
         self._timer = QTimer()
         self._timer.timeout.connect(self._spin_once)
         self._timer.start(10)
         
+    def _system_feedback(self, msg: SystemStatus):
+        self._mainWindow._table_fill(msg.nodes)
+        
     def _spin_once(self):
         if rclpy.ok() and self._internal_node:
             rclpy.spin_once(self._internal_node, timeout_sec=0.0)
-
+            
     def shutdown_plugin(self):
-        self._dvl_subscriber.destroy()
+        self._monitor_subscriber.destroy()
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once) 
         if self._internal_node:

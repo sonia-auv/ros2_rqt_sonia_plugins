@@ -28,7 +28,7 @@ The `rqt_depth_indicateur` plugin displays real-time depth of the prototype usin
 
 ---
 
-## rqt_dvl
+## rqt_monitor
 
 The `rqt_monitor` plugin displays information running **ROS2** nodes on the system.
 
