@@ -1,0 +1,21 @@
+<library path="lib/libagent_gui">
+  <class name="BagRecord" type="rqt_record.Record.Record" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A Python GUI plugin for ROS2 bags
+    </description>
+    <qtgui>
+      <group>
+        <label>&amp;SONIA</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to visualization.</statustip>
+      </group>
+      <group>
+        <label>&amp;Tools</label>
+        <icon type="theme">folder</icon>
+      </group>
+      <label>&amp;Record</label>
+      <icon type="theme">utilities-system-monitor</icon>
+      <statustip>An interface to record data from topics</statustip>
+    </qtgui>
+  </class>
+</library>
