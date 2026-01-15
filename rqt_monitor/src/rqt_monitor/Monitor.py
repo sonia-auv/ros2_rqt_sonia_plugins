@@ -5,7 +5,7 @@ from qt_gui.plugin import Plugin
 from .MonitorWidget import MonitorWidget
 from rclpy.subscription import Subscription
 
-from sonia_common_ros2.msg import SystemStatus
+from sonia_common_ros2.msg import SystemStatus, NodeStatus
 
 class Monitor(Plugin):
 
@@ -36,8 +36,30 @@ class Monitor(Plugin):
         self._timer.timeout.connect(self._spin_once)
         self._timer.start(10)
         
+        #SystemStatus
+        self._temp_status = {}
+        
     def _system_feedback_cb(self, msg: SystemStatus):
-        self._mainWindow._monitor_display(msg.nodes)
+        ui_changed = False
+        for node in msg.nodes: # check for updated msg before UI update
+            name = node.node_name
+            new_key = self._ui_key(node)
+            
+            old_key = self._temp_status.get(name)
+            
+            if old_key != new_key:
+                ui_changed = True
+                self._temp_status[name] = new_key
+        if ui_changed: #if msg different from last, update UI
+            self._mainWindow.auvName.setText(msg.auv)
+            self._mainWindow.nodeCounter.setText(str(len(msg.nodes)))
+            self._mainWindow._monitor_display(msg.nodes)
+            print("somthing")
+        else:
+            return
+        
+    def _ui_key(self, node: NodeStatus):
+        return (node.state, node.quality)
         
     def _spin_once(self):
         if rclpy.ok() and self._internal_node:

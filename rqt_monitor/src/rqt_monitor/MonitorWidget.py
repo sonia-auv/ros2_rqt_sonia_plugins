@@ -5,8 +5,6 @@ from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QHeaderView
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
-from sonia_common_ros2.msg import NodeStatus
-
 class MonitorWidget(QMainWindow):
 
 
@@ -20,13 +18,14 @@ class MonitorWidget(QMainWindow):
         
         self.header = ["Node", "State", "Quality"]
         self.state_list = ["STOPPED", "INITIALIZING", "RUNNING","IDLE"]
-        self.quality_list = [["UNKNOWN", "OK", "WARNING", "ERROR"], ["#d6d6d6", "#c8f7c5", "#fff3cd", "#f5c6cb"]]
+        self.quality_list = [["UNKNOWN", "OK", "DEGRADE"], ["#d6d6d6", "#c8f7c5", "#f5c6cb"]]
         
         self.model = QStandardItemModel(0, 3)
         self.model.setHorizontalHeaderLabels(self.header)
                 
         self.monitorTable.setModel(self.model) 
-        self.monitorTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)   
+        self.monitorTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  
+        self.monitorTable.horizontalHeader().setStyleSheet("QHeaderView::section { background-color: #263A4F; color: white}") 
 
     def _monitor_display(self, nodes):
         self.model.clear()
