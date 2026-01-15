@@ -41,7 +41,7 @@ class Monitor(Plugin):
         
     def _system_feedback_cb(self, msg: SystemStatus):
         ui_changed = False
-        for node in msg.nodes: # check for updated msg before UI update
+        for node in msg.nodes: # check if new msg different from old before UI update
             name = node.node_name
             new_key = self._ui_key(node)
             
@@ -51,10 +51,8 @@ class Monitor(Plugin):
                 ui_changed = True
                 self._temp_status[name] = new_key
         if ui_changed: #if msg different from last, update UI
-            self._mainWindow.auvName.setText(msg.auv)
             self._mainWindow.nodeCounter.setText(str(len(msg.nodes)))
             self._mainWindow._monitor_display(msg.nodes)
-            print("somthing")
         else:
             return
         
