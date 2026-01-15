@@ -16,6 +16,10 @@ class MonitorWidget(QMainWindow):
         ui_file = os.path.join(get_package_share_directory('rqt_monitor'), 'resource', 'mainwindow.ui')
         loadUi(ui_file, self)
         
+        self.auv = os.getenv("AUV")
+        if self.auv is None:
+            self.auv = "NaN"
+        self.auvName.setText(self.auv)       
         self.header = ["Node", "State", "Quality"]
         self.state_list = ["STOPPED", "INITIALIZING", "RUNNING","IDLE"]
         self.quality_list = [["UNKNOWN", "OK", "DEGRADE"], ["#d6d6d6", "#c8f7c5", "#f5c6cb"]]
