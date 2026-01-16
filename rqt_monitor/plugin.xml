@@ -1,0 +1,17 @@
+<library path="lib/libagent_gui">
+  <class name="SystemMonitor" type="rqt_monitor.Monitor.Monitor" base_class_type="rqt_gui_py::Plugin">
+    <description>
+      A Python GUI plugin for system monitoring
+    </description>
+    <qtgui>
+      <group>
+        <label>&amp;SONIA</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to visualization.</statustip>
+      </group>
+      <label>&amp;System</label>
+      <icon type="theme">utilities-system-monitor</icon>
+      <statustip>An interface to show available nodes on the system</statustip>
+    </qtgui>
+  </class>
+</library>

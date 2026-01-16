@@ -28,15 +28,15 @@ The `rqt_depth_indicateur` plugin displays real-time depth of the prototype usin
 
 ---
 
-## rqt_dvl
+## rqt_monitor
 
-The `rqt_dvl` plugin displays information about the dvl output.
+The `rqt_monitor` plugin displays information running **ROS2** nodes on the system.
 
 ### Registered Topics / Services / Actions
 
-| Type                  | Name                               | Direction       | Message/Service Type                 | Description                        |
-| --------------------- | ---------------------------------- | ----------------| ------------------------------------ | ---------------------------------- |
-| Topic                 | `/provider_dvl/dvl_velocity`       | Subscribed      | `sonia_common_ros2/msg/BodyVelocity` | Body velocity data from the dvl    |
+| Type             | Name                               | Direction       | Message/Service Type                 | Description                               |
+| ---------------- | ---------------------------------- | ----------------| ------------------------------------ | ----------------------------------------- |
+| Topic            | `/system_monitor/system_status`    | Subscribed      | `sonia_common_ros2/msg/SystemStatus` | Message contains node status information  |
 
 ---
 
