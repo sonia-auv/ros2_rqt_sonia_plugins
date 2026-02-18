@@ -3,7 +3,7 @@ import os
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QHeaderView
-from PyQt5.QtCore import QStringListModel
+from PyQt5.QtCore import Qt, QStringListModel, QSortFilterProxyModel
 from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
 
 class RecordWidget(QMainWindow):
@@ -18,18 +18,20 @@ class RecordWidget(QMainWindow):
         loadUi(ui_file, self)
         
         self.listView = QStringListModel()
+        self.topicList = []
         
         # Connect buttons
         self.recordBtn.clicked.connect(self._recordBtn_action)
         self.stopBtn.clicked.connect(self._stopBtn_action)
         self.addBtn.clicked.connect(self._addBtn_action)
         self.removeBtn.clicked.connect(self._removeBtn_action)
-        
+                
     def _loadListView(self, data):
-        pass
-        self.listView.setStringList(data)
-        self.topicListView.setModel(self.listView)
-        
+        if self.topicList != data:
+            self.topicDropdownList.clear()
+            self.topicDropdownList.addItems(data)
+            self.topicList = data
+    
     def _recordBtn_action(self):
         print("record")
         

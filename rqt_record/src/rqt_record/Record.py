@@ -24,22 +24,22 @@ class Record(Plugin):
         self._mainWindow.setPalette(context._handler._main_window.palette())
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
-        context.add_widget(self._mainWindow)
-        
-        self.topic_lists = self._internal_node.get_topic_names_and_types()
-        list = []
-        for name, types in self.topic_lists:
-            list.append(name)
-        self._mainWindow._loadListView(list)
+        context.add_widget(self._mainWindow)       
         
         # Spin this thread
         self._timer = QTimer()
-        #self._timer.timeout.connect(self._spin_once)
-        self._timer.start(10)
+        self._timer.timeout.connect(self.__fetch_topics)
+        self._timer.start(1)
         
     #def _spin_once(self):
        #if rclpy.ok() and self._internal_node:
         #    rclpy.spin_once(self._internal_node, timeout_sec=0.0)
+    def __fetch_topics(self):
+        list = []
+        self.topic_lists = self._internal_node.get_topic_names_and_types(False)
+        for name, types in self.topic_lists:
+            list.append(name)
+        self._mainWindow._loadListView(list)
             
     def shutdown_plugin(self):
         self._timer.stop()
