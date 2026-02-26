@@ -52,6 +52,34 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
+       <widget class="QComboBox" name="envChoice">
+       <property name="editable">
+        <bool>false</bool>
+        </property>
+       <property name="currentText">
+        <string>LOCAL</string>
+        </property>
+        <property name="placeholderText" stdset="0">
+        <string/>
+        </property>
+        <item>
+        <property name="text">
+        <string>LOCAL</string>
+        </property>
+        </item>
+        <item>
+        <property name="text">
+        <string>AUV8</string>
+        </property>
+        </item>
+        <item>
+        <property name="text">
+        <string>LITE1</string>
+        </property>
+        </item>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
