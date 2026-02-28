@@ -1,11 +1,12 @@
 import os
 
 from pathlib import Path
+import subprocess
+import signal
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow, QHeaderView
-from PyQt5.QtCore import Qt, QStringListModel, QSortFilterProxyModel
-from PyQt5.QtGui import QStandardItemModel, QStandardItem, QColor
+from PyQt5.QtCore import QStringListModel
 
 class RecordWidget(QMainWindow):
 
@@ -16,17 +17,20 @@ class RecordWidget(QMainWindow):
                
         ui_file = os.path.join(get_package_share_directory('rqt_record'), 'resource', 'mainwindow.ui')
         loadUi(ui_file, self)
-        home = Path.home()
+
         self.envList = {
-            'LOCAL' : str(home)+'/bags/',
+            'LOCAL' : str(Path.home())+'/bags/',
             'AUV8' : '/home/sonia/ssd/bags/',
             'LITE1' : '/home/sonia/ssd/bags/'}
         
         self.listView = QStringListModel()
         self.selectedView = QStringListModel()
         self.topicList = []
+        self.proc = None
         self.left_item = ""
         self.right_item = ""
+        
+        self.subprocess = subprocess.run
         
         # ListView setup 
         self.selectedTopics.setModel(self.selectedView)
@@ -55,12 +59,26 @@ class RecordWidget(QMainWindow):
     
     def _recordBtn_action(self):
         print(self.envList[self.envChoice.currentText()])
-        if self.bagName != "":
-            topic_list = self.selectedView.stringList()
-  
-        
+        topic_list = self.selectedView.stringList()
+        if self.bagName.text() != "":
+            dir = self.envList[self.envChoice.currentText()]+self.bagName.text()
+            self.proc = subprocess.Popen(["ros2","bag","record","-o", dir, *topic_list])
+            
+            self.recordBtn.setEnabled(False)
+            self.addBtn.setEnabled(False)
+            self.removeBtn.setEnabled(False)
+            self.bagName.setEnabled(False)
+                  
     def _stopBtn_action(self):
-        print("stop")
+        if self.proc != None:
+            self.proc.send_signal(signal.SIGINT)
+            self.proc.wait()
+            self.proc = None
+            
+            self.recordBtn.setEnabled(True)
+            self.addBtn.setEnabled(True)
+            self.removeBtn.setEnabled(True)
+            self.bagName.setEnabled(True)
         
     def _addBtn_action(self):
         current_list = self.selectedView.stringList()
