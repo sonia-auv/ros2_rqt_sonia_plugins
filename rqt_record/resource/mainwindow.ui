@@ -53,34 +53,44 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QComboBox" name="envChoice">
-       <property name="editable">
-        <bool>false</bool>
+        <property name="editable">
+         <bool>false</bool>
         </property>
-       <property name="currentText">
-        <string>LOCAL</string>
+        <property name="currentText">
+         <string>LOCAL</string>
         </property>
-        <property name="placeholderText" stdset="0">
-        <string/>
+        <property name="placeholderText">
+         <string/>
         </property>
         <item>
-        <property name="text">
-        <string>LOCAL</string>
-        </property>
+         <property name="text">
+          <string>LOCAL</string>
+         </property>
         </item>
         <item>
-        <property name="text">
-        <string>AUV8</string>
-        </property>
+         <property name="text">
+          <string>AUV8</string>
+         </property>
         </item>
         <item>
-        <property name="text">
-        <string>LITE1</string>
-        </property>
+         <property name="text">
+          <string>LITE1</string>
+         </property>
         </item>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
+       <widget class="QLineEdit" name="bagName">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>File name</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -105,19 +115,6 @@
          <string>Stop</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </item>
@@ -174,6 +171,13 @@
        <widget class="QListView" name="selectedTopics"/>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="recordFeedback">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
