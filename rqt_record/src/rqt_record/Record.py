@@ -1,9 +1,13 @@
 import rclpy
+import signal
 from PyQt5.QtCore import QTimer
 from rclpy.node import Node
+from rclpy.task import Future
 from qt_gui.plugin import Plugin
 from .RecordWidget import RecordWidget
-from rclpy.subscription import Subscription
+from rclpy.action.client import ActionClient
+
+from sonia_common_ros2.action import BagControl
 
 class Record(Plugin):
 
@@ -24,16 +28,56 @@ class Record(Plugin):
         self._mainWindow.setPalette(context._handler._main_window.palette())
         self._mainWindow.setAutoFillBackground(True)
         # Add widget to the user interface
-        context.add_widget(self._mainWindow)       
+        context.add_widget(self._mainWindow)   
+        
+        self.goal_handle = None
+        
+        # Connect buttons
+        self._mainWindow.recordBtn.clicked.connect(self._recordBtn_action)
+        self._mainWindow.stopBtn.clicked.connect(self._stopBtn_action)
+        
+        # Actions
+        self.record_client = ActionClient(self._internal_node, BagControl, "BagRecord")    
         
         # Spin this thread
         self._timer = QTimer()
         self._timer.timeout.connect(self.__fetch_topics)
         self._timer.start(1)
+    
+    def _send_goal(self, filename, list):
+        goal_msg = BagControl.Goal()
+        goal_msg.filename = filename
+        goal_msg.topic_list = list
+        server_ready = self.record_client.wait_for_server(5)
+        if not server_ready:
+            self.show_error("Server isn't responding or running")
+            return
+        self.record_future=self.record_client.send_goal_async(goal_msg, self._feedback_callback)
+        self.record_future.add_done_callback(self._goal_response_callback)   
         
-    #def _spin_once(self):
-       #if rclpy.ok() and self._internal_node:
-        #    rclpy.spin_once(self._internal_node, timeout_sec=0.0)
+    def _goal_response_callback(self, future: Future):
+        self.goal_handle = future.result()
+        if self.goal_handle.accepted:  
+            self._mainWindow._enable_disable_ctrls(True)
+    
+    def _feedback_callback(self):
+        pass
+    
+    def _recordBtn_action(self):
+        topic_list = self._mainWindow.selectedView.stringList()
+        if self._mainWindow.bagName.text() != "":
+            self._send_goal(self._mainWindow.bagName.text(), topic_list)
+            self._mainWindow._enable_disable_ctrls(False)
+                   
+    def _stopBtn_action(self):            
+        cancel_req = self.record_client._cancel_goal_async(self.goal_handle)
+        cancel_req.add_done_callback(self._cancel_response_cb)
+        
+    def _cancel_response_cb(self, resp: Future):            
+        cancel_rep = resp.result()
+        if(cancel_rep):
+            self._mainWindow._enable_disable_ctrls(False)
+              
     def __fetch_topics(self):
         list = []
         self.topic_lists = self._internal_node.get_topic_names_and_types(False)

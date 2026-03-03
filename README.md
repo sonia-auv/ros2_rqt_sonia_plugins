@@ -40,6 +40,12 @@ The `rqt_monitor` plugin displays information running **ROS2** nodes on the syst
 
 ---
 
+## rqt_record
+
+The `rqt_record` plugin allows the creation of **ROS2** bags and saves them on the system.
+
+---
+
 ## rqt_power
 
 The `rqt_power` displays power information of the thrusters and the batteries.

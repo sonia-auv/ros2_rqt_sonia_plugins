@@ -382,6 +382,7 @@ class WaypointWidget(QMainWindow):
 
     def _position_target_callback(self,data):
         self.current_target_received.emit(data)
+        
     def _mission_switch_callback(self, msg: KillStatus):
         self.mission_switch_status= msg.status
 
