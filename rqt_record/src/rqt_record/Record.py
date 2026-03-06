@@ -1,13 +1,12 @@
 import rclpy
 import signal
 from PyQt5.QtCore import QTimer
-from rclpy.node import Node
+from rclpy.node import Node, Client
 from rclpy.task import Future
 from qt_gui.plugin import Plugin
 from .RecordWidget import RecordWidget
-from rclpy.action.client import ActionClient
 
-from sonia_common_ros2.action import BagControl
+from sonia_common_ros2.srv import RecordBagService
 
 class Record(Plugin):
 
@@ -35,48 +34,44 @@ class Record(Plugin):
         # Connect buttons
         self._mainWindow.recordBtn.clicked.connect(self._recordBtn_action)
         self._mainWindow.stopBtn.clicked.connect(self._stopBtn_action)
+        self._mainWindow.pauseBtn.clicked.connect(self._pauseBtn_action)
         
         # Actions
-        self.record_client = ActionClient(self._internal_node, BagControl, "BagRecord")    
+        self.record_client: Client = self._internal_node.create_client(RecordBagService,"/bag_recorder/record")    
         
         # Spin this thread
         self._timer = QTimer()
         self._timer.timeout.connect(self.__fetch_topics)
-        self._timer.start(1)
-    
-    def _send_goal(self, filename, list):
-        goal_msg = BagControl.Goal()
-        goal_msg.filename = filename
-        goal_msg.topic_list = list
-        server_ready = self.record_client.wait_for_server(5)
-        if not server_ready:
-            self.show_error("Server isn't responding or running")
-            return
-        self.record_future=self.record_client.send_goal_async(goal_msg, self._feedback_callback)
-        self.record_future.add_done_callback(self._goal_response_callback)   
+        self._timer.start(1) 
         
-    def _goal_response_callback(self, future: Future):
-        self.goal_handle = future.result()
-        if self.goal_handle.accepted:  
-            self._mainWindow._enable_disable_ctrls(True)
-    
-    def _feedback_callback(self):
-        pass
-    
+    def _request_callback(self, resp):
+        print(resp.result().state)
+        
     def _recordBtn_action(self):
         topic_list = self._mainWindow.selectedView.stringList()
         if self._mainWindow.bagName.text() != "":
-            self._send_goal(self._mainWindow.bagName.text(), topic_list)
-            self._mainWindow._enable_disable_ctrls(False)
+            req = RecordBagService.Request()
+            req.cmd = RecordBagService.Request.CMD_START
+            req.filename = self._mainWindow.bagName.text()
+            req.topic_list = topic_list
+            
+            rep = self.record_client.call_async(req)
+            rep.add_done_callback(self._request_callback)
+            #self._mainWindow._enable_disable_ctrls(False)
                    
-    def _stopBtn_action(self):            
-        cancel_req = self.record_client._cancel_goal_async(self.goal_handle)
-        cancel_req.add_done_callback(self._cancel_response_cb)
+    def _stopBtn_action(self):       
+        req = RecordBagService.Request()
+        req.cmd = RecordBagService.Request.CMD_STOP
         
-    def _cancel_response_cb(self, resp: Future):            
-        cancel_rep = resp.result()
-        if(cancel_rep):
-            self._mainWindow._enable_disable_ctrls(False)
+        rep = self.record_client.call_async(req)
+        rep.add_done_callback(self._request_callback)     
+        
+    def _pauseBtn_action(self):
+        req = RecordBagService.Request()
+        req.cmd = RecordBagService.Request.CMD_PAUSE
+        
+        rep = self.record_client.call_async(req)
+        rep.add_done_callback(self._request_callback) 
               
     def __fetch_topics(self):
         list = []
