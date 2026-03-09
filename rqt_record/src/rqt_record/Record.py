@@ -29,7 +29,8 @@ class Record(Plugin):
         # Add widget to the user interface
         context.add_widget(self._mainWindow)   
         
-        self.goal_handle = None
+        self.is_paused = False
+        self.is_recording = False
         
         # Connect buttons
         self._mainWindow.recordBtn.clicked.connect(self._recordBtn_action)
@@ -45,33 +46,48 @@ class Record(Plugin):
         self._timer.start(1) 
         
     def _request_callback(self, resp):
-        print(resp.result().state)
+        self._mainWindow._loadFeedback(resp.result().state)
         
     def _recordBtn_action(self):
-        topic_list = self._mainWindow.selectedView.stringList()
+        
+        if self.is_paused:
+            req = RecordBagService.Request()
+            req.cmd = RecordBagService.Request.CMD_RESUME
+      
+            rep = self.record_client.call_async(req)
+            rep.add_done_callback(self._request_callback)
+            self.is_paused = False
+            self._mainWindow.recordBtn.setEnabled(False) 
+            return
+
         if self._mainWindow.bagName.text() != "":
             req = RecordBagService.Request()
             req.cmd = RecordBagService.Request.CMD_START
             req.filename = self._mainWindow.bagName.text()
-            req.topic_list = topic_list
+            req.topic_list = self._mainWindow.selectedView.stringList()
             
             rep = self.record_client.call_async(req)
             rep.add_done_callback(self._request_callback)
-            #self._mainWindow._enable_disable_ctrls(False)
+            self._mainWindow._enable_disable_ctrls(False)
                    
-    def _stopBtn_action(self):       
+    def _stopBtn_action(self):     
         req = RecordBagService.Request()
         req.cmd = RecordBagService.Request.CMD_STOP
         
         rep = self.record_client.call_async(req)
-        rep.add_done_callback(self._request_callback)     
+        rep.add_done_callback(self._request_callback)
+        self.is_paused = False 
+        self._mainWindow._enable_disable_ctrls(True)
+        self._mainWindow.bagName.clear()    
         
     def _pauseBtn_action(self):
         req = RecordBagService.Request()
         req.cmd = RecordBagService.Request.CMD_PAUSE
         
         rep = self.record_client.call_async(req)
-        rep.add_done_callback(self._request_callback) 
+        rep.add_done_callback(self._request_callback)
+        self.is_paused = True
+        self._mainWindow.recordBtn.setEnabled(True) 
               
     def __fetch_topics(self):
         list = []

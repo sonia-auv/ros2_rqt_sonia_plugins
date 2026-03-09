@@ -17,6 +17,7 @@ class RecordWidget(QMainWindow):
         
         self.listView = QStringListModel()
         self.selectedView = QStringListModel()
+        self.feedBackView = QStringListModel()
         self.topicList = []
         self.left_item = ""
         self.right_item = ""
@@ -24,8 +25,10 @@ class RecordWidget(QMainWindow):
         # ListView setup 
         self.selectedTopics.setModel(self.selectedView)
         self.allTopics.setModel(self.listView)
+        self.recordFeedback.setModel(self.feedBackView)
         self.allTopics.show()
         self.selectedTopics.show()
+        self.recordFeedback.show()
         
         # Connect buttons
         self.addBtn.clicked.connect(self._addBtn_action)
@@ -37,6 +40,10 @@ class RecordWidget(QMainWindow):
         if self.topicList != data:
             self.listView.setStringList(data)
             self.topicList = data
+    def _loadFeedback(self, data):
+        row = self.feedBackView.rowCount()
+        self.feedBackView.insertRow(row)
+        self.feedBackView.setData(self.feedBackView.index(row), data)
             
     def __on_left_item_clicked(self, index):
         self.left_item = index.data()
