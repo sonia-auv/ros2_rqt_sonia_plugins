@@ -107,13 +107,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="pubTopic">
-        <property name="text">
-         <string>Publishing</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLineEdit" name="topicFilter">
         <property name="placeholderText">
          <string>Topic filter</string>
