@@ -17,35 +17,40 @@ class RecordWidget(QMainWindow):
         
         self.listView = QStringListModel()
         self.selectedView = QStringListModel()
-        self.feedBackView = QStringListModel()
-        self.topicList = []
+        
         self.left_item = ""
         self.right_item = ""
+        self.filter_text = ""
         
         # ListView setup 
         self.selectedTopics.setModel(self.selectedView)
         self.allTopics.setModel(self.listView)
-        self.recordFeedback.setModel(self.feedBackView)
-        
+
         self.allTopics.show()
         self.selectedTopics.show()
-        self.recordFeedback.show()
         
         # Connect buttons
         self.addBtn.clicked.connect(self._addBtn_action)
         self.removeBtn.clicked.connect(self._removeBtn_action)
         self.allTopics.clicked.connect(self.__on_left_item_clicked)
         self.selectedTopics.clicked.connect(self.__on_right_item_clicked)
+        self.topicFilter.textChanged.connect(self.__on_text_changed)
                 
     def _loadListView(self, data):
-        if self.topicList != data:
+        if self.filter_text != "":
+            list = [ s for s in data if self.filter_text in s]
+            self.listView.setStringList(list)
+        else:
             self.listView.setStringList(data)
-            self.topicList = data
 
     def _loadFeedback(self, data):
-        list = []
-        list.append(data)
-        self.feedBackView.setStringList(list)
+        self.stateLine.setText(data)
+        
+    def _loadTimer(self, data):
+        self.timerLine.setText(data)
+
+    def __on_text_changed(self, text):
+        self.filter_text = text
             
     def __on_left_item_clicked(self, index):
         self.left_item = index.data()

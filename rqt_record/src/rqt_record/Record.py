@@ -1,4 +1,5 @@
 import rclpy
+import time
 from PyQt5.QtCore import QTimer
 from rclpy.node import Node, Client
 from qt_gui.plugin import Plugin
@@ -28,25 +29,25 @@ class Record(Plugin):
         context.add_widget(self._mainWindow)   
         
         self.is_paused = False
-        self.is_recording = False
+        self.start_time = None
         
         # Connect buttons
         self._mainWindow.recordBtn.clicked.connect(self._recordBtn_action)
         self._mainWindow.stopBtn.clicked.connect(self._stopBtn_action)
         self._mainWindow.pauseBtn.clicked.connect(self._pauseBtn_action)
         
-        # Actions
+        # Service
         self.record_client: Client = self._internal_node.create_client(RecordBagService,"/bag_recorder/record")    
         
         # Spin this thread
         self._timer = QTimer()
         self._timer.timeout.connect(self.__fetch_topics)
-        self._timer.start(1) 
+        self._timer.timeout.connect(self._spin_once)
+        self._timer.start(10) 
 
-        # Spin this thread
-        self._timer2 = QTimer()
-        self._timer2.timeout.connect(self._spin_once)
-        self._timer2.start(10) 
+        self.clock = QTimer()
+        self.clock.setInterval(100)
+        self.clock.timeout.connect(self._update_time)
         
     def _request_callback(self, resp):
         self._mainWindow._loadFeedback(resp.result().state)
@@ -72,6 +73,9 @@ class Record(Plugin):
             rep = self.record_client.call_async(req)
             rep.add_done_callback(self._request_callback)
             self._mainWindow._enable_disable_ctrls(False)
+
+            self.start_time = time.time()
+            self.clock.start()
                    
     def _stopBtn_action(self):     
         req = RecordBagService.Request()
@@ -81,7 +85,8 @@ class Record(Plugin):
         rep.add_done_callback(self._request_callback)
         self.is_paused = False 
         self._mainWindow._enable_disable_ctrls(True)
-        self._mainWindow.bagName.clear()    
+        self._mainWindow.bagName.clear()
+        self.clock.stop()    
         
     def _pauseBtn_action(self):
         req = RecordBagService.Request()
@@ -91,22 +96,34 @@ class Record(Plugin):
         rep.add_done_callback(self._request_callback)
         self.is_paused = True
         self._mainWindow.recordBtn.setEnabled(True) 
+    
+    def _update_time(self):
+        if self.start_time is None:
+            return
+        
+        elapsed = time.time() - self.start_time
+
+        minutes = int(elapsed // 60)
+        seconds = int(elapsed % 60)
+
+        self._mainWindow._loadTimer(f"{minutes:02}:{seconds:02}")
               
     def __fetch_topics(self):
         list = []
         self.topic_lists = self._internal_node.get_topic_names_and_types(False)
         for name, types in self.topic_lists:
             list.append(name)
-        self._mainWindow._loadListView(list)
+            self._mainWindow._loadListView(list)
 
     def _spin_once(self):
         if rclpy.ok() and self._internal_node:
             rclpy.spin_once(self._internal_node, timeout_sec=0.0)
             
-    def shutdown_plugin(self):
+    def shutdown_plugin(self):   
+        self.clock.stop()
+        self.clock.timeout.disconnect(self._update_time)
         self._timer.stop()
-        self._timer2.stop()
-        self._timer2.timeout.disconnect(self._spin_once)
+        self._timer.timeout.disconnect(self._spin_once)
         self._timer.timeout.disconnect(self.__fetch_topics)
         if self._internal_node:
             self._internal_node.destroy_node()
