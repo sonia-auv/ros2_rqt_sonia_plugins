@@ -1,8 +1,6 @@
 import rclpy
-import signal
 from PyQt5.QtCore import QTimer
 from rclpy.node import Node, Client
-from rclpy.task import Future
 from qt_gui.plugin import Plugin
 from .RecordWidget import RecordWidget
 
@@ -44,6 +42,11 @@ class Record(Plugin):
         self._timer = QTimer()
         self._timer.timeout.connect(self.__fetch_topics)
         self._timer.start(1) 
+
+        # Spin this thread
+        self._timer2 = QTimer()
+        self._timer2.timeout.connect(self._spin_once)
+        self._timer2.start(10) 
         
     def _request_callback(self, resp):
         self._mainWindow._loadFeedback(resp.result().state)
@@ -95,9 +98,15 @@ class Record(Plugin):
         for name, types in self.topic_lists:
             list.append(name)
         self._mainWindow._loadListView(list)
+
+    def _spin_once(self):
+        if rclpy.ok() and self._internal_node:
+            rclpy.spin_once(self._internal_node, timeout_sec=0.0)
             
     def shutdown_plugin(self):
         self._timer.stop()
-        #self._timer.timeout.disconnect(self._spin_once) 
+        self._timer2.stop()
+        self._timer2.timeout.disconnect(self._spin_once)
+        self._timer.timeout.disconnect(self.__fetch_topics)
         if self._internal_node:
             self._internal_node.destroy_node()
