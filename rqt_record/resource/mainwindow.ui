@@ -192,7 +192,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="timerLine">
+       <widget class="QLineEdit" name="timerLineEdit">
         <property name="readOnly">
          <bool>true</bool>
         </property>

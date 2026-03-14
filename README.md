@@ -42,7 +42,13 @@ The `rqt_monitor` plugin displays information running **ROS2** nodes on the syst
 
 ## rqt_record
 
-The `rqt_record` plugin allows the creation of **ROS2** bags and saves them on the system.
+The `rqt_record` plugin allows the creation of **ROS2** bags and saves them on the server.
+
+### Registered Topics / Services / Actions
+
+| Type             | Name                               | Direction       | Message/Service Type                    | Description                               |
+| ---------------- | ---------------------------------- | ----------------| --------------------------------------- | ----------------------------------------- |
+| Service          | `/bag_recorder/record`             | Client Server   | `sonia_common_ros2/srv/RecordBagService`| Client to send ros bag recording requests |
 
 ---
 

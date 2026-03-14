@@ -37,7 +37,7 @@ class Record(Plugin):
         self._mainWindow.pauseBtn.clicked.connect(self._pauseBtn_action)
         
         # Service
-        self.record_client: Client = self._internal_node.create_client(RecordBagService,"/bag_recorder/record")    
+        self.record_client: Client = self._internal_node.create_client(RecordBagService, "/bag_recorder/record")    
         
         # Spin this thread
         self._timer = QTimer()
@@ -48,9 +48,21 @@ class Record(Plugin):
         self.clock = QTimer()
         self.clock.setInterval(100)
         self.clock.timeout.connect(self._update_time)
-        
+
+    def _record_request_cb(self, resp):
+        msg = resp.result().message
+        if "Error" in msg:
+            self._mainWindow.timerLineEdit.clear()
+            self._mainWindow._loadFeedback(msg)
+            return
+             
+        self._mainWindow._enable_disable_ctrls(False)
+        self.start_time = time.time()
+        self.clock.start()
+        self._mainWindow._loadFeedback(msg)
+
     def _request_callback(self, resp):
-        self._mainWindow._loadFeedback(resp.result().state)
+        self._mainWindow._loadFeedback(resp.result().message)
         
     def _recordBtn_action(self):
         
@@ -64,18 +76,14 @@ class Record(Plugin):
             self._mainWindow.recordBtn.setEnabled(False) 
             return
 
-        if self._mainWindow.bagName.text() != "":
+        if self._mainWindow.bagName.text() != "" and len(self._mainWindow.selectedView.stringList()) != 0:
             req = RecordBagService.Request()
             req.cmd = RecordBagService.Request.CMD_START
             req.filename = self._mainWindow.bagName.text()
             req.topic_list = self._mainWindow.selectedView.stringList()
             
             rep = self.record_client.call_async(req)
-            rep.add_done_callback(self._request_callback)
-            self._mainWindow._enable_disable_ctrls(False)
-
-            self.start_time = time.time()
-            self.clock.start()
+            rep.add_done_callback(self._record_request_cb)
                    
     def _stopBtn_action(self):     
         req = RecordBagService.Request()
@@ -113,7 +121,7 @@ class Record(Plugin):
         self.topic_lists = self._internal_node.get_topic_names_and_types(False)
         for name, types in self.topic_lists:
             list.append(name)
-            self._mainWindow._loadListView(list)
+        self._mainWindow._loadListView(list)
 
     def _spin_once(self):
         if rclpy.ok() and self._internal_node:
@@ -125,5 +133,6 @@ class Record(Plugin):
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once)
         self._timer.timeout.disconnect(self.__fetch_topics)
+        self._stopBtn_action()
         if self._internal_node:
             self._internal_node.destroy_node()
