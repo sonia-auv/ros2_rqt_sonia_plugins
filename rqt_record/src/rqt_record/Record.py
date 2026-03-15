@@ -30,6 +30,7 @@ class Record(Plugin):
         
         self.is_paused = False
         self.start_time = None
+        self.past_list = []
         
         # Connect buttons
         self._mainWindow.recordBtn.clicked.connect(self._recordBtn_action)
