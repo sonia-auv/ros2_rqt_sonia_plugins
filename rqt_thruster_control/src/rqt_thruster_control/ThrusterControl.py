@@ -39,7 +39,4 @@ class ThrusterControl(Plugin):
         self._timer.timeout.disconnect(self._spin_once)
         self._mainWindow.shutdown_plugin()  
         if self._internal_node:
-            self._internal_node.destroy_node()
-        if rclpy.ok():
-            rclpy.shutdown()
-             
+            self._internal_node.destroy_node()             

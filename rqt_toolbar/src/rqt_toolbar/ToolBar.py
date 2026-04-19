@@ -60,6 +60,4 @@ class ToolBar(Plugin):
         self._timer.stop()
         self._timer.timeout.disconnect(self._spin_once)
         if self._internal_node:
-            self._internal_node.destroy_node()
-        if rclpy.ok():
-            rclpy.shutdown()             
+            self._internal_node.destroy_node()        

@@ -6,8 +6,7 @@ from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import pyqtSignal
 
-from sonia_common_ros2.msg import MotorPwm
-from std_msgs.msg import Int8MultiArray
+from sonia_common_ros2.msg import MotorPwm, MotorNewton
 
 
 class ThrusterEffortWidget(QWidget):
@@ -25,7 +24,7 @@ class ThrusterEffortWidget(QWidget):
         qos_rel = QoSProfile(depth=10)
         qos_rel.reliability= ReliabilityPolicy.RELIABLE
         
-        self._thruster_newton_subscriber: Subscription = internal_node.create_subscription(Int8MultiArray, "/telemetry/thruster_newton" , self._handle_thruster_newton_msg,10)
+        self._thruster_newton_subscriber: Subscription = internal_node.create_subscription(MotorNewton, "/telemetry/thruster_newton" , self._handle_thruster_newton_msg,10)
         self._thruster_pwm_subscriber: Subscription = internal_node.create_subscription(MotorPwm, "/provider_thruster/thruster_pwm", self._handle_thruster_pwm_msg, qos_rel)
 
         self.monitor_thruster_newton_msg.connect(self._received_thruster_newton_msg)
@@ -37,10 +36,15 @@ class ThrusterEffortWidget(QWidget):
     def _handle_thruster_pwm_msg(self, msg):
         self.monitor_thruster_pwm_msg.emit(msg)
 
-    def _received_thruster_newton_msg(self, msg):
-        print(msg)
-        for i in range(0, len(msg.data)):
-            self._set_thruster_value(i + 1, msg.data[i])
+    def _received_thruster_newton_msg(self, msg:MotorNewton):
+        self._set_thruster_value(1, msg.motor1)
+        self._set_thruster_value(2, msg.motor2)
+        self._set_thruster_value(3, msg.motor3)
+        self._set_thruster_value(4, msg.motor4)
+        self._set_thruster_value(5, msg.motor5)
+        self._set_thruster_value(6, msg.motor6)
+        self._set_thruster_value(7, msg.motor7)
+        self._set_thruster_value(8, msg.motor8)
     
     def _received_thruster_pwm_msg(self, msg:MotorPwm):   
         self._set_pwm_value(1, msg.motor1)
@@ -53,7 +57,7 @@ class ThrusterEffortWidget(QWidget):
         self._set_pwm_value(8, msg.motor8)
 
     def _set_thruster_value(self, thruster_id, value):
-        eval('self.T' + str(thruster_id) + '_value').setText('{}'.format(int(value)) + ' N')
+        eval('self.T' + str(thruster_id) + '_value').setText('{:.2f}'.format(value) + ' N')
         eval('self.T' + str(thruster_id) + '_slider').setValue(int(value))
     
     def _set_pwm_value(self, thruster_id, value):

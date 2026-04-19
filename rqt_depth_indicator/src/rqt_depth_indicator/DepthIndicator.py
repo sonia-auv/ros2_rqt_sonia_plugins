@@ -42,5 +42,3 @@ class DepthIndicator(Plugin):
         self._mainWindow.shutdown_plugin()
         if self._internal_node:
             self._internal_node.destroy_node()
-        if rclpy.ok():
-            rclpy.shutdown()
