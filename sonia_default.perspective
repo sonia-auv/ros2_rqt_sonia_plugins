@@ -1,0 +1,269 @@
+{
+  "keys": {},
+  "groups": {
+    "mainwindow": {
+      "keys": {
+        "geometry": {
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'01d9d0cb00030000000000460000001b0000077f0000043700000046000000400000077f000004370000000000000000078000000046000000400000077f00000437')",
+          "type": "repr(QByteArray.hex)",
+          "pretty-print": "     F     7 F @   7      F @   7"
+        },
+        "state": {
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff00000000fd00000002000000020000073a00000209fc0100000002fb0000005a007200710074005f0069006d006100670065005f0076006900650077005f005f0049006d0061006700650056006900650077005f005f0031005f005f0049006d00610067006500560069006500770057006900640067006500740100000000000003ce000001b000fffffffc000003d40000036600000366000007bffa000000010200000003fb00000062007200710074005f0070006f007700650072005f005f00500072006f007600690064006500720050006f007700650072005f005f0031005f005f004d00790050006f0077006500720043006f006e00740072006f006c0057006900640067006500740100000000ffffffff000001ea000003fdfb00000076007200710074005f00740068007200750073007400650072005f0063006f006e00740072006f006c005f005f005400680072007500730074006500720073005f005f0031005f005f004d0079005400680072007500730074006500720043006f006e00740072006f006c0057006900640067006500740100000060000002090000017100fffffffb00000058007200710074005f00740068007200750073007400650072005f006500660066006f00720074005f005f00540068007200750073007400650072004500660066006f00720074005f005f0031005f005f0046006f0072006d0100000000ffffffff0000000000000000000000030000073a00000173fc0100000006fb00000048007200710074005f007200650063006f00720064005f005f004200610067005200650063006f00720064005f005f0031005f005f004d00610069006e00570069006e0064006f00770100000000000002260000000000000000fb00000052007200710074005f006d006f006e00690074006f0072005f005f00530079007300740065006d004d006f006e00690074006f0072005f005f0031005f005f004d00610069006e00570069006e0064006f00770100000000000002950000022600000295fb0000004a007200710074005f0077006100790070006f0069006e0074005f005f0057006100790070006f0069006e0074005f005f0031005f005f004d00610069006e00570069006e0064006f0077010000029b000002950000015e00000295fb00000058007200710074005f00640065007000740068005f0069006e00640069006300610074006f0072005f005f004400650070007400680049006e00640069006300610074006f0072005f005f0031005f005f0046006f0072006d010000053600000204000000e300fffffffb0000004a007200710074005f0077006100790070006f0069006e0074005f005f0057006100790070006f0069006e0074005f005f0032005f005f004d00610069006e00570069006e0064006f00770100000577000001c30000000000000000fb0000004a007200710074005f006100630074007500610074006f0072005f005f004100630074007500610074006f0072005f005f0031005f005f006d00610069006e00570069006400670065007401000005ac0000018e00000000000000000000073a0000000000000004000000040000000800000008fc00000002000000020000000100000032007200710074005f0074006f006f006c006200610072005f005f0054006f006f006c006200610072005f005f0031005f005f0100000000ffffffff0000000000000000000000030000000100000036004d0069006e0069006d0069007a006500640044006f0063006b00570069006400670065007400730054006f006f006c0062006100720000000000ffffffff0000000000000000')",
+          "type": "repr(QByteArray.hex)",
+          "pretty-print": "                 Zrqt_image_view__ImageView__1__ImageViewWidget            f f                                                                                                                                  `   q                                                            : s                                             &                                                     &                                               ^                                                  6                                               w                                                       :                                                         6MinimizedDockWidgetsToolbar        "
+        }
+      },
+      "groups": {
+        "toolbar_areas": {
+          "keys": {
+            "MinimizedDockWidgetsToolbar": {
+              "repr": "8",
+              "type": "repr"
+            },
+            "rqt_toolbar__Toolbar__1__": {
+              "repr": "4",
+              "type": "repr"
+            }
+          },
+          "groups": {}
+        }
+      }
+    },
+    "pluginmanager": {
+      "keys": {
+        "running-plugins": {
+          "repr": "{'rqt_depth_indicator/DepthIndicator': [1], 'rqt_image_view/ImageView': [1], 'rqt_monitor/SystemMonitor': [1], 'rqt_power/ProviderPower': [1], 'rqt_thruster_control/Thrusters': [1], 'rqt_toolbar/Toolbar': [1], 'rqt_waypoint/Waypoint': [1]}",
+          "type": "repr"
+        }
+      },
+      "groups": {
+        "plugin__rqt_actuator__Actuator__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__mainWidget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Actuator'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_depth_indicator__DepthIndicator__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__Form": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Depth Indicator'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_image_view__ImageView__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__ImageViewWidget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Image View'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            },
+            "plugin": {
+              "keys": {
+                "color_scheme": {
+                  "repr": "-1",
+                  "type": "repr"
+                },
+                "dynamic_range": {
+                  "repr": "False",
+                  "type": "repr"
+                },
+                "max_range": {
+                  "repr": "10.0",
+                  "type": "repr"
+                },
+                "mouse_pub_topic": {
+                  "repr": "'/camera_array/bottom/image_raw_mouse_left'",
+                  "type": "repr"
+                },
+                "num_gridlines": {
+                  "repr": "0",
+                  "type": "repr"
+                },
+                "publish_click_location": {
+                  "repr": "False",
+                  "type": "repr"
+                },
+                "rotate": {
+                  "repr": "0",
+                  "type": "repr"
+                },
+                "smooth_image": {
+                  "repr": "False",
+                  "type": "repr"
+                },
+                "toolbar_hidden": {
+                  "repr": "False",
+                  "type": "repr"
+                },
+                "topic": {
+                  "repr": "'/camera_array/bottom/image_raw'",
+                  "type": "repr"
+                },
+                "zoom1": {
+                  "repr": "False",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_monitor__SystemMonitor__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__MainWindow": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'System'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_power__ProviderPower__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__MyPowerControlWidget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Power'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_record__BagRecord__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__MainWindow": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Record'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_thruster_control__Thrusters__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__MyThrusterControlWidget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Thruster'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_waypoint__Waypoint__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__MainWindow": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Waypoint'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}
