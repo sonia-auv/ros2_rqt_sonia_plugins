@@ -77,11 +77,11 @@ class Record(Plugin):
             self._mainWindow.recordBtn.setEnabled(False) 
             return
 
-        if self._mainWindow.bagName.text() != "" and len(self._mainWindow.selectedView.stringList()) != 0:
+        if self._mainWindow.bagName.text() != "" and len(self._mainWindow.selectedListModel.stringList()) != 0:
             req = RecordBagService.Request()
             req.cmd = RecordBagService.Request.CMD_START
             req.filename = self._mainWindow.bagName.text()
-            req.topic_list = self._mainWindow.selectedView.stringList()
+            req.topic_list = self._mainWindow.selectedListModel.stringList()
             
             rep = self.record_client.call_async(req)
             rep.add_done_callback(self._record_request_cb)
