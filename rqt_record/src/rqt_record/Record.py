@@ -66,7 +66,8 @@ class Record(Plugin):
         self._mainWindow._loadFeedback(resp.result().message)
         
     def _recordBtn_action(self):
-        
+        if not self.record_client.service_is_ready():
+            self._mainWindow._loadFeedback("Bag server is not responding...")
         if self.is_paused:
             req = RecordBagService.Request()
             req.cmd = RecordBagService.Request.CMD_RESUME
