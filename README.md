@@ -132,6 +132,7 @@ The `rqt_waypoint` plugin is used to control the movements of the prototype and 
 | Topic            | `/proc_planner/send_pose_array`    | Published       | `sonia_common_ros2/msg/PoseArray`               | Sonia geometry pose array information         |
 | Topic            | `/proc_control/reset_trajectory`   | Published       | `std_msgs/msg/Bool`                             | Signal the reset the trajectory               |
 | Topic            | `/provider_dvl/enable_disable_dvl` | Published       | `std_msgs/msg/Bool`                             | Signal the dvl to start or stop               |
+| Topic            | `/proc_control/imu_tared` | Published       | `std_msgs/msg/Bool`                             | Send ime tared confirmation               |
 | Service          | `/proc_simulation/auv_pose`        | Client Server   | `ssonia_common_ros2/srv/ObjectPoseService`      | Service to grab geometry pose                 |
 | Service          | `/proc_simulation/select_auv`      | Client Server   | `ssonia_common_ros2/srv/SetSimulationAUVService`| Service to set AUV for the simulation         |
 | Service          | `/provider_depth/tare`             | Client Server   | `std_srvs/srv/Trigger`                          | Resets the depth sensor to current position   |
