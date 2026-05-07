@@ -204,7 +204,6 @@ class WaypointWidget(QMainWindow):
         if self.imu_tare_service.service_is_ready():
             rep=self.imu_tare_service.call_async(self.tare_req)
             rep.add_done_callback(self.imu_tare_callback)
-            print("not tared")
         else:
             tare = Bool()
             tare.data = False
