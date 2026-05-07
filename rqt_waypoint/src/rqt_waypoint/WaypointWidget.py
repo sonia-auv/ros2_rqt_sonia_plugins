@@ -201,8 +201,14 @@ class WaypointWidget(QMainWindow):
         rep.add_done_callback(self.depth_tare_callback)
         
     def _tare_imu(self):
-        rep=self.imu_tare_service.call_async(self.tare_req)
-        rep.add_done_callback(self.imu_tare_callback)
+        if self.imu_tare_service.service_is_ready():
+            rep=self.imu_tare_service.call_async(self.tare_req)
+            rep.add_done_callback(self.imu_tare_callback)
+            print("not tared")
+        else:
+            tare = Bool()
+            tare.data = False
+            self.imu_tared_publisher.publish(tare)
         
     def imu_tare_callback(self, rep):
         tare = Bool()

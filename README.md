@@ -133,8 +133,8 @@ The `rqt_waypoint` plugin is used to control the movements of the prototype and 
 | Topic            | `/proc_control/reset_trajectory`   | Published       | `std_msgs/msg/Bool`                             | Signal the reset the trajectory               |
 | Topic            | `/provider_dvl/enable_disable_dvl` | Published       | `std_msgs/msg/Bool`                             | Signal the dvl to start or stop               |
 | Topic            | `/proc_control/imu_tared` | Published       | `std_msgs/msg/Bool`                             | Send ime tared confirmation               |
-| Service          | `/proc_simulation/auv_pose`        | Client Server   | `ssonia_common_ros2/srv/ObjectPoseService`      | Service to grab geometry pose                 |
-| Service          | `/proc_simulation/select_auv`      | Client Server   | `ssonia_common_ros2/srv/SetSimulationAUVService`| Service to set AUV for the simulation         |
+| Service          | `/proc_simulation/auv_pose`        | Client Server   | `sonia_common_ros2/srv/ObjectPoseService`      | Service to grab geometry pose                 |
+| Service          | `/proc_simulation/select_auv`      | Client Server   | `sonia_common_ros2/srv/SetSimulationAUVService`| Service to set AUV for the simulation         |
 | Service          | `/provider_depth/tare`             | Client Server   | `std_srvs/srv/Trigger`                          | Resets the depth sensor to current position   |
 | Service          | `/provider_imu/tare`               | Client Server   | `std_srvs/srv/Trigger`                          | Resets the imu sensor to current orientation  |
 | Service          | `/mission_server/mission_list`     | Client Server   | `sonia_common_ros2/srv/MissionListService`      | Returns a list of missions                    |
