@@ -201,10 +201,11 @@ class WaypointWidget(QMainWindow):
         rep.add_done_callback(self.depth_tare_callback)
         
     def _tare_imu(self):
-        if self.imu_tare_service.service_is_ready():
+        if self.imu_tare_service.service_is_ready(): #verify if the tare service server is alive
             rep=self.imu_tare_service.call_async(self.tare_req)
             rep.add_done_callback(self.imu_tare_callback)
-        else:
+
+        else: #if no service service, publish not tared  
             tare = Bool()
             tare.data = False
             self.imu_tared_publisher.publish(tare)
