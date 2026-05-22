@@ -38,7 +38,7 @@ class Record(Plugin):
         self._mainWindow.pauseBtn.clicked.connect(self._pauseBtn_action)
         
         # Service
-        self.record_client: Client = self._internal_node.create_client(RecordBagService, "/bag_recorder/record")    
+        self.record_client: Client = self._internal_node.create_client(RecordBagService, "/bag_server/record")    
         
         # Spin this thread
         self._timer = QTimer()
@@ -75,7 +75,8 @@ class Record(Plugin):
             rep = self.record_client.call_async(req)
             rep.add_done_callback(self._request_callback)
             self.is_paused = False
-            self._mainWindow.recordBtn.setEnabled(False) 
+            self._mainWindow.recordBtn.setEnabled(False)
+            self.clock.start()
             return
 
         if self._mainWindow.bagName.text() != "" and len(self._mainWindow.selectedListModel.stringList()) != 0:
@@ -105,7 +106,8 @@ class Record(Plugin):
         rep = self.record_client.call_async(req)
         rep.add_done_callback(self._request_callback)
         self.is_paused = True
-        self._mainWindow.recordBtn.setEnabled(True) 
+        self._mainWindow.recordBtn.setEnabled(True)
+        self.clock.stop() 
     
     def _update_time(self):
         if self.start_time is None:
@@ -121,8 +123,11 @@ class Record(Plugin):
     def __fetch_topics(self):
         list = []
         self.topic_lists = self._internal_node.get_topic_names_and_types(False)
+
         for name, types in self.topic_lists:
-            list.append(name)
+            pub_count = self._internal_node.get_publishers_info_by_topic(name)
+            if len(pub_count) > 0:
+                list.append(name)
         self._mainWindow._loadListView(list)
 
     def _spin_once(self):
