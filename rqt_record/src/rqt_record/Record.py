@@ -47,8 +47,9 @@ class Record(Plugin):
         self._timer.start(10) 
 
         self.clock = QTimer()
-        self.clock.setInterval(100)
+        self.clock.setInterval(1000)
         self.clock.timeout.connect(self._update_time)
+        self.elapsed_sec = 0
 
     def _record_request_cb(self, resp):
         msg = resp.result().message
@@ -58,7 +59,6 @@ class Record(Plugin):
             return
              
         self._mainWindow._enable_disable_ctrls(False)
-        self.start_time = time.time()
         self.clock.start()
         self._mainWindow._loadFeedback(msg)
 
@@ -97,7 +97,8 @@ class Record(Plugin):
         self.is_paused = False 
         self._mainWindow._enable_disable_ctrls(True)
         self._mainWindow.bagName.clear()
-        self.clock.stop()    
+        self.clock.stop() 
+        self.elapsed_sec = 0   
         
     def _pauseBtn_action(self):
         req = RecordBagService.Request()
@@ -110,13 +111,10 @@ class Record(Plugin):
         self.clock.stop() 
     
     def _update_time(self):
-        if self.start_time is None:
-            return
-        
-        elapsed = time.time() - self.start_time
+        self.elapsed_sec +=1
 
-        minutes = int(elapsed // 60)
-        seconds = int(elapsed % 60)
+        minutes = int(self.elapsed_sec // 60)
+        seconds = int(self.elapsed_sec % 60)
 
         self._mainWindow._loadTimer(f"{minutes:02}:{seconds:02}")
               
