@@ -48,7 +48,7 @@ The `rqt_record` plugin allows the creation of **ROS2** bags and saves them on t
 
 | Type             | Name                               | Direction       | Message/Service Type                    | Description                               |
 | ---------------- | ---------------------------------- | ----------------| --------------------------------------- | ----------------------------------------- |
-| Service          | `/bag_recorder/record`             | Client Server   | `sonia_common_ros2/srv/RecordBagService`| Client to send ros bag recording requests |
+| Service          | `/bag_server/record`             | Client Server   | `sonia_common_ros2/srv/RecordBagService`| Client to send ros bag recording requests |
 
 ---
 
