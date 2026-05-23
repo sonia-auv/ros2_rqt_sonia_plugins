@@ -82,6 +82,7 @@ class WaypointWidget(QMainWindow):
         self.single_add_pose_publisher: Publisher = ros_node.create_publisher(soniaPose,"/proc_control/add_pose", 10)
         self.multi_add_pose_publisher: Publisher = ros_node.create_publisher(PoseArray,"/proc_planner/send_pose_array",10)
         self.reset_trajectory_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/reset_trajectory", 10)
+        self.imu_tared_publisher: Publisher = ros_node.create_publisher(Bool, "/proc_control/imu_tared", 10)
         self.set_dvl_started_publisher: Publisher = ros_node.create_publisher(Bool, "/provider_dvl/enable_disable_dvl", qos_dvl)
 
         # Services
@@ -197,13 +198,25 @@ class WaypointWidget(QMainWindow):
 
     def _reset_depth(self):
         rep = self.depth_tare_service.call_async(self.tare_req)
-        rep.add_done_callback(self.tare_callback)
+        rep.add_done_callback(self.depth_tare_callback)
         
     def _tare_imu(self):
-        rep=self.imu_tare_service.call_async(self.tare_req)
-        rep.add_done_callback(self.tare_callback)
+        if self.imu_tare_service.service_is_ready(): #verify if the tare service server is alive
+            rep=self.imu_tare_service.call_async(self.tare_req)
+            rep.add_done_callback(self.imu_tare_callback)
+
+        else: #if no service service, publish not tared  
+            tare = Bool()
+            tare.data = False
+            self.imu_tared_publisher.publish(tare)
         
-    def tare_callback(self, rep):
+    def imu_tare_callback(self, rep):
+        tare = Bool()
+        tare.data = rep.result().success
+        self.imu_tared_publisher.publish(tare)
+        print(rep.result().message)
+
+    def depth_tare_callback(self, rep):
         print(rep.result().message)
         
     def startDVL(self):
@@ -509,6 +522,7 @@ class WaypointWidget(QMainWindow):
         self.simulation_start_publisher.destroy()
         self.single_add_pose_publisher.destroy()
         self.multi_add_pose_publisher.destroy()
+        self.imu_tared_publisher.destroy()
         self.reset_trajectory_publisher.destroy()
         self.set_dvl_started_publisher.destroy()
         self.initial_position_service.destroy()
