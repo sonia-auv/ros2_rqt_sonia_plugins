@@ -1,4 +1,5 @@
 import rclpy
+import time
 from PyQt5.QtCore import QTimer
 from rclpy.node import Node
 from qt_gui.plugin import Plugin
@@ -35,12 +36,20 @@ class Monitor(Plugin):
         self._timer = QTimer()
         self._timer.timeout.connect(self._spin_once)
         self._timer.start(10)
+
+        #check callback state
+        self._last_msg_time = 0.0
+        self._check_timer = QTimer()
+        self._check_timer.timeout.connect(self._check_callback)
+        self._check_timer.start(1000)
         
         #SystemStatus
         self._temp_status = {}
         
     def _system_feedback_cb(self, msg: SystemStatus):
+        self._last_msg_time = time.time()
         ui_changed = False
+
         for node in msg.nodes: # check if new msg different from old before UI update
             name = node.node_name
             new_key = self._ui_key(node)
@@ -59,6 +68,11 @@ class Monitor(Plugin):
     def _ui_key(self, node: NodeStatus):
         return (node.state, node.quality)
         
+    def _check_callback(self):
+        if time.time() - self._last_msg_time > 3.0:
+            self._mainWindow.nodeCounter.setText(str(0))
+            self._mainWindow._monitor_display([])
+
     def _spin_once(self):
         if rclpy.ok() and self._internal_node:
             rclpy.spin_once(self._internal_node, timeout_sec=0.0)
