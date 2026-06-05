@@ -70,7 +70,7 @@ class Monitor(Plugin):
         
     def _check_callback(self):
         if time.time() - self._last_msg_time > 3.0:
-            self._mainWindow.nodeCounter.setText(str(0))
+            self._mainWindow.nodeCounter.setText('0')
             self._mainWindow._monitor_display([])
 
     def _spin_once(self):
