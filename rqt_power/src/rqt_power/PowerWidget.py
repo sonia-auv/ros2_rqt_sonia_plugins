@@ -7,6 +7,7 @@ from rclpy.qos import QoSProfile, ReliabilityPolicy
 from python_qt_binding import loadUi
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtGui import QPixmap
 
 from std_msgs.msg import Bool
 from sonia_common_ros2.msg import BatteryPowerMessages, MotorPowerMessages, MotorFeedback
@@ -29,6 +30,16 @@ class PowerWidget(QMainWindow):
         loadUi(ui_file, self)
 
         self.setObjectName('MyPowerControlWidget')
+
+        #set Right CAD
+        auv = os.getenv("AUV", "")
+        if auv == "LITE1":
+            auv_png = os.path.join(get_package_share_directory('rqt_power'), 'resource', 'LITE1_Top_filaire_transparent_Rotate.png')
+            
+            pix = QPixmap(auv_png)
+            self.label.setPixmap(pix)
+            self.label_2.setPixmap(pix)
+            self.label_3.setPixmap(pix)
         
         qos_rel = QoSProfile(depth=10)
         qos_rel.reliability= ReliabilityPolicy.RELIABLE

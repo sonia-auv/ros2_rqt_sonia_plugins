@@ -13,6 +13,8 @@ setup(
         ('share/' + package_name + '/resource', ['resource/mainwindow.ui']),
         ('share/' + package_name + '/resource', ['resource/AUV8.1_Top.png']),
         ('share/' + package_name + '/resource', ['resource/AUV8.1_Top_filaire_transparent_Rotate.png']),
+        ('share/' + package_name + '/resource', ['resource/LITE1_Top.png']),
+        ('share/' + package_name + '/resource', ['resource/LITE1_Top_filaire_transparent_Rotate.png']),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name, ['plugin.xml']),
     ],
