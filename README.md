@@ -185,6 +185,17 @@ rqt
 ```
 Note: if a new plugin is added, the command requires a parameter to fetch the new additions `rqt --force-discover`.
 
+
+### Custom launch
+you can setup a custom launch to isolate rqt per prototype, the projects contains 2 scripts in the sub-folder `scripts/` ready for the currect active prototypes **AUV8.1** and **LITE**. The scripts sets up the `ROS_DOMAIN_ID`, `AUV` envariable needed and other requirements defined in the script.
+
+Both the scripts can be setup with an alias in the `.bashrc` to the quickly launch them.
+
+```bash
+ros_connect_auv8='$HOME/ros2_sonia_ws/src/ros2_rqt_sonia_plugins/scripts/ros_connect_auv8.sh'
+```
+After this configuration, to launch the rqt, simply type the alias created in the terminal.
+
 ---
 
 ## References
