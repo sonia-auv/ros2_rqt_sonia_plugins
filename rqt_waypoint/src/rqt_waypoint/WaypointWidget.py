@@ -1,6 +1,4 @@
 import os
-import threading
-from time import sleep, time
 
 import math
 from rclpy.subscription import Subscription
@@ -11,13 +9,13 @@ from rclpy.task import Future
 from rclpy.qos import QoSProfile, ReliabilityPolicy
 from ament_index_python import get_package_share_directory
 from python_qt_binding import loadUi
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QHeaderView, QLabel, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QHeaderView, QTableWidgetItem
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QBrush, QColor
 
 from std_msgs.msg import Bool,String
 from geometry_msgs.msg import Pose as geoPose
-from sonia_common_ros2.msg import MissionTimer, MpcInfo, PoseArray, Pose as soniaPose, MissionStatus, KillStatus
+from sonia_common_ros2.msg import MpcInfo, PoseArray, Pose as soniaPose, MissionStatus, KillStatus
 
 from sonia_common_ros2.srv import ObjectPoseService, SetSimulationAUVService, MissionListService
 from sonia_common_ros2.action import MissionControl
@@ -28,11 +26,6 @@ from tf_transformations import euler_from_quaternion
 class WaypointWidget(QMainWindow):
 
     current_target_received = pyqtSignal('PyQt_PyObject')
-    createLabel = pyqtSignal(MissionTimer)
-    greenLabel = pyqtSignal(MissionTimer)
-    redLabel = pyqtSignal(MissionTimer)
-    failedLabel = pyqtSignal(MissionTimer)
-    listMissionLabels = {}
 
     def __init__(self, ros_node):
         super(WaypointWidget, self).__init__()
@@ -46,7 +39,6 @@ class WaypointWidget(QMainWindow):
 
         self.current_mode_id = 0
         self.z_pose = 0
-        self.labelsCreated = 0
         self.mission_switch_status= False
 
         self.sendWaypointButton.setEnabled(False)
@@ -73,7 +65,6 @@ class WaypointWidget(QMainWindow):
         # Subscribers
         self.position_target_subscriber: Subscription = ros_node.create_subscription(geoPose,'/proc_control/current_target', self._position_target_callback,10)
         self.controller_info_subscriber: Subscription = ros_node.create_subscription(MpcInfo, "/proc_control/controller_info", self.set_mpc_info,10)
-        self.timeout_subscriber: Subscription = ros_node.create_subscription(MissionTimer,"/sonia_behaviors/timeout", self.timeout_info,10)
         self._mission_switch: Subscription = ros_node.create_subscription(MissionStatus, '/provider_rs485/mission_status', self._mission_switch_callback, 10)
         self.mission_report_sub: Subscription= ros_node.create_subscription(String, "/mission_server/status_report", self.mission_report_cb, 1)
 
@@ -96,10 +87,6 @@ class WaypointWidget(QMainWindow):
         self.mission_client = ActionClient(ros_node, MissionControl, "MissionControl")
 
         self.current_target_received.connect(self._current_target_received)
-        self.createLabel.connect(self.addButton)
-        self.redLabel.connect(self.missionTimeout)
-        self.greenLabel.connect(self.missionComplete)
-        self.failedLabel.connect(self.missionFailed)
 
         # Simulation menu
         self.actionStart_Simulation.triggered.connect(self.send_initial_position)
@@ -124,78 +111,6 @@ class WaypointWidget(QMainWindow):
         self.reloadListBtn.clicked.connect(self._mission_list_reload)
         self.missionAbortBtn.clicked.connect(self._mission_abort_cb)
     
-    def timeout_info(self, msg):
-        if msg.status == 1:
-            self.createLabel.emit(msg)
-        else:
-            if msg.unique_id in self.listMissionLabels:
-                if msg.status == 2:
-                    self.missionComplete(msg)
-                elif msg.status == 3:
-                    self.missionTimeout(msg)
-                elif msg.status == 4:
-                    self.missionFailed(msg)
-    
-    @pyqtSlot(MissionTimer)
-    def addButton(self, msg: MissionTimer):
-        label1 = QLabel()
-        label1.setText(msg.mission)
-        self.missionGrid.addWidget(label1, self.labelsCreated, 0)
-        timeout = float(msg.timeout)
-        label2 = QLabel()
-        label2.setText(f"{timeout:.1f}")
-        self.missionGrid.addWidget(label2, self.labelsCreated, 1)
-        self.labelsCreated += 1
-        self.listMissionLabels[msg.unique_id] = [label1, label2]
-        t = threading.Thread(target = self.countdownThread, args=(msg.unique_id, timeout))
-        t.start()
-    
-    def countdownThread(self, uniqueID, timeout):
-        label = self.listMissionLabels[uniqueID][1]
-        startTime = time()
-        while (time())-startTime <= timeout:
-            sleep(0.1)
-            if label.styleSheet() != "":
-                return
-            label.setText(f"{(timeout-((time())-startTime)):.1f}")
-        label.setStyleSheet("background-color: yellow")
-        label.setText(f"{0:.1f}")
-        t = threading.Thread(target = self.countdownTillDestroyThread, args=(uniqueID,))
-        t.start()
-    
-    def countdownTillDestroyThread(self, uniqueID):
-        sleep(30)
-        try:
-            self.listMissionLabels[uniqueID][0].close()
-            self.listMissionLabels[uniqueID][1].close()
-            del self.listMissionLabels[uniqueID]
-        except (RuntimeError, KeyError):
-            pass
-
-    @pyqtSlot(MissionTimer)
-    def missionComplete(self, msg):
-        label = self.listMissionLabels[msg.unique_id][1]
-        label.setStyleSheet("background-color: green")
-        label.setText(f"{label.text()} (Completed)")
-        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.unique_id,))
-        t.start()
-    
-    @pyqtSlot(MissionTimer)
-    def missionTimeout(self, msg):
-        label = self.listMissionLabels[msg.unique_id][1]
-        label.setStyleSheet("background-color: red")
-        label.setText(f"{0:.1f} (Timed Out)")
-        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.unique_id,))
-        t.start()
-    
-    @pyqtSlot(MissionTimer)
-    def missionFailed(self, msg):
-        label = self.listMissionLabels[msg.unique_id][1]
-        label.setStyleSheet("background-color: red")
-        label.setText(f"{label.text()} (Failed)")
-        t = threading.Thread(target = self.countdownTillDestroyThread, args=(msg.unique_id,))
-        t.start()
-
     def _reset_depth(self):
         rep = self.depth_tare_service.call_async(self.tare_req)
         rep.add_done_callback(self.depth_tare_callback)
